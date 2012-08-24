@@ -1,6 +1,6 @@
 import java.sql.*;
 
-public class SQLiteSample {
+class SQLiteSample {
 	public static void main(String[] args) {
 		String dbname = args.length > 0 ? args[0] : ":memory:";
 		SQLiteConnector sqlc = new SQLiteConnector(dbname);
