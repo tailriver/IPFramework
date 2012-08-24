@@ -18,25 +18,28 @@ abstract class AbstractParser implements NLDatabaseInput {
 	 * 1行読み込むごとに呼び出される。<br>
 	 * 抽象メソッドなので Override する必要がある。
 	 * @param line 読み込まれた文字列
-	 * @throws ParserException
+	 * @return processed ({@code true}), or not ({@code false})<br>
+	 * 処理できない場合は{@link ParserException}が呼ばれる
+	 * @throws Exception re-throw as a {@link ParserException} in {@link #parse(String)}
 	 */
-	protected abstract void parseLoopHook(final String line) throws ParserException;
+	protected abstract boolean parseLoopHook(String line) throws Exception;
 
 	/**
 	 * {@link #parse(String)}で定義されたフックの一つ。
 	 * ファイルが開かれ、最初の行の読み込みが始まる直前に読み込まれる。<br>
 	 * デフォルトは何もしないので、必要であれば Override する。
-	 * @throws ParserException
+	 * @throws Exception re-throw as a {@link ParserException} in {@link #parse(String)}
+
 	 */
-	protected void parseBeforeHook() throws ParserException {}
+	protected void parseBeforeHook() throws Exception {}
 
 	/**
 	 * {@link #parse(String)}で定義されたフックの一つ。
 	 * ファイルの終端まで読み込まれ、ファイルを閉じる直前に読み込まれる。<br>
 	 * デフォルトは何もしないので、必要であれば Override する。
-	 * @throws ParserException
+	 * @throws Exception re-throw as a {@link ParserException} in {@link #parse(String)}
 	 */
-	protected void parseAfterHook() throws ParserException {}
+	protected void parseAfterHook() throws Exception {}
 
 	/**
 	 * ファイルからの読み込みの実装例。
@@ -56,26 +59,33 @@ abstract class AbstractParser implements NLDatabaseInput {
 		BufferedReader br = null;
 		try {
 			br = new BufferedReader(new FileReader(filename));
-			String line;
 
-			parseBeforeHook();
-			while ((line = br.readLine()) != null)
-				parseLoopHook(line);
-			parseAfterHook();
+			String line = "";
+			int lineNum = 0;
+			try {
+				parseBeforeHook();
+				while ((line = br.readLine()) != null) {
+					lineNum++;
+					boolean matched = parseLoopHook(line);
+					if (!matched)
+						throw new ParserException("not matched to any expressions");
+				}
+				parseAfterHook();
+			} catch (Exception e) {
+				String s = e.getMessage() + " in " + filename + " at line " + lineNum + ".\n";
+				s += "> " + line;
+				throw new ParserException(s);
+			}
 		} catch (FileNotFoundException e) {
-			System.err.println("File not found: " + filename);
 			throw new ParserException(e.toString());
 		} catch (IOException e) {
-			e.printStackTrace();
 			throw new ParserException(e.toString());
 		} finally {
 			try {
 				if (br != null)
 					br.close();
 			} catch (IOException e) {
-				System.err.println("Fail to close: " + filename);
-				e.printStackTrace();
-				throw new ParserException();
+				throw new ParserException("Fail to close " + filename);
 			}
 		}
 	}

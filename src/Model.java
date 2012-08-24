@@ -28,9 +28,9 @@ class Model {
 			// TODO output for ANSYS
 			// TODO output for gnuplot?
 		} catch (ParserException e) {
-			e.printStackTrace();
+			System.err.println(e.getMessage());
 		} catch (SQLException e) {
-			e.printStackTrace();
+			System.err.println(e.getMessage());
 		} finally {
 			sqlc.close();
 		}
