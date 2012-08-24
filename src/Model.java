@@ -20,10 +20,13 @@ class Model {
 		Connection conn = sqlc.getConnection();
 		NLDatabaseInput nldi = new ModelParser();
 		try {
+			// parse
 			nldi.parse(inputfile);
-			System.out.print(nldi);
 			nldi.create(conn);
 			nldi.save(conn);
+
+			// TODO output for ANSYS
+			// TODO output for gnuplot?
 		} catch (ParserException e) {
 			e.printStackTrace();
 		} catch (SQLException e) {

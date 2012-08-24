@@ -1,6 +1,5 @@
 import java.sql.*;
 import java.util.*;
-import java.util.Map.Entry;
 import java.util.regex.*;
 
 
@@ -87,18 +86,100 @@ class ModelParser extends AbstractParser {
 	}
 
 	@Override
-	protected void parseAfterHook() throws ParserException {
-		// TODO expand cycle
-	}
-
-	@Override
 	public void create(Connection conn) throws SQLException {
-		// TODO
+		Statement s = conn.createStatement();
+		s.addBatch("DROP TABLE IF EXISTS constant");
+		s.addBatch("DROP TABLE IF EXISTS node");
+		s.addBatch("DROP TABLE IF EXISTS element");
+
+		s.addBatch("CREATE TABLE constant (" +
+				"key STRING PRIMARY KEY," +
+				"value REAL" +
+				")");
+		s.addBatch("CREATE TABLE node (" +
+				"num INTEGER PRIMARY KEY," +
+				"r REAL," +
+				"t REAL," +
+				"z REAL," +
+				"UNIQUE(r, t, z)" +
+				")");
+		s.addBatch("CREATE TABLE element (" +
+				"num INTEGER PRIMARY KEY," +
+				"p REFERENCES node," +
+				"q REFERENCES node," +
+				"r REFERENCES node," +
+				"s REFERENCES node," +
+				"t REFERENCES node," +
+				"u REFERENCES node," +
+				"v REFERENCES node," +
+				"w REFERENCES node" +
+				")");
+		s.executeBatch();
 	}
 
 	@Override
 	public void save(Connection conn) throws SQLException {
-		// TODO
+		PreparedStatement psInsertConstant =
+				conn.prepareStatement("INSERT INTO constant (key,value) VALUES (?,?)");
+		PreparedStatement psInsertNode =
+				conn.prepareStatement("INSERT OR IGNORE INTO node (r,t,z) VALUES (?,?,?)");
+		PreparedStatement psSelectNode =
+				conn.prepareStatement("SELECT num FROM node WHERE r=? AND t=? AND z=?");
+		PreparedStatement psInsertElement =
+				conn.prepareStatement("INSERT INTO element (p,q,r,s,t,u,v,w) VALUES (?,?,?,?,?,?,?,?)");
+
+		// insert constants
+		for (Map.Entry<String, Double> e : constantMap.entrySet()) {
+			psInsertConstant.setString(1, e.getKey());
+			psInsertConstant.setDouble(2, e.getValue());
+			psInsertConstant.addBatch();
+		}
+		psInsertConstant.executeBatch();
+
+		// expand cycle
+		double maxCycleDegree =
+				constantMap.containsKey("max_cycle_degree") ? constantMap.get("max_cycle_degree") : 180;
+
+		for (UnitPlane up : unitPlaneList) {
+			for (int cycle = 0; cycle < maxCycleDegree / up.cycleDegree; cycle++) {
+				List<Integer> lowerNodes = new ArrayList<Integer>();
+				List<Integer> upperNodes = new ArrayList<Integer>();
+
+				for (PlaneNode pn : up.nodes) {
+					double r = pn.r;
+					double t = pn.t + cycle * up.cycleDegree;
+					psInsertNode.setDouble(1, r);
+					psInsertNode.setDouble(2, t);
+					psInsertNode.setDouble(3, 0);
+					psInsertNode.execute();
+
+					psSelectNode.setDouble(1, r);
+					psSelectNode.setDouble(2, t);
+					psSelectNode.setDouble(3, 0);
+					ResultSet rsLower = psSelectNode.executeQuery();
+					lowerNodes.add(rsLower.getInt(1));
+
+					psInsertNode.setDouble(1, r);
+					psInsertNode.setDouble(2, t);
+					psInsertNode.setDouble(3, 1);
+					psInsertNode.execute();
+
+					psSelectNode.setDouble(1, r);
+					psSelectNode.setDouble(2, t);
+					psSelectNode.setDouble(3, 1);
+					ResultSet rsUpper = psSelectNode.executeQuery();
+					upperNodes.add(rsUpper.getInt(1));
+				}
+
+				for (int i = 0; i < PLANE_NODE_SIZE; i++) {
+					psInsertElement.setInt(i+1, lowerNodes.get(i));					
+					psInsertElement.setInt(i+5, upperNodes.get(i));					
+				}
+				psInsertElement.addBatch();
+			}
+		}
+		psInsertElement.executeBatch();
+		conn.commit();
 	}
 
 	protected void setIsPlaneContext(boolean newState) throws ParserException {
@@ -121,7 +202,7 @@ class ModelParser extends AbstractParser {
 		String n = "\n";
 		StringBuilder sb = new StringBuilder();
 		sb.append("CONSTANT TABLE").append(n);
-		for (Entry<String, Double> e : constantMap.entrySet()) {
+		for (Map.Entry<String, Double> e : constantMap.entrySet()) {
 			sb.append(e.getKey()).append(" : ").append(e.getValue()).append(n);
 		}
 		sb.append(n);

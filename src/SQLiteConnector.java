@@ -11,6 +11,7 @@ class SQLiteConnector {
 
 			// initialize
 			dbh.setAutoCommit(false);
+			dbh.createStatement().execute("PRAGMA foreign_keys = ON");
 
 		} catch (ClassNotFoundException e) {
 			System.err.println("SQLite JDBC Not Found");
