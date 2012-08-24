@@ -64,10 +64,10 @@ abstract class AbstractParser implements NLDatabaseInput {
 			parseAfterHook();
 		} catch (FileNotFoundException e) {
 			System.err.println("File not found: " + filename);
-			throw new ParserException();
+			throw new ParserException(e.toString());
 		} catch (IOException e) {
 			e.printStackTrace();
-			throw new ParserException();
+			throw new ParserException(e.toString());
 		} finally {
 			try {
 				if (br != null)

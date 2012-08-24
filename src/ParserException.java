@@ -7,4 +7,13 @@ import java.io.*;
  */
 class ParserException extends IOException {
 	private static final long serialVersionUID = 1L;
+
+	public ParserException() {
+		super();
+	}
+
+	public ParserException(String str) {
+		super(str);
+	}
+
 }
