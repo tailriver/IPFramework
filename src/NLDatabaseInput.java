@@ -1,20 +1,20 @@
 import java.sql.*;
 
 /**
- * What is NL?
+ * Interface for NL Database Input
  * <ul>
  * <li>テキストファイルから読み込み＆処理</li>
  * <li>SQLデータベースに読み込んだデータを書き込む</li>
  * </ul>
  * @author tailriver
  */
-interface NLInterface {
+interface NLDatabaseInput {
 	/**
 	 * ファイルからデータを読み込む
 	 * @param filename 読み込むファイル
 	 * @throws ParserException
 	 */
-	public void load(String filename) throws ParserException;
+	public void parse(String filename) throws ParserException;
 
 	/**
 	 * データベースにテーブルを作成する<br>

@@ -12,7 +12,7 @@ class SampleParser extends AbstractParser {
 	}
 
 	@Override
-	protected void loadLoopHook(String line) {
+	protected void parseLoopHook(String line) throws ParserException {
 		s.add(line);
 		i.add(line.length());
 	}

@@ -18,11 +18,11 @@ class SampleParserMain {
 
 		SQLiteConnector sqlc = new SQLiteConnector(dbname);
 		Connection conn = sqlc.getConnection();
-		NLInterface nli = new SampleParser();
+		NLDatabaseInput nldi = new SampleParser();
 		try {
-			nli.load(inputfile);
-			nli.create(conn);
-			nli.save(conn);
+			nldi.parse(inputfile);
+			nldi.create(conn);
+			nldi.save(conn);
 		} catch (ParserException e) {
 			System.err.println("Parse error in SampleParser");
 			e.printStackTrace();
