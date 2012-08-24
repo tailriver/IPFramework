@@ -78,8 +78,6 @@ abstract class AbstractParser implements NLDatabaseInput {
 			}
 		} catch (FileNotFoundException e) {
 			throw new ParserException(e.toString());
-		} catch (IOException e) {
-			throw new ParserException(e.toString());
 		} finally {
 			try {
 				if (br != null)
