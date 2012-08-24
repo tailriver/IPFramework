@@ -1,14 +1,15 @@
 import java.sql.*;
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.regex.*;
 
 
 class ModelParser extends AbstractParser {
 	static final int PLANE_NODE_SIZE = 4;
-	static final Pattern constantPattern  = Pattern.compile("^##\\s*(\\w+):\\s*([\\d.]+)");
-	static final Pattern cyclePattern     = Pattern.compile("^##\\s*([\\d.]+)");
-	static final Pattern commentPattern   = Pattern.compile("^#");
-	static final Pattern planeNodePattern = Pattern.compile("^([\\d.]+)\\s+([\\d.]+)");
+	static final Pattern constantPattern  = Pattern.compile("^##\\s*(\\w+):\\s*([\\d.]+).*");
+	static final Pattern cyclePattern     = Pattern.compile("^##\\s*([\\d.]+).*");
+	static final Pattern commentPattern   = Pattern.compile("^#.*");
+	static final Pattern planeNodePattern = Pattern.compile("^([\\d.]+)\\s+([\\d.]+).*");
 
 	class PlaneNode {
 		public double r;	// r [%]
@@ -35,7 +36,7 @@ class ModelParser extends AbstractParser {
 
 			final Matcher constantMatcher = constantPattern.matcher(line);
 			if (constantMatcher.matches()) {
-				String key = constantMatcher.group(1);
+				String key = constantMatcher.group(1).toLowerCase();
 				double value = Double.valueOf(constantMatcher.group(2));
 				constantMap.put(key, value);
 				setIsPlaneContext(false);
@@ -92,24 +93,12 @@ class ModelParser extends AbstractParser {
 
 	@Override
 	public void create(Connection conn) throws SQLException {
-		Statement stmt = conn.createStatement();
-		stmt.addBatch("DROP TABLE IF EXISTS string_count");
-		stmt.addBatch("CREATE TABLE string_count" +
-				"(" +
-				"id INTEGER PRIMARY KEY, " +
-				"string STRING, " +
-				"count INTEGER" +
-				")");
-		stmt.executeBatch();
+		// TODO
 	}
 
 	@Override
 	public void save(Connection conn) throws SQLException {
-		PreparedStatement ps = conn.prepareStatement(
-				"INSERT INTO string_count (string,count) VALUES (?,?)"
-				);
-		ps.executeBatch();
-		conn.commit();
+		// TODO
 	}
 
 	protected void setIsPlaneContext(boolean newState) throws ParserException {
@@ -125,5 +114,24 @@ class ModelParser extends AbstractParser {
 				throw new ParserException("The number of nodes per unit plane element should be four.");
 		}
 		isPlaneContext = newState;
+	}
+
+	@Override
+	public String toString() {
+		String n = "\n";
+		StringBuilder sb = new StringBuilder();
+		sb.append("CONSTANT TABLE").append(n);
+		for (Entry<String, Double> e : constantMap.entrySet()) {
+			sb.append(e.getKey()).append(" : ").append(e.getValue()).append(n);
+		}
+		sb.append(n);
+		sb.append("ELEMENT TABLE").append(n);
+		for (UnitPlane up : unitPlaneList) {
+			sb.append("Cycle: ").append(up.cycleDegree).append(n);
+			for (PlaneNode pn : up.nodes) {
+				sb.append("  ").append(pn.r).append(", ").append(pn.t).append(n);
+			}
+		}
+		return sb.toString();
 	}
 }

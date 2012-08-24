@@ -1,8 +1,8 @@
-<class-diagram version="1.0.9" icons="true" automaticImage="PNG" always-add-relationships="false" generalizations="true" 
+<class-diagram version="1.0.9" icons="true" automaticImage="PNG" always-add-relationships="true" generalizations="true" 
   realizations="true" associations="true" dependencies="true" nesting-relationships="true">  
   <class id="1" corner="BOTTOM_RIGHT" language="java" name="SQLiteSample" project="SQLiteSample" 
     file="/SQLiteSample/src/SQLiteSample.java" binary="false">    
-    <position height="-1" width="-1" x="692" y="68"/>    
+    <position height="-1" width="-1" x="914" y="376"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true"/>      
       <operations public="true" package="true" protected="true" private="true"/>    
@@ -10,7 +10,7 @@
   </class>  
   <class id="2" corner="BOTTOM_RIGHT" language="java" name="SQLiteConnector" project="SQLiteSample" 
     file="/SQLiteSample/src/SQLiteConnector.java" binary="false">    
-    <position height="-1" width="-1" x="488" y="68"/>    
+    <position height="-1" width="-1" x="915" y="208"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true"/>      
       <operations public="true" package="true" protected="true" private="true"/>    
@@ -18,7 +18,7 @@
   </class>  
   <class id="3" corner="BOTTOM_RIGHT" language="java" name="AbstractParser" project="SQLiteSample" 
     file="/SQLiteSample/src/AbstractParser.java" binary="false">    
-    <position height="-1" width="-1" x="266" y="388"/>    
+    <position height="-1" width="-1" x="257" y="208"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true"/>      
       <operations public="true" package="true" protected="true" private="true"/>    
@@ -26,7 +26,7 @@
   </class>  
   <class id="4" corner="BOTTOM_RIGHT" language="java" name="ParserException" project="SQLiteSample" 
     file="/SQLiteSample/src/ParserException.java" binary="false">    
-    <position height="-1" width="-1" x="74" y="388"/>    
+    <position height="-1" width="-1" x="70" y="208"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="false" package="false" protected="false" private="false"/>      
       <operations public="false" package="false" protected="false" private="false"/>    
@@ -34,7 +34,7 @@
   </class>  
   <class id="5" corner="BOTTOM_RIGHT" language="java" name="SampleParser" project="SQLiteSample" 
     file="/SQLiteSample/src/SampleParser.java" binary="false">    
-    <position height="-1" width="-1" x="488" y="388"/>    
+    <position height="-1" width="-1" x="503" y="123"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true"/>      
       <operations public="true" package="true" protected="true" private="true"/>    
@@ -42,7 +42,7 @@
   </class>  
   <class id="6" corner="BOTTOM_RIGHT" language="java" name="SampleParserMain" project="SQLiteSample" 
     file="/SQLiteSample/src/SampleParserMain.java" binary="false">    
-    <position height="-1" width="-1" x="679" y="215"/>    
+    <position height="-1" width="-1" x="714" y="118"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true"/>      
       <operations public="true" package="true" protected="true" private="true"/>    
@@ -50,7 +50,7 @@
   </class>  
   <class id="7" corner="BOTTOM_RIGHT" language="java" name="java.io.IOException" project="SQLiteSample" 
     file="/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Classes/classes.jar" binary="true">    
-    <position height="-1" width="-1" x="74" y="257"/>    
+    <position height="-1" width="-1" x="70" y="126"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="false">      
       <attributes public="false" package="false" protected="false" private="false"/>      
       <operations public="false" package="false" protected="false" private="false"/>    
@@ -58,7 +58,7 @@
   </class>  
   <interface id="8" corner="BOTTOM_RIGHT" language="java" name="java.sql.Connection" project="SQLiteSample" 
     file="/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Classes/classes.jar" binary="true">    
-    <position height="-1" width="-1" x="74" y="68"/>    
+    <position height="-1" width="-1" x="915" y="22"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="false" package="false" protected="false" private="false"/>      
       <operations public="false" package="false" protected="false" private="false"/>    
@@ -66,60 +66,112 @@
   </interface>  
   <interface id="9" corner="BOTTOM_RIGHT" language="java" name="NLDatabaseInput" project="SQLiteSample" 
     file="/SQLiteSample/src/NLDatabaseInput.java" binary="false">    
-    <position height="-1" width="-1" x="266" y="215"/>    
+    <position height="-1" width="-1" x="257" y="22"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true"/>      
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </interface>  
-  <generalization id="10">    
-    <end type="SOURCE" refId="5"/>    
-    <end type="TARGET" refId="3"/>  
-  </generalization>  
-  <dependency id="11">    
-    <end type="SOURCE" refId="3"/>    
-    <end type="TARGET" refId="7"/>  
+  <class id="10" corner="BOTTOM_LEFT" language="java" name="ModelParser" project="SQLiteSample" 
+    file="/SQLiteSample/src/ModelParser.java" binary="false">    
+    <position height="-1" width="-1" x="502" y="388"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="11" corner="BOTTOM_RIGHT" language="java" name="ModelParser.UnitPlane" project="SQLiteSample" 
+    file="/SQLiteSample/src/ModelParser.java" binary="false">    
+    <position height="-1" width="-1" x="197" y="489"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="12" corner="BOTTOM_LEFT" language="java" name="ModelParser.PlaneNode" project="SQLiteSample" 
+    file="/SQLiteSample/src/ModelParser.java" binary="false">    
+    <position height="-1" width="-1" x="66" y="326"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="13" corner="BOTTOM_RIGHT" language="java" name="Model" project="SQLiteSample" 
+    file="/SQLiteSample/src/Model.java" binary="false">    
+    <position height="-1" width="-1" x="714" y="388"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <dependency id="14">    
+    <end type="SOURCE" refId="13"/>    
+    <end type="TARGET" refId="2"/>  
   </dependency>  
-  <association id="12">    
+  <association id="15">    
     <end type="SOURCE" refId="2" navigable="false">      
-      <attribute id="13" name="dbh"/>      
-      <multiplicity id="14" minimum="0" maximum="1"/>    
+      <attribute id="16" name="dbh"/>      
+      <multiplicity id="17" minimum="0" maximum="1"/>    
     </end>    
     <end type="TARGET" refId="8" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <dependency id="15">    
-    <end type="SOURCE" refId="6"/>    
-    <end type="TARGET" refId="2"/>  
-  </dependency>  
-  <dependency id="16">    
-    <end type="SOURCE" refId="9"/>    
-    <end type="TARGET" refId="8"/>  
-  </dependency>  
-  <dependency id="17">    
-    <end type="SOURCE" refId="6"/>    
-    <end type="TARGET" refId="9"/>  
-  </dependency>  
-  <generalization id="18">    
-    <end type="SOURCE" refId="4"/>    
-    <end type="TARGET" refId="7"/>  
-  </generalization>  
-  <dependency id="19">    
-    <end type="SOURCE" refId="3"/>    
-    <end type="TARGET" refId="4"/>  
-  </dependency>  
-  <realization id="20">    
-    <end type="SOURCE" refId="3"/>    
-    <end type="TARGET" refId="9"/>  
-  </realization>  
-  <dependency id="21">    
-    <end type="SOURCE" refId="1"/>    
-    <end type="TARGET" refId="2"/>  
-  </dependency>  
-  <dependency id="22">    
+  <dependency id="18">    
     <end type="SOURCE" refId="6"/>    
     <end type="TARGET" refId="5"/>  
   </dependency>  
+  <realization id="19">    
+    <end type="SOURCE" refId="3"/>    
+    <end type="TARGET" refId="9"/>  
+  </realization>  
+  <dependency id="20">    
+    <end type="SOURCE" refId="1"/>    
+    <end type="TARGET" refId="2"/>  
+  </dependency>  
+  <dependency id="21">    
+    <end type="SOURCE" refId="6"/>    
+    <end type="TARGET" refId="2"/>  
+  </dependency>  
+  <generalization id="22">    
+    <end type="SOURCE" refId="5"/>    
+    <end type="TARGET" refId="3"/>  
+  </generalization>  
+  <generalization id="23">    
+    <end type="SOURCE" refId="10"/>    
+    <end type="TARGET" refId="3"/>  
+  </generalization>  
+  <dependency id="24">    
+    <end type="SOURCE" refId="9"/>    
+    <end type="TARGET" refId="8"/>  
+  </dependency>  
+  <dependency id="25">    
+    <end type="SOURCE" refId="3"/>    
+    <end type="TARGET" refId="4"/>  
+  </dependency>  
+  <generalization id="26">    
+    <end type="SOURCE" refId="4"/>    
+    <end type="TARGET" refId="7"/>  
+  </generalization>  
+  <association id="27">    
+    <end type="SOURCE" refId="11" navigable="false">      
+      <attribute id="28" name="nodes"/>      
+      <multiplicity id="29" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="12" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <dependency id="30">    
+    <end type="SOURCE" refId="13"/>    
+    <end type="TARGET" refId="10"/>  
+  </dependency>  
+  <association id="31">    
+    <end type="SOURCE" refId="10" navigable="false">      
+      <attribute id="32" name="unitPlaneList"/>      
+      <multiplicity id="33" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="11" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
   <classifier-display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
     visibility="true">    
     <attributes public="true" package="true" protected="true" private="true"/>    
