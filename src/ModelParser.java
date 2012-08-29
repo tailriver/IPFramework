@@ -82,35 +82,12 @@ class ModelParser extends AbstractParser {
 
 	@Override
 	public void create(Connection conn) throws SQLException {
-		Statement s = conn.createStatement();
-		s.addBatch("DROP TABLE IF EXISTS constant");
-		s.addBatch("DROP TABLE IF EXISTS node");
-		s.addBatch("DROP TABLE IF EXISTS element");
-
-		// TODO constantテーブルはModelParserから分離した方がよい？
-		s.addBatch("CREATE TABLE constant (" +
-				"key STRING PRIMARY KEY," +
-				"value REAL" +
-				")");
-		s.addBatch("CREATE TABLE node (" +
-				"num INTEGER PRIMARY KEY," +
-				"r REAL," +
-				"t REAL," +
-				"z REAL," +
-				"UNIQUE(r, t, z)" +
-				")");
-		s.addBatch("CREATE TABLE element (" +
-				"num INTEGER PRIMARY KEY," +
-				"p REFERENCES node," +
-				"q REFERENCES node," +
-				"r REFERENCES node," +
-				"s REFERENCES node," +
-				"t REFERENCES node," +
-				"u REFERENCES node," +
-				"v REFERENCES node," +
-				"w REFERENCES node" +
-				")");
-		s.executeBatch();
+		ConstantTable ct = new ConstantTable(conn);
+		NodeTable     nt = new NodeTable(conn);
+		ElementTable  et = new ElementTable(conn);
+		ct.create();
+		nt.create();
+		et.create();
 	}
 
 	/**
@@ -119,69 +96,41 @@ class ModelParser extends AbstractParser {
 	 */
 	@Override
 	public void save(Connection conn) throws SQLException {
-		PreparedStatement psInsertConstant =
-				conn.prepareStatement("INSERT INTO constant (key,value) VALUES (?,?)");
-		PreparedStatement psInsertNode =
-				conn.prepareStatement("INSERT OR IGNORE INTO node (r,t,z) VALUES (?,?,?)");
-		PreparedStatement psSelectNode =
-				conn.prepareStatement("SELECT num FROM node WHERE r=? AND t=? AND z=?");
-		PreparedStatement psInsertElement =
-				conn.prepareStatement("INSERT INTO element (p,q,r,s,t,u,v,w) VALUES (?,?,?,?,?,?,?,?)");
+		ConstantTable ct = new ConstantTable(conn);
+		NodeTable     nt = new NodeTable(conn);
+		ElementTable  et = new ElementTable(conn);
 
 		// 定数の追加
-		for (Map.Entry<String, Double> e : constantMap.entrySet()) {
-			psInsertConstant.setString(1, e.getKey());
-			psInsertConstant.setDouble(2, e.getValue());
-			psInsertConstant.addBatch();
-		}
-		psInsertConstant.executeBatch();
+		for (Map.Entry<String, Double> e : constantMap.entrySet())
+			ct.setValue(e.getKey(), e.getValue());
 
 		// 繰り返し角度の拡張
-		double maxCycleDegree =
-				constantMap.containsKey("max_cycle_degree") ? constantMap.get("max_cycle_degree") : 180;
+		double maxCycleDegree = ct.getValue("max_cycle_degree", 180);
 
-				for (UnitPlane up : unitPlaneList) {
-					for (int cycle = 0; cycle < maxCycleDegree / up.cycleDegree; cycle++) {
-						List<Integer> lowerNodes = new ArrayList<Integer>();
-						List<Integer> upperNodes = new ArrayList<Integer>();
+		for (UnitPlane up : unitPlaneList) {
+			for (int cycle = 0; cycle < maxCycleDegree / up.cycleDegree; cycle++) {
+				List<Integer> lowerNodes = new ArrayList<Integer>();
+				List<Integer> upperNodes = new ArrayList<Integer>();
 
-						for (PlaneNode pn : up.nodes) {
-							double r = pn.r;
-							double t = pn.t + cycle * up.cycleDegree;
-							psInsertNode.setDouble(1, r);
-							psInsertNode.setDouble(2, t);
-							psInsertNode.setDouble(3, 0);
-							psInsertNode.execute();
+				for (PlaneNode pn : up.nodes) {
+					double r = pn.r;
+					double t = pn.t + cycle * up.cycleDegree;
+					double z = calculateDepth(r, t);
 
-							// TODO lastrowid をどこかで使えるはず
-							psSelectNode.setDouble(1, r);
-							psSelectNode.setDouble(2, t);
-							psSelectNode.setDouble(3, 0);
-							ResultSet rsLower = psSelectNode.executeQuery();
-							lowerNodes.add(rsLower.getInt(1));
+					// TODO lastrowid をどこかで使えるはず
+					nt.insertNode(r, t, 0);
+					int lowerNode = nt.selectNode(r, t, 0);
+					lowerNodes.add(lowerNode);
 
-							double z = calculateDepth(r, t);
-							psInsertNode.setDouble(1, r);
-							psInsertNode.setDouble(2, t);
-							psInsertNode.setDouble(3, z);
-							psInsertNode.execute();
-
-							psSelectNode.setDouble(1, r);
-							psSelectNode.setDouble(2, t);
-							psSelectNode.setDouble(3, z);
-							ResultSet rsUpper = psSelectNode.executeQuery();
-							upperNodes.add(rsUpper.getInt(1));
-						}
-
-						for (int i = 0; i < PLANE_NODE_SIZE; i++) {
-							psInsertElement.setInt(i+1, lowerNodes.get(i));					
-							psInsertElement.setInt(i+5, upperNodes.get(i));					
-						}
-						psInsertElement.addBatch();
-					}
+					nt.insertNode(r, t, z);
+					int upperNode = nt.selectNode(r, t, z);
+					upperNodes.add(upperNode);
 				}
-				psInsertElement.executeBatch();
-				conn.commit();
+
+				et.insertElement(lowerNodes, upperNodes);
+			}
+		}
+		conn.commit();
 	}
 
 	/**
@@ -207,10 +156,10 @@ class ModelParser extends AbstractParser {
 
 	/**
 	 * 高さ計算用メソッド Overrideすることで曲面を作成可能<br>
-	 * デフォルトでは、どのような入力でも単位高さ (1) を返す
-	 * @param r 半径方向座標 [%] （無次元）
-	 * @param t 周方向座標 [degree]
-	 * @return z 軸方向座標（無次元）
+	 * デフォルトでは、どのような入力に対しても単位高さ (1) を返す
+	 * @param r 無次元半径方向座標 [0,100] (%)
+	 * @param t 周方向座標 [0,360) (degree)
+	 * @return z 無次元軸方向座標
 	 */
 	protected double calculateDepth(double r, double t) {
 		return 1;

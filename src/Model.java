@@ -1,36 +1,31 @@
 import java.io.*;
 import java.sql.*;
-import java.util.*;
 
 class Model {
+	static final double DEFAULT_RADIUS    = 1;
+	static final double DEFAULT_THICKNESS = 1;
+
 	private static void usage() {
 		System.err.println("Required just two arguments.");
 		System.err.println("Usage:");
 		System.err.println("	java Model [dbname] [inputfile]");
 	}
 
-	public static void generateAnsysInput(Connection conn) throws SQLException {
-		PreparedStatement psSelectConstant =
-				conn.prepareStatement("SELECT * FROM constant WHERE key=?");
-
-		Map<String, Double> constant = new HashMap<String, Double>();
-		for (String key : new String[]{"radius", "thickness"}) {
-			psSelectConstant.setString(1, key);
-			ResultSet rs = psSelectConstant.executeQuery();
-			double value = rs.getDouble("value");
-			constant.put(key, value);
-		}
-
+	public static void generateAnsysInput(Connection conn, String filename) throws SQLException {
 		PrintWriter pw = null;
 		try {
-			Statement st = conn.createStatement();
-			pw = new PrintWriter(new BufferedWriter(new FileWriter("model.ansys.txt")));
+			ConstantTable ct = new ConstantTable(conn);
+			NodeTable     nt = new NodeTable(conn);
+			ElementTable  et = new ElementTable(conn);
+
+			final double radius    = ct.getValue("radius", DEFAULT_RADIUS);
+			final double thickness = ct.getValue("thickness", DEFAULT_THICKNESS);
+
+			pw = new PrintWriter(new BufferedWriter(new FileWriter(filename)));
 
 			// write node information
 			pw.println("CSYS,1");
-			ResultSet sqlNodes = st.executeQuery("SELECT * FROM node");
-			final double radius = constant.get("radius");
-			final double thickness = constant.get("thickness");
+			ResultSet sqlNodes = nt.selectAllNodes();
 			while (sqlNodes.next()) {
 				int num  = sqlNodes.getInt("num");
 				double r = sqlNodes.getDouble("r");
@@ -41,16 +36,8 @@ class Model {
 
 			// write element information
 			pw.println("ET,1,SOLID185");
-			ResultSet sqlElements = st.executeQuery("SELECT * FROM element");
-			final String[] elementLabels = new String[]{"p", "q", "r", "s", "t", "u", "v", "w"};
-			while (sqlElements.next()) {
-				int num  = sqlNodes.getInt("num");
-				Integer[] elementNodes = new Integer[elementLabels.length];
-				for (int i = 0; i < elementLabels.length; i++) {
-					elementNodes[i] = sqlElements.getInt(elementLabels[i]);
-				}
-				pw.printf("EN,%d,%s\n", num, Util.<Integer>join(",", elementNodes));
-			}
+			for (ElementTable.Row r : et.selectAllElements())
+				pw.printf("EN,%d,%s\n", r.num, Util.<Integer>join(",", r.nodes));
 			pw.println("ALLSEL");
 			pw.println("NSEL,S,LOC,Y,0");
 			pw.println("NSEL,A,LOC,Y,180");
@@ -58,6 +45,7 @@ class Model {
 			pw.println("ALLSEL");
 			pw.println("NSEL,S,LOC,Z,0");
 			pw.println("DSYM,SYMM,Z");
+			pw.println("ALLSEL");
 			pw.println("NSEL,S,LOC,Y,180");
 			pw.printf("NSEL,R,LOC,X,%.4e\n", radius * 1e-3);
 			pw.println("D,ALL,UX,0");
@@ -88,13 +76,14 @@ class Model {
 			nldi.save(conn);
 
 			// for ANSYS
-			generateAnsysInput(conn);
+			generateAnsysInput(conn, "model.ansys.txt");
 
 			// TODO output for gnuplot?
 		} catch (ParserException e) {
 			System.err.println(e.getMessage());
 		} catch (SQLException e) {
 			System.err.println(e.getMessage());
+			e.printStackTrace();
 		} finally {
 			sqlc.close();
 		}
