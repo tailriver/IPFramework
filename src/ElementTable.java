@@ -36,7 +36,7 @@ class ElementTable {
 		s.executeBatch();
 	}
 
-	public void insertElement(List<Integer> lowerNodes, List<Integer> upperNodes) throws SQLException {
+	public void insert(List<Integer> lowerNodes, List<Integer> upperNodes) throws SQLException {
 		PreparedStatement ps =
 				conn.prepareStatement("INSERT INTO element (p,q,r,s,t,u,v,w) VALUES (?,?,?,?,?,?,?,?)");
 		for (int i = 0; i < ModelParser.PLANE_NODE_SIZE; i++) {
@@ -46,25 +46,11 @@ class ElementTable {
 		ps.execute();
 	}
 
-	public int selectNode(double r, double t, double z) throws SQLException {
-		PreparedStatement ps =
-				conn.prepareStatement("SELECT num FROM node WHERE r=? AND t=? AND z=?");
-		ps.setDouble(1, r);
-		ps.setDouble(2, t);
-		ps.setDouble(3, z);
-		ResultSet rs = ps.executeQuery();
-
-		if (rs.getFetchSize() != 1)
-			throw new SQLException("node not found");
-
-		return rs.getInt("num");
-	}
-
-	public List<ElementTable.Row> selectAllElements() throws SQLException {
+	public List<Row> selectAll() throws SQLException {
 		Statement st = conn.createStatement();
 
 		String[] elementLabels = new String[]{"p", "q", "r", "s", "t", "u", "v", "w"};
-		List<ElementTable.Row> rows = new ArrayList<ElementTable.Row>();
+		List<Row> rows = new ArrayList<Row>();
 
 		ResultSet rs = st.executeQuery("SELECT * FROM element");
 		while (rs.next()) {

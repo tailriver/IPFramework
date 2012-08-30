@@ -4,6 +4,23 @@ import java.sql.*;
 class Model {
 	static final double DEFAULT_RADIUS    = 1;
 	static final double DEFAULT_THICKNESS = 1;
+	static final double DEFAULT_MAX_CYCLE_DEGREE = 180;
+
+	Connection conn;
+	ModelParser p;
+
+	Model(Connection conn) {
+		this.conn = conn;
+		p = new ModelParser();
+	}
+
+	public void parse(String filename) throws ParserException {
+		p.parse(filename);
+	}
+
+	public void save(Connection conn) throws SQLException {
+		p.save(conn);
+	}
 
 	private static void usage() {
 		System.err.println("Required just two arguments.");
@@ -11,33 +28,34 @@ class Model {
 		System.err.println("	java Model [dbname] [inputfile]");
 	}
 
-	public static void generateAnsysInput(Connection conn, String filename) throws SQLException {
+	public void generateAnsysInput(String filename) throws SQLException {
 		PrintWriter pw = null;
 		try {
 			ConstantTable ct = new ConstantTable(conn);
 			NodeTable     nt = new NodeTable(conn);
 			ElementTable  et = new ElementTable(conn);
 
-			final double radius    = ct.getValue("radius", DEFAULT_RADIUS);
-			final double thickness = ct.getValue("thickness", DEFAULT_THICKNESS);
+			final double radius    = ct.select("radius", DEFAULT_RADIUS);
+			final double thickness = ct.select("thickness", DEFAULT_THICKNESS);
 
 			pw = new PrintWriter(new BufferedWriter(new FileWriter(filename)));
 
-			// write node information
+			// node information
 			pw.println("CSYS,1");
-			ResultSet sqlNodes = nt.selectAllNodes();
-			while (sqlNodes.next()) {
-				int num  = sqlNodes.getInt("num");
-				double r = sqlNodes.getDouble("r");
-				double t = sqlNodes.getDouble("t");
-				double z = sqlNodes.getDouble("z");
-				pw.printf("N,%d,%.4e,%s,%.4e\n", num, r * radius * 1e-5, t, z * thickness * 1e-3);
-			}
+			for (NodeTable.Row r : nt.selectAll())
+				pw.printf("N,%d,%.4e,%s,%.4e\n",
+						r.num,
+						r.get(Util.C3D.r) * radius * 1e-5,
+						r.get(Util.C3D.t),
+						r.get(Util.C3D.z) * thickness * 1e-3
+						);
 
-			// write element information
+			// element information
 			pw.println("ET,1,SOLID185");
-			for (ElementTable.Row r : et.selectAllElements())
+			for (ElementTable.Row r : et.selectAll())
 				pw.printf("EN,%d,%s\n", r.num, Util.<Integer>join(",", r.nodes));
+
+			// constraint information
 			pw.println("ALLSEL");
 			pw.println("NSEL,S,LOC,Y,0");
 			pw.println("NSEL,A,LOC,Y,180");
@@ -66,17 +84,17 @@ class Model {
 		String dbname    = args[0];
 		String inputfile = args[1];
 
-		SQLiteConnector sqlc = new SQLiteConnector(dbname);
-		Connection conn = sqlc.getConnection();
-		NLDatabaseInput nldi = new ModelParser();
+		Connection conn = null;
 		try {
+			conn = SQLiteUtil.getConnection(dbname);
+			Model m = new Model(conn);
+
 			// parse
-			nldi.parse(inputfile);
-			nldi.create(conn);
-			nldi.save(conn);
+			m.parse(inputfile);
+			m.save(conn);
 
 			// for ANSYS
-			generateAnsysInput(conn, "model.ansys.txt");
+			m.generateAnsysInput("model.ansys.txt");
 
 			// TODO output for gnuplot?
 		} catch (ParserException e) {
@@ -85,7 +103,7 @@ class Model {
 			System.err.println(e.getMessage());
 			e.printStackTrace();
 		} finally {
-			sqlc.close();
+			SQLiteUtil.closeConnection(conn);
 		}
 	}
 }

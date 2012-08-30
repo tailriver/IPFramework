@@ -14,10 +14,10 @@ CLASSES=$(patsubst src/%.java,bin/%.class,$(wildcard src/*.java))
 .PHONY: SQLiteSample clean
 .SUFFIXES : .java .class
 
-ALL:: SQLiteSample
+ALL:: model
 
-SQLiteSample: bin/SQLiteSample.class $(CLASSES)
-	$(JAVA) $(JAVAFLAGS) $(<:bin/%.class=%) $(DBFILE)
+model: bin/Model.class $(CLASSES)
+	$(JAVA) $(JAVAFLAGS) $(<:bin/%.class=%) $(DBFILE) data/model.txt
 
 bin/%.class: src/%.java
 	mkdir -p bin

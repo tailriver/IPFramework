@@ -3,27 +3,40 @@ import java.util.*;
 import java.util.regex.*;
 
 
-class ModelParser extends AbstractParser {
+class ModelParser extends Parser {
 	static final int PLANE_NODE_SIZE = 4;
 	static final Pattern constantPattern  = Pattern.compile("^##\\s*(\\w+):\\s*([\\d.]+).*");
 	static final Pattern cyclePattern     = Pattern.compile("^##\\s*([\\d.]+).*");
 	static final Pattern commentPattern   = Pattern.compile("^#.*");
 	static final Pattern planeNodePattern = Pattern.compile("^([\\d.]+)\\s+([\\d.]+).*");
 
-	class PlaneNode {
-		public double r;	// r [%]
-		public double t;	// theta [degree]
+	@SuppressWarnings("serial")
+	class UnitPlane extends ArrayList<UnitPlane.PlaneNode> {
+		class PlaneNode extends EnumMap<Util.C2D, Double> {
+			public PlaneNode() {
+				super(Util.C2D.class);
+			}
+		}
+
+		public final double cycleDegree;
+
+		UnitPlane(double cycleDegree) {
+			super(PLANE_NODE_SIZE);
+			this.cycleDegree = cycleDegree;
+		}
 	}
 
-	class UnitPlane {
-		public double cycleDegree;
-		public List<PlaneNode> nodes = new ArrayList<PlaneNode>(PLANE_NODE_SIZE);
-	}
+	Map<String, Double> constantMap;
+	List<UnitPlane> unitPlaneList;
+	double currentCycleDegree;
+	boolean isPlaneContext;
 
-	Map<String, Double> constantMap = new HashMap<String, Double>();
-	List<UnitPlane> unitPlaneList = new ArrayList<UnitPlane>();
-	double currentCycleDegree = 360;
-	boolean isPlaneContext = false;
+	ModelParser() {
+		constantMap = new HashMap<String, Double>();
+		unitPlaneList = new ArrayList<UnitPlane>();
+		currentCycleDegree = 180;
+		isPlaneContext = false;
+	}
 
 	@Override
 	protected boolean parseLoopHook(String line) throws Exception {
@@ -59,8 +72,7 @@ class ModelParser extends AbstractParser {
 			UnitPlane currentUnitPlane;
 			if (!isPlaneContext) {
 				// 頂点定義の文脈でなければ新しく要素を作り、それを対象とする
-				currentUnitPlane = new UnitPlane();
-				currentUnitPlane.cycleDegree = currentCycleDegree;
+				currentUnitPlane = new UnitPlane(currentCycleDegree);
 				unitPlaneList.add(currentUnitPlane);
 			}
 			else {
@@ -68,26 +80,18 @@ class ModelParser extends AbstractParser {
 				currentUnitPlane = unitPlaneList.get(unitPlaneList.size() - 1);
 			}
 
-			PlaneNode pn = new PlaneNode();
-			pn.r = Double.valueOf(planeNodeMatcher.group(1));
-			pn.t = Double.valueOf(planeNodeMatcher.group(2));
-			currentUnitPlane.nodes.add(pn);
+			Double r = Double.valueOf(planeNodeMatcher.group(1));
+			Double t = Double.valueOf(planeNodeMatcher.group(2));
+			UnitPlane.PlaneNode pn = currentUnitPlane.new PlaneNode();
+			pn.put(Util.C2D.r, r);
+			pn.put(Util.C2D.t, t);
+			currentUnitPlane.add(pn);
 
 			setIsPlaneContext(true);
 			return true;
 		}
 
 		return false;
-	}
-
-	@Override
-	public void create(Connection conn) throws SQLException {
-		ConstantTable ct = new ConstantTable(conn);
-		NodeTable     nt = new NodeTable(conn);
-		ElementTable  et = new ElementTable(conn);
-		ct.create();
-		nt.create();
-		et.create();
 	}
 
 	/**
@@ -100,34 +104,39 @@ class ModelParser extends AbstractParser {
 		NodeTable     nt = new NodeTable(conn);
 		ElementTable  et = new ElementTable(conn);
 
+		// テーブルの作成
+		ct.create();
+		nt.create();
+		et.create();
+
 		// 定数の追加
 		for (Map.Entry<String, Double> e : constantMap.entrySet())
-			ct.setValue(e.getKey(), e.getValue());
+			ct.insert(e.getKey(), e.getValue());
 
 		// 繰り返し角度の拡張
-		double maxCycleDegree = ct.getValue("max_cycle_degree", 180);
+		double maxCycleDegree = ct.select("max_cycle_degree", Model.DEFAULT_MAX_CYCLE_DEGREE);
 
 		for (UnitPlane up : unitPlaneList) {
 			for (int cycle = 0; cycle < maxCycleDegree / up.cycleDegree; cycle++) {
 				List<Integer> lowerNodes = new ArrayList<Integer>();
 				List<Integer> upperNodes = new ArrayList<Integer>();
 
-				for (PlaneNode pn : up.nodes) {
-					double r = pn.r;
-					double t = pn.t + cycle * up.cycleDegree;
+				for (UnitPlane.PlaneNode pn : up) {
+					double r = pn.get(Util.C2D.r);
+					double t = pn.get(Util.C2D.t) + cycle * up.cycleDegree;
 					double z = calculateDepth(r, t);
 
 					// TODO lastrowid をどこかで使えるはず
-					nt.insertNode(r, t, 0);
-					int lowerNode = nt.selectNode(r, t, 0);
+					nt.insert(r, t, 0);
+					int lowerNode = nt.select(r, t, 0);
 					lowerNodes.add(lowerNode);
 
-					nt.insertNode(r, t, z);
-					int upperNode = nt.selectNode(r, t, z);
+					nt.insert(r, t, z);
+					int upperNode = nt.select(r, t, z);
 					upperNodes.add(upperNode);
 				}
 
-				et.insertElement(lowerNodes, upperNodes);
+				et.insert(lowerNodes, upperNodes);
 			}
 		}
 		conn.commit();
@@ -141,7 +150,7 @@ class ModelParser extends AbstractParser {
 	 */
 	protected void setIsPlaneContext(boolean newState) throws ParserException {
 		if (!unitPlaneList.isEmpty() && isPlaneContext) {
-			int nodeSize = unitPlaneList.get(unitPlaneList.size() - 1).nodes.size();
+			int nodeSize = unitPlaneList.get(unitPlaneList.size() - 1).size();
 
 			// true -> false (lost context)
 			if (!newState && nodeSize < PLANE_NODE_SIZE)
@@ -181,8 +190,9 @@ class ModelParser extends AbstractParser {
 		sb.append("ELEMENT TABLE").append(n);
 		for (UnitPlane up : unitPlaneList) {
 			sb.append("Cycle: ").append(up.cycleDegree).append(n);
-			for (PlaneNode pn : up.nodes) {
-				sb.append("  ").append(pn.r).append(", ").append(pn.t).append(n);
+			for (UnitPlane.PlaneNode pn : up) {
+				sb.append("  ").append(pn.get(Util.C2D.r)).append(", ");
+				sb.append(pn.get(Util.C2D.t)).append(n);
 			}
 		}
 		return sb.toString();

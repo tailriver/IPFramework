@@ -3,10 +3,11 @@ import java.sql.*;
 class SQLiteSample {
 	public static void main(String[] args) {
 		String dbname = args.length > 0 ? args[0] : ":memory:";
-		SQLiteConnector sqlc = new SQLiteConnector(dbname);
-		Connection con = sqlc.getConnection();
+		Connection con = null;
 
 		try {
+			con = SQLiteUtil.getConnection(dbname);
+
 			// create (and drop) table
 			Statement sth = con.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
 			sth.execute("DROP TABLE IF EXISTS test");
@@ -65,7 +66,7 @@ class SQLiteSample {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
-			sqlc.close();
+			SQLiteUtil.closeConnection(con);
 		}
 	}
 }

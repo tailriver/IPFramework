@@ -1,18 +1,17 @@
 import java.io.*;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 /**
- * <h1>{@link NLDatabaseInput}を一部実装した抽象クラス</h1>
  * {@link #parse(String)}中に実行されるフックがいくつかあるので、必要なものを Override して使う。<br>
- * なお、SQLデータベースに関連する以下のメソッドは未実装なので、継承クラスで実装する必要がある。
+ * なお、以下のメソッドは未実装なので、継承クラスで実装する必要がある。
  * <ul>
- * <li>{@link NLDatabaseInput#create}</li>
- * <li>{@link NLDatabaseInput#save}</li>
+ * <li>{@link #create}</li>
+ * <li>{@link #save}</li>
  * </ul>
  * @author tailriver
  */
-abstract class AbstractParser implements NLDatabaseInput {
-	public AbstractParser() {}
-
+abstract class Parser {
 	/**
 	 * {@link #parse(String)}で定義されたフックの一つ。
 	 * 1行読み込むごとに呼び出される。<br>
@@ -87,4 +86,6 @@ abstract class AbstractParser implements NLDatabaseInput {
 			}
 		}
 	}
+
+	abstract public void save(Connection conn) throws SQLException;
 }
