@@ -1,7 +1,8 @@
 package net.tailriver.nl;
 
 import java.io.*;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 
 import net.tailriver.nl.dataset.FactorSet;
@@ -12,7 +13,7 @@ import net.tailriver.nl.sql.FactorTable;
 import net.tailriver.nl.sql.SQLiteUtil;
 import net.tailriver.nl.util.ArrayListWOF;
 
-class Factor {
+public class Factor {
 	Connection conn;
 	FactorParser p;
 

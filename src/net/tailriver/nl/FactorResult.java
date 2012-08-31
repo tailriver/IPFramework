@@ -10,7 +10,7 @@ import net.tailriver.nl.sql.FactorResultTable;
 import net.tailriver.nl.sql.FactorTable;
 import net.tailriver.nl.sql.SQLiteUtil;
 
-class FactorResult {
+public class FactorResult {
 	Connection conn;
 	AnsysResultParser p;
 
