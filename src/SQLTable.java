@@ -25,7 +25,7 @@ public class SQLTable {
 
 		StringBuilder sb = new StringBuilder("CREATE TABLE ");
 		sb.append(tableName).append(" (").append(Util.join(", ", scheme)).append(")");
-		execute(scheme.toString());
+		execute(sb.toString());
 	}
 
 	public void drop() throws SQLException {

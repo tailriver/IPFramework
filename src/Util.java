@@ -9,7 +9,7 @@ class Util {
 		StringBuilder sb = new StringBuilder();
 		for (T s : array)
 			sb.append(s).append(sep);
-		return sb.substring(0, sb.length() - 1);
+		return sb.substring(0, sb.length() - sep.length());
 	}
 
 	@SuppressWarnings("unchecked")

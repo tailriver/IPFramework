@@ -9,6 +9,7 @@ class Factor {
 	Factor(Connection conn) {
 		this.conn = conn;
 		p = new FactorParser();
+		p.isPrintStackTrace = true;
 	}
 
 	public void parse(String filename) throws ParserException {

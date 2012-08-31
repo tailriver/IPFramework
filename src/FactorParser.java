@@ -6,8 +6,8 @@ import java.util.regex.*;
 public class FactorParser extends Parser {
 	class FactorParserSet extends FactorSet {
 		public final Point p;
-		FactorParserSet(Point p, String d, Double v) {
-			super(d, v);
+		FactorParserSet(Id<FactorTable> fid, Point p, String d, Double v) {
+			super(fid, null, d, v);
 			this.p = p;
 		}
 	}
@@ -58,7 +58,7 @@ public class FactorParser extends Parser {
 			Double value = Double.valueOf(factorMatcher.group(5));
 
 			Point p = new Point(Coordinate.Cylindrical, r, t, z);
-			factorSub.add(new FactorParserSet(p, direction, value));
+			factorSub.add(new FactorParserSet(factorSub.id(), p, direction, value));
 
 			isSameIdContext = true;
 			return true;
