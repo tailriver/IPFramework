@@ -16,11 +16,11 @@ public class FactorParser extends Parser {
 			Pattern.compile("^([\\d.]+)\\s+([\\d.]+)\\s+([\\d.]+)\\s+([XYZ])\\s+([-\\d.]+).*");
 
 	private String filename;
-	protected List<List<FactorParserSet>> factors;
+	protected List<FactorList<FactorParserSet>> factors;
 	protected boolean isSameIdContext;
 
 	FactorParser() {
-		factors = new ArrayList<List<FactorParserSet>>();
+		factors = new ArrayList<FactorList<FactorParserSet>>();
 		isSameIdContext = false;
 	}
 
@@ -39,15 +39,16 @@ public class FactorParser extends Parser {
 
 		final Matcher factorMatcher = factorPattern.matcher(line);
 		if (factorMatcher.matches()) {
-			List<FactorParserSet> currentUnitPlane;
+			FactorList<FactorParserSet> factorSub;
 			if (!isSameIdContext) {
 				// 頂点定義の文脈でなければ新しく要素を作り、それを対象とする
-				currentUnitPlane = new ArrayList<FactorParserSet>();
-				factors.add(currentUnitPlane);
+				Id<FactorTable> fid = new Id<FactorTable>(factors.size() + 1);
+				factorSub = new FactorList<FactorParserSet>(fid);
+				factors.add(factorSub);
 			}
 			else {
 				// 頂点定義の文脈であれば（前の行でも頂点を定義しているなら）最後の要素が対象
-				currentUnitPlane = factors.get(factors.size() - 1);
+				factorSub = factors.get(factors.size() - 1);
 			}
 
 			Double r = Double.valueOf(factorMatcher.group(1));
@@ -57,7 +58,7 @@ public class FactorParser extends Parser {
 			Double value = Double.valueOf(factorMatcher.group(5));
 
 			Point p = new Point(Coordinate.Cylindrical, r, t, z);
-			currentUnitPlane.add(new FactorParserSet(p, direction, value));
+			factorSub.add(new FactorParserSet(p, direction, value));
 
 			isSameIdContext = true;
 			return true;
@@ -82,17 +83,17 @@ public class FactorParser extends Parser {
 		FactorTable   ft = new FactorTable(conn);
 
 		// 定数の追加
-		ct.insert("FACTOR=" + filename, 0d);
+		ct.insert("AUTO:FACTOR:" + filename, 0d);
 
 		// テーブルの作成
+		ft.drop();
 		ft.create();
 
-		Iterator<List<FactorParserSet>> fi = factors.iterator();
-		for (int id = 1; fi.hasNext(); id++) {
-			for  (FactorParserSet f : fi.next()) {
-				Id<FactorTable> num = new Id<FactorTable>(id);
+		for (FactorList<FactorParserSet> fl : factors) {
+			Id<FactorTable> fid = fl.id();
+			for  (FactorParserSet f : fl) {
 				Id<NodeTable> node = nt.select(f.p);
-				ft.insert(num, node, f);
+				ft.insert(fid, node, f);
 			}
 		}
 		conn.commit();

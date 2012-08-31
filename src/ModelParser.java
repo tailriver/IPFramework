@@ -100,6 +100,9 @@ public class ModelParser extends Parser {
 		ElementTable  et = new ElementTable(conn);
 
 		// テーブルの作成
+		ct.drop();
+		nt.drop();
+		et.drop();
 		ct.create();
 		nt.create();
 		et.create();

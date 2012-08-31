@@ -30,11 +30,11 @@ class Factor {
 		PrintWriter cpw = null;
 		try {
 			FactorTable et = new FactorTable(conn);
-			List<FactorList> factors = et.selectAllByFactorNum();
+			List<FactorList<FactorSet>> factors = et.selectAllByFactorNum();
 
 			// case information
 			lpw = new PrintWriter(new BufferedWriter(new FileWriter(loopfile)));
-			for (FactorList one : factors) {
+			for (FactorList<FactorSet> one : factors) {
 				lpw.println("*IF,%FACTOR_ID%,EQ," + one.id().id() + ",THEN");
 				lpw.println("ALLSEL");
 				for (FactorSet fs : one) {

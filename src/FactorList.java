@@ -2,7 +2,7 @@ import java.util.ArrayList;
 
 
 @SuppressWarnings("serial")
-public class FactorList extends ArrayList<FactorSet> {
+public class FactorList<T extends FactorSet> extends ArrayList<T> {
 	private Id<FactorTable> fid;
 
 	public FactorList(Id<FactorTable> fid) {
@@ -18,7 +18,7 @@ public class FactorList extends ArrayList<FactorSet> {
 	}
 
 	@Override
-	public boolean add(FactorSet e) {
+	public boolean add(T e) {
 		if (e.id() != fid.id())
 			throw new IllegalArgumentException("try to add a different FactorID set");
 		return super.add(e);
