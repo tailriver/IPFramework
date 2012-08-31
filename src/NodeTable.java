@@ -1,24 +1,10 @@
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.List;
+import java.util.*;
 
 
-class NodeTable {
-	@SuppressWarnings("serial")
-	public class Row extends EnumMap<Util.C3D, Double> {
-		public final int num;
-
-		Row(int num, double r, double t, double z) {
-			super(Util.C3D.class);
-			this.num = num;
-			put(Util.C3D.r, r);
-			put(Util.C3D.t, t);
-			put(Util.C3D.z, z);
-		}
-	}
-
-	Connection conn;
+class NodeTable implements Identifiable {
+	static final Coordinate NODE_COORDINATE_SYSTEM = Coordinate.Cylindrical;
+	private Connection conn;
 
 	public NodeTable(Connection conn) {
 		this.conn = conn;
@@ -34,41 +20,49 @@ class NodeTable {
 		st.executeBatch();
 	}
 
-	public void insert(double r, double t, double z) throws SQLException {
+	public void insert(Point p) throws SQLException {
+		if (!p.equals(NODE_COORDINATE_SYSTEM))
+			throw new IllegalArgumentException("Incompatible coordinate system");
+
 		PreparedStatement ps =
 				conn.prepareStatement("INSERT OR IGNORE INTO node (r,t,z) VALUES (?,?,?)");
-		ps.setDouble(1, r);
-		ps.setDouble(2, t);
-		ps.setDouble(3, z);
+		for (int i = 0; i < NODE_COORDINATE_SYSTEM.getDimension(); i++)
+			ps.setDouble(i+1, p.x(i));
 		ps.execute();
 	}
 
-	public int select(double r, double t, double z) throws SQLException {
+	public Id<NodeTable> select(Point p) throws SQLException {
+		if (!p.equals(NODE_COORDINATE_SYSTEM))
+			throw new IllegalArgumentException("Incompatible coordinate system");
+
 		PreparedStatement ps =
 				conn.prepareStatement("SELECT num FROM node WHERE r=? AND t=? AND z=?");
-		ps.setDouble(1, r);
-		ps.setDouble(2, t);
-		ps.setDouble(3, z);
+		for (int i = 0; i < NODE_COORDINATE_SYSTEM.getDimension(); i++)
+			ps.setDouble(i+1, p.x(i));
 		ResultSet rs = ps.executeQuery();
 
 		try {
-			return rs.getInt("num");
+			int n = rs.getInt("num");
+			return new Id<NodeTable>(n);
 		} catch (SQLException e) {
 			throw new SQLException("node not found");			
 		}
 	}
 
-	public List<Row> selectAll() throws SQLException {
+	public List<NodeSet> selectAll() throws SQLException {
 		Statement st = conn.createStatement();
 		ResultSet rs = st.executeQuery("SELECT * FROM node");
 
-		List<Row> rows = new ArrayList<Row>();
+		List<NodeSet> rows = new ArrayList<NodeSet>();
 		while (rs.next()) {
-			int num  = rs.getInt("num");
+			int n    = rs.getInt("num");
 			double r = rs.getDouble("r");
 			double t = rs.getDouble("t");
 			double z = rs.getDouble("z");
-			rows.add(new Row(num, r, t, z));
+
+			Id<NodeTable> num = new Id<NodeTable>(n);
+			Point p = new Point(Coordinate.Cylindrical, r, t, z);
+			rows.add(new NodeSet(num, p));
 		}
 
 		return rows;

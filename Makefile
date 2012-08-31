@@ -19,6 +19,9 @@ ALL:: model
 model: bin/Model.class $(CLASSES)
 	$(JAVA) $(JAVAFLAGS) $(<:bin/%.class=%) $(DBFILE) data/model.txt
 
+factor: bin/Factor.class $(CLASSES)
+	$(JAVA) $(JAVAFLAGS) $(<:bin/%.class=%) $(DBFILE) data/factor_maximum_rtz.txt
+
 bin/%.class: src/%.java
 	mkdir -p bin
 	$(JAVAC) $(JAVACFLAGS) $<

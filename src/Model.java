@@ -42,18 +42,14 @@ class Model {
 
 			// node information
 			pw.println("CSYS,1");
-			for (NodeTable.Row r : nt.selectAll())
+			for (NodeSet r : nt.selectAll())
 				pw.printf("N,%d,%.4e,%s,%.4e\n",
-						r.num,
-						r.get(Util.C3D.r) * radius * 1e-5,
-						r.get(Util.C3D.t),
-						r.get(Util.C3D.z) * thickness * 1e-3
-						);
+						r.id(), r.p(0) * radius * 1e-5, r.p(1), r.p(2) * thickness * 1e-3);
 
 			// element information
 			pw.println("ET,1,SOLID185");
-			for (ElementTable.Row r : et.selectAll())
-				pw.printf("EN,%d,%s\n", r.num, Util.<Integer>join(",", r.nodes));
+			for (ElementSet r : et.selectAll())
+				pw.printf("EN,%d,%s\n", r.id(), Util.<Id<NodeTable>>join(",", r.nodes()));
 
 			// constraint information
 			pw.println("ALLSEL");

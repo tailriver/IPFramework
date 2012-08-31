@@ -3,21 +3,13 @@ import java.util.*;
 import java.util.regex.*;
 
 
-class ModelParser extends Parser {
+public class ModelParser extends Parser {
 	static final int PLANE_NODE_SIZE = 4;
-	static final Pattern constantPattern  = Pattern.compile("^##\\s*(\\w+):\\s*([\\d.]+).*");
 	static final Pattern cyclePattern     = Pattern.compile("^##\\s*([\\d.]+).*");
-	static final Pattern commentPattern   = Pattern.compile("^#.*");
 	static final Pattern planeNodePattern = Pattern.compile("^([\\d.]+)\\s+([\\d.]+).*");
 
 	@SuppressWarnings("serial")
-	class UnitPlane extends ArrayList<UnitPlane.PlaneNode> {
-		class PlaneNode extends EnumMap<Util.C2D, Double> {
-			public PlaneNode() {
-				super(Util.C2D.class);
-			}
-		}
-
+	class UnitPlane extends ArrayList<Point> {
 		public final double cycleDegree;
 
 		UnitPlane(double cycleDegree) {
@@ -26,10 +18,10 @@ class ModelParser extends Parser {
 		}
 	}
 
-	Map<String, Double> constantMap;
-	List<UnitPlane> unitPlaneList;
-	double currentCycleDegree;
-	boolean isPlaneContext;
+	protected Map<String, Double> constantMap;
+	protected List<UnitPlane> unitPlaneList;
+	protected double currentCycleDegree;
+	private boolean isPlaneContext;
 
 	ModelParser() {
 		constantMap = new HashMap<String, Double>();
@@ -45,7 +37,7 @@ class ModelParser extends Parser {
 			return true;
 		}
 
-		final Matcher constantMatcher = constantPattern.matcher(line);
+		final Matcher constantMatcher = Util.CONSTANT_PATTERN.matcher(line);
 		if (constantMatcher.matches()) {
 			String key = constantMatcher.group(1).toLowerCase();
 			double value = Double.valueOf(constantMatcher.group(2));
@@ -61,7 +53,7 @@ class ModelParser extends Parser {
 			return true;
 		}
 
-		final Matcher commentMatcher = commentPattern.matcher(line);
+		final Matcher commentMatcher = Util.COMMENT_PATTERN.matcher(line);
 		if (commentMatcher.matches()) {
 			// 一行だけ変えたいという需要があるかもしれないので isPlaneContext は変更しない
 			return true;
@@ -82,16 +74,19 @@ class ModelParser extends Parser {
 
 			Double r = Double.valueOf(planeNodeMatcher.group(1));
 			Double t = Double.valueOf(planeNodeMatcher.group(2));
-			UnitPlane.PlaneNode pn = currentUnitPlane.new PlaneNode();
-			pn.put(Util.C2D.r, r);
-			pn.put(Util.C2D.t, t);
-			currentUnitPlane.add(pn);
+			Point p = new Point(Coordinate.Polar, r, t);
+			currentUnitPlane.add(p);
 
 			setIsPlaneContext(true);
 			return true;
 		}
 
 		return false;
+	}
+
+	@Override
+	protected void parseAfterHook(String filename) throws Exception {
+		constantMap.put("AUTO:MODEL:" + filename, 0d);
 	}
 
 	/**
@@ -118,25 +113,28 @@ class ModelParser extends Parser {
 
 		for (UnitPlane up : unitPlaneList) {
 			for (int cycle = 0; cycle < maxCycleDegree / up.cycleDegree; cycle++) {
-				List<Integer> lowerNodes = new ArrayList<Integer>();
-				List<Integer> upperNodes = new ArrayList<Integer>();
+				List<Id<NodeTable>> lowerNodes = new ArrayList<Id<NodeTable>>();
+				List<Id<NodeTable>> upperNodes = new ArrayList<Id<NodeTable>>();
 
-				for (UnitPlane.PlaneNode pn : up) {
-					double r = pn.get(Util.C2D.r);
-					double t = pn.get(Util.C2D.t) + cycle * up.cycleDegree;
+				for (Point p : up) {
+					double r = p.x(0);
+					double t = p.x(1) + cycle * up.cycleDegree;
 					double z = calculateDepth(r, t);
 
 					// TODO lastrowid をどこかで使えるはず
-					nt.insert(r, t, 0);
-					int lowerNode = nt.select(r, t, 0);
-					lowerNodes.add(lowerNode);
+					Point p1 = new Point(Coordinate.Cylindrical, r, t, 0);
+					nt.insert(p1);
+					Id<NodeTable> lower = nt.select(p1);
+					lowerNodes.add(lower);
 
-					nt.insert(r, t, z);
-					int upperNode = nt.select(r, t, z);
-					upperNodes.add(upperNode);
+					Point p2 = new Point(Coordinate.Cylindrical, r, t, z);
+					nt.insert(p2);
+					Id<NodeTable> upper = nt.select(p2);
+					upperNodes.add(upper);
 				}
 
-				et.insert(lowerNodes, upperNodes);
+				lowerNodes.addAll(upperNodes);
+				et.insert(lowerNodes);
 			}
 		}
 		conn.commit();
@@ -190,9 +188,8 @@ class ModelParser extends Parser {
 		sb.append("ELEMENT TABLE").append(n);
 		for (UnitPlane up : unitPlaneList) {
 			sb.append("Cycle: ").append(up.cycleDegree).append(n);
-			for (UnitPlane.PlaneNode pn : up) {
-				sb.append("  ").append(pn.get(Util.C2D.r)).append(", ");
-				sb.append(pn.get(Util.C2D.t)).append(n);
+			for (Point p : up) {
+				sb.append("  ").append(Util.<Double>join(", ", p.x())).append(n);
 			}
 		}
 		return sb.toString();

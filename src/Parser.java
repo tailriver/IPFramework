@@ -6,12 +6,13 @@ import java.sql.SQLException;
  * {@link #parse(String)}中に実行されるフックがいくつかあるので、必要なものを Override して使う。<br>
  * なお、以下のメソッドは未実装なので、継承クラスで実装する必要がある。
  * <ul>
- * <li>{@link #create}</li>
  * <li>{@link #save}</li>
  * </ul>
  * @author tailriver
  */
-abstract class Parser {
+public abstract class Parser {
+	public boolean isPrintStackTrace = false;
+
 	/**
 	 * {@link #parse(String)}で定義されたフックの一つ。
 	 * 1行読み込むごとに呼び出される。<br>
@@ -21,7 +22,7 @@ abstract class Parser {
 	 * 処理できない場合は{@link ParserException}が呼ばれる
 	 * @throws Exception re-throw as a {@link ParserException} in {@link #parse(String)}
 	 */
-	protected abstract boolean parseLoopHook(String line) throws Exception;
+	abstract protected boolean parseLoopHook(String line) throws Exception;
 
 	/**
 	 * {@link #parse(String)}で定義されたフックの一つ。
@@ -30,7 +31,7 @@ abstract class Parser {
 	 * @throws Exception re-throw as a {@link ParserException} in {@link #parse(String)}
 
 	 */
-	protected void parseBeforeHook() throws Exception {}
+	protected void parseBeforeHook(String filename) throws Exception {}
 
 	/**
 	 * {@link #parse(String)}で定義されたフックの一つ。
@@ -38,19 +39,20 @@ abstract class Parser {
 	 * デフォルトは何もしないので、必要であれば Override する。
 	 * @throws Exception re-throw as a {@link ParserException} in {@link #parse(String)}
 	 */
-	protected void parseAfterHook() throws Exception {}
+	protected void parseAfterHook(String filename) throws Exception {}
 
 	/**
 	 * ファイルからの読み込みの実装例。
 	 * メソッド中で次のフックを呼び出す。
 	 * <ul>
-	 *  <li>{@link #parseBeforeHook()}</li>
+	 *  <li>{@link #parseBeforeHook(String)}</li>
 	 *  <li>{@link #parseLoopHook(String)}</li>
-	 *  <li>{@link #parseAfterHook()}</li>
+	 *  <li>{@link #parseAfterHook(String)}</li>
 	 * </ul>
 	 * @param filename このメソッドで読み込むファイルの名前
 	 * @throws ParserException
 	 */
+	@SuppressWarnings("javadoc")
 	public final void parse(String filename) throws ParserException {
 		if (filename == null)
 			throw new IllegalArgumentException();
@@ -62,15 +64,18 @@ abstract class Parser {
 			String line = "";
 			int lineNum = 0;
 			try {
-				parseBeforeHook();
+				parseBeforeHook(filename);
 				while ((line = br.readLine()) != null) {
 					lineNum++;
 					boolean matched = parseLoopHook(line);
 					if (!matched)
 						throw new ParserException("not matched to any expressions");
 				}
-				parseAfterHook();
+				parseAfterHook(filename);
 			} catch (Exception e) {
+				if (isPrintStackTrace)
+					e.printStackTrace();
+
 				String s = e.getMessage() + " in " + filename + " at line " + lineNum + ".\n";
 				s += "> " + line;
 				throw new ParserException(s);

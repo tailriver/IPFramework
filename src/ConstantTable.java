@@ -2,7 +2,7 @@ import java.sql.*;
 
 
 class ConstantTable {
-	Connection conn;
+	private Connection conn;
 
 	public ConstantTable(Connection conn) {
 		this.conn = conn;

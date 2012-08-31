@@ -2,9 +2,8 @@
  * Exception class for file reading and processing in {@link NLDatabaseInput}.
  * @author tailriver
  */
+@SuppressWarnings("serial")
 class ParserException extends Exception {
-	private static final long serialVersionUID = 1L;
-
 	public ParserException() {
 		super();
 	}
