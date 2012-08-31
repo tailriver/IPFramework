@@ -112,6 +112,9 @@ public class DesignParser extends Parser {
 
 		int designIdNum = 1;
 		for (ArrayListWOF<DesignParserSet, Double> wof : designNodes) {
+			if (wof.value() == maxCycleDegree)
+				System.err.println("Warning: cycle_degree is equals to its maximum (really expected?)");
+
 			// Note: See condition of the 'for' statement below.
 			//       Here is used [<=] sign although it is [<] sign in ModelParser.
 			//       ModelParser is for element definition; DesignParser want to get node information

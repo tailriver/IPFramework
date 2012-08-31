@@ -41,11 +41,11 @@ public abstract class Parser {
 	/**
 	 * {@link #parse(String)}で定義されたフックの一つ。
 	 * ファイルの終端まで読み込まれ、ファイルを閉じる直前に読み込まれる。<br>
-	 * デフォルトは何もしないので、必要であれば Override する。
+	 * デフォルトは読み込んだファイルを表示する程度なので、必要であれば Override する。
 	 * @throws Exception re-throw as a {@link ParserException} in {@link #parse(String)}
 	 */
 	protected void parseAfterHook(String filename) throws Exception {
-		System.out.println(this.getClass().getName() + " : " + filename);
+		System.out.println(this.getClass().getName() + ": " + filename);
 	}
 
 	/**

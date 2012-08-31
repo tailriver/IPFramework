@@ -14,7 +14,7 @@ public class DesignTable extends Table {
 		addColumn("id", "INTEGER");
 		addColumn("node", "INTEGER REFERENCES node");
 		addColumn("comp", "TEXT");
-		addColumn("value", "REAL");
+		addColumn("weight", "REAL");
 		addTableConstraint("PRIMARY KEY(id,node,comp)");
 	}
 
@@ -24,7 +24,7 @@ public class DesignTable extends Table {
 		ps.setInt(1, did.id());
 		ps.setInt(2, node.id());
 		ps.setString(3, ds.component().name());
-		ps.setDouble(4, ds.value());
+		ps.setDouble(4, ds.weight());
 		ps.execute();
 		ps.close();
 	}
@@ -39,13 +39,24 @@ public class DesignTable extends Table {
 		return max;
 	}
 
+	public List<DesignSet> select(DesignId did) throws SQLException {
+		PreparedStatement ps = conn.prepareStatement("SELECT * FROM " + tableName + " WHERE id=?");
+		ps.setInt(1, did.id());
+		ResultSet rs = ps.executeQuery();
+
+		List<DesignSet> dsl = processSelectResult(rs);
+		rs.close();
+		ps.close();
+		return dsl;
+	}
+
 	public List<DesignSet> selectAll() throws SQLException {
 		Statement st = conn.createStatement();
 		ResultSet rs = st.executeQuery("SELECT * FROM " + tableName);
 
-		List<DesignSet> fsl = processSelectResult(rs);
+		List<DesignSet> dsl = processSelectResult(rs);
 		st.close();
-		return fsl;
+		return dsl;
 	}
 
 	private List<DesignSet> processSelectResult(ResultSet rs) throws SQLException {

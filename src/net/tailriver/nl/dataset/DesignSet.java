@@ -6,13 +6,13 @@ public class DesignSet extends DesignId {
 
 	private final NodeId n;
 	private final Component d;
-	private final double v;
+	private final double w;
 
-	public DesignSet(DesignId did, NodeId node, String component, double value) {
+	public DesignSet(DesignId did, NodeId node, String component, double weight) {
 		super(did);
 		this.n = node;
 		this.d = Component.valueOf(component);
-		this.v = value;
+		this.w = weight;
 	}
 
 	public NodeId node() {
@@ -23,7 +23,7 @@ public class DesignSet extends DesignId {
 		return d;
 	}
 
-	public double value() {
-		return v;
+	public double weight() {
+		return w;
 	}
 }

@@ -47,7 +47,7 @@ public class NodeTable extends Table {
 			int n = rs.getInt("num");
 			return new NodeId(n);
 		} catch (SQLException e) {
-			throw new SQLException("node not found");			
+			throw new SQLException("node not found: " + p.toString());			
 		} finally {
 			rs.close();
 			ps.close();

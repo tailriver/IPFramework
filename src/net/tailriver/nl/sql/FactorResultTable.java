@@ -4,6 +4,7 @@ import java.sql.*;
 import java.util.List;
 
 import net.tailriver.nl.dataset.AnsysResultSet;
+import net.tailriver.nl.dataset.DesignSet.Component;
 import net.tailriver.nl.id.*;
 
 
@@ -24,9 +25,9 @@ public class FactorResultTable extends Table {
 		for (AnsysResultSet ars : arsList) {
 			ps.setInt(1, ars.id());
 			ps.setInt(2, ars.node().id());
-			ps.setDouble(3, ars.sxx());
-			ps.setDouble(4, ars.syy());
-			ps.setDouble(5, ars.sxy());
+			ps.setDouble(3, ars.s(Component.XX));
+			ps.setDouble(4, ars.s(Component.YY));
+			ps.setDouble(5, ars.s(Component.XY));
 			ps.addBatch();
 
 			if (isDebugMode)

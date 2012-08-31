@@ -17,19 +17,36 @@
   <javac encoding="UTF-8" srcdir="${src}" destdir="${bin}" includeantruntime="false"/>
  </target>
 
- <target name="exec" depends="compile">
+ <target name="model" depends="compile">
   <java classpath="${classpath}" classname="${basepackage}.Model">
    <arg line="${dbfile} data/model.txt"/>
   </java>
+ </target>
+
+ <target name="factor" depends="model">
   <java classpath="${classpath}" classname="${basepackage}.Factor">
    <arg line="${dbfile} data/factor_maximum_rtz.txt"/>
   </java>
+ </target>
+
+ <target name="factorresult" depends="factor">
   <java classpath="${classpath}" classname="${basepackage}.FactorResult">
    <arg line="${dbfile} data/factor_result/"/>
   </java>
+ </target>
+
+ <target name="design" depends="model">
   <java classpath="${classpath}" classname="${basepackage}.Design">
    <arg line="${dbfile} data/design_node_extent.txt"/>
   </java>
  </target>
+
+ <target name="responsematrix" depends="factorresult,design">
+  <java classpath="${classpath}" classname="${basepackage}.ResponseMatrix">
+   <arg line="${dbfile}"/>
+  </java>
+ </target>
+
+ <target name="exec" depends="responsematrix"/>
 
 </project>
