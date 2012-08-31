@@ -8,24 +8,14 @@ public class ModelParser extends Parser {
 	static final Pattern cyclePattern     = Pattern.compile("^##\\s*([\\d.]+).*");
 	static final Pattern planeNodePattern = Pattern.compile("^([\\d.]+)\\s+([\\d.]+).*");
 
-	@SuppressWarnings("serial")
-	private class UnitPlane extends ArrayList<Point> {
-		public final double cycleDegree;
-
-		UnitPlane(double cycleDegree) {
-			super(PLANE_NODE_SIZE);
-			this.cycleDegree = cycleDegree;
-		}
-	}
-
 	protected Map<String, Double> constantMap;
-	protected List<UnitPlane> unitPlaneList;
+	protected List<ArrayListWOF<Point, Double>> unitPlaneList;
 	protected double currentCycleDegree;
 	private boolean isPlaneContext;
 
 	public ModelParser() {
 		constantMap = new HashMap<String, Double>();
-		unitPlaneList = new ArrayList<UnitPlane>();
+		unitPlaneList = new ArrayList<ArrayListWOF<Point, Double>>();
 		currentCycleDegree = 180;
 		isPlaneContext = false;
 	}
@@ -66,10 +56,10 @@ public class ModelParser extends Parser {
 
 		final Matcher planeNodeMatcher = planeNodePattern.matcher(line);
 		if (planeNodeMatcher.matches()) {
-			UnitPlane currentUnitPlane;
+			ArrayListWOF<Point, Double> currentUnitPlane;
 			if (!isPlaneContext) {
 				// 頂点定義の文脈でなければ新しく要素を作り、それを対象とする
-				currentUnitPlane = new UnitPlane(currentCycleDegree);
+				currentUnitPlane = new ArrayListWOF<Point, Double>(currentCycleDegree);
 				unitPlaneList.add(currentUnitPlane);
 			}
 			else {
@@ -114,14 +104,14 @@ public class ModelParser extends Parser {
 		// 繰り返し角度の拡張
 		double maxCycleDegree = ct.select("max_cycle_degree", ConstantTable.DEFAULT_MAX_CYCLE_DEGREE);
 
-		for (UnitPlane up : unitPlaneList) {
-			for (int cycle = 0; cycle < maxCycleDegree / up.cycleDegree; cycle++) {
+		for (ArrayListWOF<Point, Double> wof : unitPlaneList) {
+			for (int cycle = 0; cycle < maxCycleDegree / wof.value(); cycle++) {
 				List<Id<NodeTable>> lowerNodes = new ArrayList<Id<NodeTable>>();
 				List<Id<NodeTable>> upperNodes = new ArrayList<Id<NodeTable>>();
 
-				for (Point p : up) {
+				for (Point p : wof) {
 					double r = p.x(0);
-					double t = p.x(1) + cycle * up.cycleDegree;
+					double t = p.x(1) + cycle * wof.value();
 					double z = calculateDepth(r, t);
 
 					// TODO lastrowid をどこかで使えるはず
@@ -189,9 +179,9 @@ public class ModelParser extends Parser {
 		}
 		sb.append(n);
 		sb.append("ELEMENT TABLE").append(n);
-		for (UnitPlane up : unitPlaneList) {
-			sb.append("Cycle: ").append(up.cycleDegree).append(n);
-			for (Point p : up) {
+		for (ArrayListWOF<Point, Double> wof : unitPlaneList) {
+			sb.append("Cycle: ").append(wof.value()).append(n);
+			for (Point p : wof) {
 				sb.append("  ").append(Util.<Double>join(", ", p.x())).append(n);
 			}
 		}

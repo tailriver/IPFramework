@@ -31,14 +31,14 @@ class Factor {
 		PrintWriter cpw = null;
 		try {
 			FactorTable et = new FactorTable(conn);
-			List<FactorList<FactorSet>> factors = et.selectAllByFactorNum();
+			List<ArrayListWOF<FactorSet, Id<FactorTable>>> factors = et.selectAllByFactorNum();
 
 			// case information
 			lpw = new PrintWriter(new BufferedWriter(new FileWriter(loopfile)));
-			for (FactorList<FactorSet> one : factors) {
-				lpw.println("*IF,%FACTOR_ID%,EQ," + one.id().id() + ",THEN");
+			for (ArrayListWOF<FactorSet, Id<FactorTable>> wof : factors) {
+				lpw.println("*IF,%FACTOR_ID%,EQ," + wof.value().id() + ",THEN");
 				lpw.println("ALLSEL");
-				for (FactorSet fs : one) {
+				for (FactorSet fs : wof) {
 					lpw.printf("F,%d,F%s,%.5f\n", fs.node().id(), fs.direction(), fs.value());
 				}
 				lpw.println("*ENDIF");

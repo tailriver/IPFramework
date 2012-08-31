@@ -14,7 +14,7 @@ public class FactorTable extends SQLTable implements Identifiable {
 
 	public void insert(Id<FactorTable> num, Id<NodeTable> node, FactorSet fs) throws SQLException {
 		PreparedStatement ps =
-				conn.prepareStatement("INSERT INTO " + tableName + " (id,node,comp,value) VALUES (?,?,?,?)");
+				conn.prepareStatement("INSERT INTO " + tableName + " VALUES (?,?,?,?)");
 		ps.setInt(1, num.id());
 		ps.setInt(2, node.id());
 		ps.setString(3, fs.direction().name());
@@ -33,18 +33,21 @@ public class FactorTable extends SQLTable implements Identifiable {
 		return max;
 	}
 
-	public List<FactorList<FactorSet>> selectAllByFactorNum() throws SQLException {
+	public List<ArrayListWOF<FactorSet, Id<FactorTable>>> selectAllByFactorNum() throws SQLException {
 		int maxFactorId = maxFactorId();
 
-		List<FactorList<FactorSet>> whole = new ArrayList<FactorList<FactorSet>>();
+		List<ArrayListWOF<FactorSet, Id<FactorTable>>> whole =
+				new ArrayList<ArrayListWOF<FactorSet, Id<FactorTable>>>();
 		PreparedStatement ps =
 				conn.prepareStatement("SELECT * FROM " + tableName + " WHERE id=?");
 		for (int id = 1; id <= maxFactorId; id++) {
 			ps.setInt(1, id);
 			ResultSet rs = ps.executeQuery();
-			FactorList<FactorSet> fl = new FactorList<FactorSet>(id);
-			fl.addAll(processSelectResult(rs));
-			whole.add(fl);
+			Id<FactorTable> fid = new Id<FactorTable>(id);
+			ArrayListWOF<FactorSet, Id<FactorTable>> wof =
+					new ArrayListWOF<FactorSet, Id<FactorTable>>(fid);
+			wof.addAll(processSelectResult(rs));
+			whole.add(wof);
 		}
 		ps.close();
 		return whole;

@@ -16,11 +16,11 @@ public class FactorParser extends Parser {
 			Pattern.compile("^([\\d.]+)\\s+([\\d.]+)\\s+([\\d.]+)\\s+([XYZ])\\s+([-\\d.]+).*");
 
 	private String filename;
-	protected List<FactorList<FactorParserSet>> factors;
+	protected List<ArrayListWOF<FactorParserSet, Id<FactorTable>>> factors;
 	protected boolean isSameIdContext;
 
 	public FactorParser() {
-		factors = new ArrayList<FactorList<FactorParserSet>>();
+		factors = new ArrayList<ArrayListWOF<FactorParserSet,Id<FactorTable>>>();
 		isSameIdContext = false;
 	}
 
@@ -44,11 +44,11 @@ public class FactorParser extends Parser {
 
 		final Matcher factorMatcher = factorPattern.matcher(line);
 		if (factorMatcher.matches()) {
-			FactorList<FactorParserSet> factorSub;
+			ArrayListWOF<FactorParserSet, Id<FactorTable>> factorSub;
 			if (!isSameIdContext) {
 				// 頂点定義の文脈でなければ新しく要素を作り、それを対象とする
 				Id<FactorTable> fid = new Id<FactorTable>(factors.size() + 1);
-				factorSub = new FactorList<FactorParserSet>(fid);
+				factorSub = new ArrayListWOF<FactorParser.FactorParserSet, Id<FactorTable>>(fid);
 				factors.add(factorSub);
 			}
 			else {
@@ -63,7 +63,7 @@ public class FactorParser extends Parser {
 			Double value = Double.valueOf(factorMatcher.group(5));
 
 			Point p = new Point(Coordinate.Cylindrical, r, t, z);
-			factorSub.add(new FactorParserSet(factorSub.id(), p, direction, value));
+			factorSub.add(new FactorParserSet(factorSub.value(), p, direction, value));
 
 			isSameIdContext = true;
 			return true;
@@ -89,9 +89,9 @@ public class FactorParser extends Parser {
 		ft.drop();
 		ft.create();
 
-		for (FactorList<FactorParserSet> fl : factors) {
-			Id<FactorTable> fid = fl.id();
-			for  (FactorParserSet f : fl) {
+		for (ArrayListWOF<FactorParserSet, Id<FactorTable>> wof : factors) {
+			Id<FactorTable> fid = wof.value();
+			for  (FactorParserSet f : wof) {
 				Id<NodeTable> node = nt.select(f.p);
 				ft.insert(fid, node, f);
 			}
