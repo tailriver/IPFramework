@@ -1,8 +1,13 @@
+package net.tailriver.nl.sql;
+
 import java.sql.*;
 import java.util.List;
 
+import net.tailriver.nl.dataset.AnsysResultSet;
+import net.tailriver.nl.id.*;
 
-public class FactorResultTable extends SQLTable implements Identifiable {
+
+public class FactorResultTable extends Table {
 	public FactorResultTable(Connection conn) {
 		super(conn, "factor_result");
 		addColumn("factor", "INTEGER REFERENCES factor(id)");
@@ -31,7 +36,7 @@ public class FactorResultTable extends SQLTable implements Identifiable {
 		ps.close();
 	}
 
-	public AnsysResultSet select(Id<FactorTable> fid, Id<NodeTable> node) throws SQLException {
+	public AnsysResultSet select(FactorId fid, NodeId node) throws SQLException {
 		PreparedStatement ps =
 				conn.prepareStatement("SELECT * FROM " + tableName + " WHERE factor=? AND node=?");
 		ps.setInt(1, fid.id());

@@ -1,11 +1,14 @@
-public class Id<T extends Identifiable> {
+package net.tailriver.nl.id;
+
+
+public abstract class Id {
 	private final int id;
 
 	public Id(int id) {
 		this.id = id;
 	}
 
-	public Id(Id<T> idn) {
+	public Id(Id idn) {
 		this.id = idn != null ? idn.id : -1;
 	}
 
@@ -20,12 +23,8 @@ public class Id<T extends Identifiable> {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj instanceof Id<?>)
-			return id == ((Id<?>) obj).id;
+		if (obj instanceof Id)
+			return id == ((Id) obj).id;
 		return false;
-	}
-
-	public boolean equals(Id<T> obj) {
-		return id == obj.id;
 	}
 }

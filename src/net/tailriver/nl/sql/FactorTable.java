@@ -1,8 +1,15 @@
+package net.tailriver.nl.sql;
+
 import java.sql.*;
 import java.util.*;
 
+import net.tailriver.nl.dataset.FactorSet;
+import net.tailriver.nl.id.FactorId;
+import net.tailriver.nl.id.NodeId;
+import net.tailriver.nl.util.*;
 
-public class FactorTable extends SQLTable implements Identifiable {
+
+public class FactorTable extends Table {
 	public FactorTable(Connection conn) {
 		super(conn, "factor");
 		addColumn("id", "INTEGER");
@@ -12,10 +19,10 @@ public class FactorTable extends SQLTable implements Identifiable {
 		addTableConstraint("PRIMARY KEY(id,node,comp)");
 	}
 
-	public void insert(Id<FactorTable> num, Id<NodeTable> node, FactorSet fs) throws SQLException {
+	public void insert(FactorId fid, NodeId node, FactorSet fs) throws SQLException {
 		PreparedStatement ps =
 				conn.prepareStatement("INSERT INTO " + tableName + " VALUES (?,?,?,?)");
-		ps.setInt(1, num.id());
+		ps.setInt(1, fid.id());
 		ps.setInt(2, node.id());
 		ps.setString(3, fs.direction().name());
 		ps.setDouble(4, fs.value());
@@ -33,19 +40,18 @@ public class FactorTable extends SQLTable implements Identifiable {
 		return max;
 	}
 
-	public List<ArrayListWOF<FactorSet, Id<FactorTable>>> selectAllByFactorNum() throws SQLException {
+	public List<ArrayListWOF<FactorSet, FactorId>> selectAllByFactorNum() throws SQLException {
 		int maxFactorId = maxFactorId();
 
-		List<ArrayListWOF<FactorSet, Id<FactorTable>>> whole =
-				new ArrayList<ArrayListWOF<FactorSet, Id<FactorTable>>>();
+		List<ArrayListWOF<FactorSet, FactorId>> whole =
+				new ArrayList<ArrayListWOF<FactorSet, FactorId>>();
 		PreparedStatement ps =
 				conn.prepareStatement("SELECT * FROM " + tableName + " WHERE id=?");
 		for (int id = 1; id <= maxFactorId; id++) {
 			ps.setInt(1, id);
 			ResultSet rs = ps.executeQuery();
-			Id<FactorTable> fid = new Id<FactorTable>(id);
-			ArrayListWOF<FactorSet, Id<FactorTable>> wof =
-					new ArrayListWOF<FactorSet, Id<FactorTable>>(fid);
+			FactorId fid = new FactorId(id);
+			ArrayListWOF<FactorSet, FactorId> wof = new ArrayListWOF<FactorSet, FactorId>(fid);
 			wof.addAll(processSelectResult(rs));
 			whole.add(wof);
 		}
@@ -65,8 +71,8 @@ public class FactorTable extends SQLTable implements Identifiable {
 	private List<FactorSet> processSelectResult(ResultSet rs) throws SQLException {
 		List<FactorSet> fsl = new ArrayList<FactorSet>();
 		while (rs.next()) {
-			Id<FactorTable> fid = new Id<FactorTable>(rs.getInt("id"));
-			Id<NodeTable> num = new Id<NodeTable>(rs.getInt("node"));
+			FactorId fid = new FactorId(rs.getInt("id"));
+			NodeId num = new NodeId(rs.getInt("node"));
 			String d = rs.getString("comp");
 			Double v = rs.getDouble("value");
 			fsl.add(new FactorSet(fid, num, d, v));

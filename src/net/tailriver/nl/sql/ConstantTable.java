@@ -1,10 +1,12 @@
+package net.tailriver.nl.sql;
+
 import java.sql.*;
 
 
-class ConstantTable extends SQLTable {
-	static final double DEFAULT_RADIUS    = 1;
-	static final double DEFAULT_THICKNESS = 1;
-	static final double DEFAULT_MAX_CYCLE_DEGREE = 180;
+public class ConstantTable extends Table {
+	public static final double DEFAULT_RADIUS    = 1;
+	public static final double DEFAULT_THICKNESS = 1;
+	public static final double DEFAULT_MAX_CYCLE_DEGREE = 180;
 
 	public ConstantTable(Connection conn) {
 		super(conn, "constant");

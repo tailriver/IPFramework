@@ -1,8 +1,15 @@
+package net.tailriver.nl.sql;
+
 import java.sql.*;
 import java.util.*;
 
+import net.tailriver.nl.dataset.ElementSet;
+import net.tailriver.nl.id.ElementId;
+import net.tailriver.nl.id.NodeId;
+import net.tailriver.nl.util.*;
 
-class ElementTable extends SQLTable implements Identifiable {
+
+public class ElementTable extends Table {
 	public static final String[] ELEMENT_LABELS = new String[]{"p", "q", "r", "s", "t", "u", "v", "w"};
 
 	public ElementTable(Connection conn) {
@@ -12,12 +19,12 @@ class ElementTable extends SQLTable implements Identifiable {
 			addColumn(label, "INTEGER REFERENCES node");
 	}
 
-	public void insert(List<Id<NodeTable>> nodes) throws SQLException {
+	public void insert(List<NodeId> nodes) throws SQLException {
 		PreparedStatement ps =
 				conn.prepareStatement(
 						"INSERT INTO " + tableName
 						+ " ("+ Util.join(",", ELEMENT_LABELS) + ") VALUES (?,?,?,?,?,?,?,?)");
-		for (int i = 0; i < 2 * ModelParser.PLANE_NODE_SIZE; i++)
+		for (int i = 0; i < ELEMENT_LABELS.length; i++)
 			ps.setInt(i+1, nodes.get(i).id());
 		ps.execute();
 		ps.close();
@@ -29,11 +36,10 @@ class ElementTable extends SQLTable implements Identifiable {
 
 		ResultSet rs = st.executeQuery("SELECT * FROM " + tableName);
 		while (rs.next()) {
-			Id<ElementTable> eid = new Id<ElementTable>(rs.getInt("id"));
-			@SuppressWarnings("unchecked")
-			Id<NodeTable>[] nodes = new Id[ELEMENT_LABELS.length];
+			ElementId eid = new ElementId(rs.getInt("id"));
+			NodeId[] nodes = new NodeId[ELEMENT_LABELS.length];
 			for (int i = 0; i < ELEMENT_LABELS.length; i++)
-				nodes[i] = new Id<NodeTable>(rs.getInt(ELEMENT_LABELS[i]));
+				nodes[i] = new NodeId(rs.getInt(ELEMENT_LABELS[i]));
 			rows.add(new ElementSet(eid, nodes));
 		}
 

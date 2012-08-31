@@ -1,5 +1,14 @@
+package net.tailriver.nl;
+
 import java.io.*;
 import java.sql.*;
+
+import net.tailriver.nl.dataset.ElementSet;
+import net.tailriver.nl.dataset.NodeSet;
+import net.tailriver.nl.id.NodeId;
+import net.tailriver.nl.parser.*;
+import net.tailriver.nl.sql.*;
+import net.tailriver.nl.util.Util;
 
 public class Model {
 	Connection conn;
@@ -45,7 +54,7 @@ public class Model {
 			// element information
 			pw.println("ET,1,SOLID185");
 			for (ElementSet r : et.selectAll())
-				pw.printf("EN,%d,%s\n", r.id(), Util.<Id<NodeTable>>join(",", r.nodes()));
+				pw.printf("EN,%d,%s\n", r.id(), Util.<NodeId>join(",", r.nodes()));
 
 			// constraint information
 			pw.println("ALLSEL");

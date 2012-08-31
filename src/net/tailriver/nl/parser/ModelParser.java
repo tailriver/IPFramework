@@ -1,10 +1,17 @@
+package net.tailriver.nl.parser;
+
 import java.sql.*;
 import java.util.*;
 import java.util.regex.*;
 
+import net.tailriver.nl.id.NodeId;
+import net.tailriver.nl.sql.*;
+import net.tailriver.nl.util.*;
+import static net.tailriver.nl.util.Point.*;
+
 
 public class ModelParser extends Parser {
-	static final int PLANE_NODE_SIZE = 4;
+	public static final int PLANE_NODE_SIZE = 4;
 	static final Pattern cyclePattern     = Pattern.compile("^##\\s*([\\d.]+).*");
 	static final Pattern planeNodePattern = Pattern.compile("^([\\d.]+)\\s+([\\d.]+).*");
 
@@ -32,7 +39,7 @@ public class ModelParser extends Parser {
 			return true;
 		}
 
-		final Matcher constantMatcher = Util.CONSTANT_PATTERN.matcher(line);
+		final Matcher constantMatcher = Parser.CONSTANT_PATTERN.matcher(line);
 		if (constantMatcher.matches()) {
 			String key = constantMatcher.group(1).toLowerCase();
 			double value = Double.valueOf(constantMatcher.group(2));
@@ -48,7 +55,7 @@ public class ModelParser extends Parser {
 			return true;
 		}
 
-		final Matcher commentMatcher = Util.COMMENT_PATTERN.matcher(line);
+		final Matcher commentMatcher = Parser.COMMENT_PATTERN.matcher(line);
 		if (commentMatcher.matches()) {
 			// 一行だけ変えたいという需要があるかもしれないので isPlaneContext は変更しない
 			return true;
@@ -106,8 +113,8 @@ public class ModelParser extends Parser {
 
 		for (ArrayListWOF<Point, Double> wof : unitPlaneList) {
 			for (int cycle = 0; cycle < maxCycleDegree / wof.value(); cycle++) {
-				List<Id<NodeTable>> lowerNodes = new ArrayList<Id<NodeTable>>();
-				List<Id<NodeTable>> upperNodes = new ArrayList<Id<NodeTable>>();
+				List<NodeId> lowerNodes = new ArrayList<NodeId>();
+				List<NodeId> upperNodes = new ArrayList<NodeId>();
 
 				for (Point p : wof) {
 					double r = p.x(0);
@@ -117,12 +124,12 @@ public class ModelParser extends Parser {
 					// TODO lastrowid をどこかで使えるはず
 					Point p1 = new Point(Coordinate.Cylindrical, r, t, 0);
 					nt.insert(p1);
-					Id<NodeTable> lower = nt.select(p1);
+					NodeId lower = nt.select(p1);
 					lowerNodes.add(lower);
 
 					Point p2 = new Point(Coordinate.Cylindrical, r, t, z);
 					nt.insert(p2);
-					Id<NodeTable> upper = nt.select(p2);
+					NodeId upper = nt.select(p2);
 					upperNodes.add(upper);
 				}
 

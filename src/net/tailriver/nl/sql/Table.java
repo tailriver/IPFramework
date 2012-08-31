@@ -1,14 +1,17 @@
+package net.tailriver.nl.sql;
 import java.sql.*;
 import java.util.*;
 
-public class SQLTable {
+import net.tailriver.nl.util.Util;
+
+abstract class Table {
 	protected Connection conn;
 	protected String tableName;
 	private Map<String, String> columnDefs;
 	private List<String> constraints;
 	protected boolean isDebugMode;
 
-	public SQLTable(Connection conn, String tableName) {
+	public Table(Connection conn, String tableName) {
 		this.conn = conn;
 		this.tableName = tableName;
 		columnDefs = new LinkedHashMap<String, String>();

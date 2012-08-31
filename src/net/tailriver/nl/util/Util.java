@@ -1,10 +1,7 @@
+package net.tailriver.nl.util;
 import java.util.*;
-import java.util.regex.Pattern;
 
-class Util {
-	public static final Pattern CONSTANT_PATTERN = Pattern.compile("^##\\s*(\\w+):\\s*([\\d.]+).*");
-	public static final Pattern COMMENT_PATTERN = Pattern.compile("^#.*");
-
+public class Util {
 	public static <T> String join(CharSequence sep, T[] array) {
 		StringBuilder sb = new StringBuilder();
 		for (T s : array)

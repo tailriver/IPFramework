@@ -1,7 +1,8 @@
+package net.tailriver.nl.sql;
 import java.sql.*;
 
 
-class SQLiteUtil {
+public class SQLiteUtil {
 	public static Connection getConnection(String dbname) throws SQLException {
 		try {
 			Class.forName("org.sqlite.JDBC");

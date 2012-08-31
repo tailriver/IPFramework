@@ -1,8 +1,15 @@
+package net.tailriver.nl.sql;
+
 import java.sql.*;
 import java.util.*;
 
+import net.tailriver.nl.dataset.NodeSet;
+import net.tailriver.nl.id.NodeId;
+import net.tailriver.nl.util.*;
+import static net.tailriver.nl.util.Point.*;
 
-public class NodeTable extends SQLTable implements Identifiable {
+
+public class NodeTable extends Table {
 	static final Coordinate NODE_COORDINATE_SYSTEM = Coordinate.Cylindrical;
 
 	public NodeTable(Connection conn) {
@@ -26,7 +33,7 @@ public class NodeTable extends SQLTable implements Identifiable {
 		ps.close();
 	}
 
-	public Id<NodeTable> select(Point p) throws SQLException {
+	public NodeId select(Point p) throws SQLException {
 		if (!p.equals(NODE_COORDINATE_SYSTEM))
 			throw new IllegalArgumentException("Incompatible coordinate system");
 
@@ -38,7 +45,7 @@ public class NodeTable extends SQLTable implements Identifiable {
 
 		try {
 			int n = rs.getInt("num");
-			return new Id<NodeTable>(n);
+			return new NodeId(n);
 		} catch (SQLException e) {
 			throw new SQLException("node not found");			
 		} finally {
@@ -58,7 +65,7 @@ public class NodeTable extends SQLTable implements Identifiable {
 			double t = rs.getDouble("t");
 			double z = rs.getDouble("z");
 
-			Id<NodeTable> num = new Id<NodeTable>(n);
+			NodeId num = new NodeId(n);
 			Point p = new Point(Coordinate.Cylindrical, r, t, z);
 			rows.add(new NodeSet(num, p));
 		}

@@ -1,6 +1,8 @@
+package net.tailriver.nl.parser;
+
 import java.io.*;
-import java.sql.Connection;
-import java.sql.SQLException;
+import java.sql.*;
+import java.util.regex.Pattern;
 
 /**
  * {@link #parse(String)}中に実行されるフックがいくつかあるので、必要なものを Override して使う。<br>
@@ -11,6 +13,8 @@ import java.sql.SQLException;
  * @author tailriver
  */
 public abstract class Parser {
+	public static final Pattern CONSTANT_PATTERN = Pattern.compile("^##\\s*(\\w+):\\s*([\\d.]+).*");
+	public static final Pattern COMMENT_PATTERN = Pattern.compile("^#.*");
 	public boolean isPrintStackTrace = false;
 
 	/**

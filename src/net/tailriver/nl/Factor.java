@@ -1,6 +1,16 @@
+package net.tailriver.nl;
+
 import java.io.*;
 import java.sql.*;
 import java.util.List;
+
+import net.tailriver.nl.dataset.FactorSet;
+import net.tailriver.nl.id.FactorId;
+import net.tailriver.nl.parser.FactorParser;
+import net.tailriver.nl.parser.ParserException;
+import net.tailriver.nl.sql.FactorTable;
+import net.tailriver.nl.sql.SQLiteUtil;
+import net.tailriver.nl.util.ArrayListWOF;
 
 class Factor {
 	Connection conn;
@@ -31,11 +41,11 @@ class Factor {
 		PrintWriter cpw = null;
 		try {
 			FactorTable et = new FactorTable(conn);
-			List<ArrayListWOF<FactorSet, Id<FactorTable>>> factors = et.selectAllByFactorNum();
+			List<ArrayListWOF<FactorSet, FactorId>> factors = et.selectAllByFactorNum();
 
 			// case information
 			lpw = new PrintWriter(new BufferedWriter(new FileWriter(loopfile)));
-			for (ArrayListWOF<FactorSet, Id<FactorTable>> wof : factors) {
+			for (ArrayListWOF<FactorSet, FactorId> wof : factors) {
 				lpw.println("*IF,%FACTOR_ID%,EQ," + wof.value().id() + ",THEN");
 				lpw.println("ALLSEL");
 				for (FactorSet fs : wof) {

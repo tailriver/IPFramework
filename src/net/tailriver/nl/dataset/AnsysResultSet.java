@@ -1,8 +1,12 @@
-public class AnsysResultSet extends Id<FactorTable> {
-	private Id<NodeTable> n;
+package net.tailriver.nl.dataset;
+import net.tailriver.nl.id.*;
+import net.tailriver.nl.util.Util;
+
+public class AnsysResultSet extends FactorId {
+	private NodeId n;
 	private final Double sxx, syy, sxy;
 
-	public AnsysResultSet(Id<FactorTable> fid, Id<NodeTable> node, Double sxx, Double syy, Double sxy) {
+	public AnsysResultSet(FactorId fid, NodeId node, Double sxx, Double syy, Double sxy) {
 		super(fid);
 		this.n = node;
 		this.sxx = sxx;
@@ -10,7 +14,7 @@ public class AnsysResultSet extends Id<FactorTable> {
 		this.sxy = sxy;
 	}
 
-	public Id<NodeTable> node() {
+	public NodeId node() {
 		return n;
 	}
 

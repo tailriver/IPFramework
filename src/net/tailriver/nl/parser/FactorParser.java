@@ -1,12 +1,21 @@
+package net.tailriver.nl.parser;
+
 import java.sql.*;
 import java.util.*;
 import java.util.regex.*;
+
+import net.tailriver.nl.dataset.*;
+import net.tailriver.nl.id.FactorId;
+import net.tailriver.nl.id.NodeId;
+import net.tailriver.nl.sql.*;
+import net.tailriver.nl.util.*;
+import net.tailriver.nl.util.Point.*;
 
 
 public class FactorParser extends Parser {
 	class FactorParserSet extends FactorSet {
 		public final Point p;
-		FactorParserSet(Id<FactorTable> fid, Point p, String d, Double v) {
+		FactorParserSet(FactorId fid, Point p, String d, Double v) {
 			super(fid, null, d, v);
 			this.p = p;
 		}
@@ -16,11 +25,11 @@ public class FactorParser extends Parser {
 			Pattern.compile("^([\\d.]+)\\s+([\\d.]+)\\s+([\\d.]+)\\s+([XYZ])\\s+([-\\d.]+).*");
 
 	private String filename;
-	protected List<ArrayListWOF<FactorParserSet, Id<FactorTable>>> factors;
+	protected List<ArrayListWOF<FactorParserSet, FactorId>> factors;
 	protected boolean isSameIdContext;
 
 	public FactorParser() {
-		factors = new ArrayList<ArrayListWOF<FactorParserSet,Id<FactorTable>>>();
+		factors = new ArrayList<ArrayListWOF<FactorParserSet,FactorId>>();
 		isSameIdContext = false;
 	}
 
@@ -36,7 +45,7 @@ public class FactorParser extends Parser {
 			return true;
 		}
 
-		final Matcher commentMatcher = Util.COMMENT_PATTERN.matcher(line);
+		final Matcher commentMatcher = Parser.COMMENT_PATTERN.matcher(line);
 		if (commentMatcher.matches()) {
 			// 一行だけ変えたいという需要があるかもしれないので isPlaneContext は変更しない
 			return true;
@@ -44,11 +53,11 @@ public class FactorParser extends Parser {
 
 		final Matcher factorMatcher = factorPattern.matcher(line);
 		if (factorMatcher.matches()) {
-			ArrayListWOF<FactorParserSet, Id<FactorTable>> factorSub;
+			ArrayListWOF<FactorParserSet, FactorId> factorSub;
 			if (!isSameIdContext) {
 				// 頂点定義の文脈でなければ新しく要素を作り、それを対象とする
-				Id<FactorTable> fid = new Id<FactorTable>(factors.size() + 1);
-				factorSub = new ArrayListWOF<FactorParser.FactorParserSet, Id<FactorTable>>(fid);
+				FactorId fid = new FactorId(factors.size() + 1);
+				factorSub = new ArrayListWOF<FactorParser.FactorParserSet, FactorId>(fid);
 				factors.add(factorSub);
 			}
 			else {
@@ -89,10 +98,10 @@ public class FactorParser extends Parser {
 		ft.drop();
 		ft.create();
 
-		for (ArrayListWOF<FactorParserSet, Id<FactorTable>> wof : factors) {
-			Id<FactorTable> fid = wof.value();
+		for (ArrayListWOF<FactorParserSet, FactorId> wof : factors) {
+			FactorId fid = wof.value();
 			for  (FactorParserSet f : wof) {
-				Id<NodeTable> node = nt.select(f.p);
+				NodeId node = nt.select(f.p);
 				ft.insert(fid, node, f);
 			}
 		}
