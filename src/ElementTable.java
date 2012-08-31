@@ -9,7 +9,7 @@ class ElementTable extends SQLTable implements Identifiable {
 		super(conn, "element");
 		addColumn("id", "INTEGER PRIMARY KEY");
 		for (String label : ELEMENT_LABELS)
-			addColumn(label, "REFERENCES node");
+			addColumn(label, "INTEGER REFERENCES node");
 	}
 
 	public void insert(List<Id<NodeTable>> nodes) throws SQLException {
@@ -20,6 +20,7 @@ class ElementTable extends SQLTable implements Identifiable {
 		for (int i = 0; i < 2 * ModelParser.PLANE_NODE_SIZE; i++)
 			ps.setInt(i+1, nodes.get(i).id());
 		ps.execute();
+		ps.close();
 	}
 
 	public List<ElementSet> selectAll() throws SQLException {
@@ -36,6 +37,8 @@ class ElementTable extends SQLTable implements Identifiable {
 			rows.add(new ElementSet(eid, nodes));
 		}
 
+		rs.close();
+		st.close();
 		return rows;
 	}
 }

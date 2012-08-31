@@ -39,7 +39,9 @@ public abstract class Parser {
 	 * デフォルトは何もしないので、必要であれば Override する。
 	 * @throws Exception re-throw as a {@link ParserException} in {@link #parse(String)}
 	 */
-	protected void parseAfterHook(String filename) throws Exception {}
+	protected void parseAfterHook(String filename) throws Exception {
+		System.out.println(this.getClass().getName() + " : " + filename);
+	}
 
 	/**
 	 * ファイルからの読み込みの実装例。

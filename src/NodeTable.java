@@ -11,7 +11,7 @@ public class NodeTable extends SQLTable implements Identifiable {
 		addColumn("r", "REAL");
 		addColumn("t", "REAL");
 		addColumn("z", "REAL");
-		addProperty("UNIQUE(r,t,z)");
+		addTableConstraint("UNIQUE(r,t,z)");
 	}
 
 	public void insert(Point p) throws SQLException {
@@ -23,6 +23,7 @@ public class NodeTable extends SQLTable implements Identifiable {
 		for (int i = 0; i < NODE_COORDINATE_SYSTEM.getDimension(); i++)
 			ps.setDouble(i+1, p.x(i));
 		ps.execute();
+		ps.close();
 	}
 
 	public Id<NodeTable> select(Point p) throws SQLException {
@@ -40,6 +41,9 @@ public class NodeTable extends SQLTable implements Identifiable {
 			return new Id<NodeTable>(n);
 		} catch (SQLException e) {
 			throw new SQLException("node not found");			
+		} finally {
+			rs.close();
+			ps.close();
 		}
 	}
 
@@ -59,6 +63,8 @@ public class NodeTable extends SQLTable implements Identifiable {
 			rows.add(new NodeSet(num, p));
 		}
 
+		rs.close();
+		st.close();
 		return rows;
 	}
 }

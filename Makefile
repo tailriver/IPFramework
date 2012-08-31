@@ -11,16 +11,19 @@ JAVACFLAGS=-d bin -sourcepath src -cp $(CLASSPATH) -deprecation
 
 CLASSES=$(patsubst src/%.java,bin/%.class,$(wildcard src/*.java))
 
-.PHONY: SQLiteSample clean
+.PHONY: model factor factor_result clean
 .SUFFIXES : .java .class
 
-ALL:: model
+ALL:: factor_result
 
 model: bin/Model.class $(CLASSES)
 	$(JAVA) $(JAVAFLAGS) $(<:bin/%.class=%) $(DBFILE) data/model.txt
 
-factor: bin/Factor.class $(CLASSES)
+factor: bin/Factor.class $(CLASSES) model
 	$(JAVA) $(JAVAFLAGS) $(<:bin/%.class=%) $(DBFILE) data/factor_maximum_rtz.txt
+
+factor_result: bin/FactorResult.class $(CLASSES) model factor
+	$(JAVA) $(JAVAFLAGS) $(<:bin/%.class=%) $(DBFILE) data/factor_result/
 
 bin/%.class: src/%.java
 	mkdir -p bin

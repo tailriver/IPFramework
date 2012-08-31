@@ -2,6 +2,10 @@ import java.sql.*;
 
 
 class ConstantTable extends SQLTable {
+	static final double DEFAULT_RADIUS    = 1;
+	static final double DEFAULT_THICKNESS = 1;
+	static final double DEFAULT_MAX_CYCLE_DEGREE = 180;
+
 	public ConstantTable(Connection conn) {
 		super(conn, "constant");
 		addColumn("key", "STRING PRIMARY KEY");
@@ -13,6 +17,10 @@ class ConstantTable extends SQLTable {
 		ps.setString(1, key);
 		ps.setDouble(2, value);
 		ps.execute();
+		ps.close();
+
+		if (isDebugMode)
+			System.out.println(key + ": " + value);
 	}
 
 	public double select(String key, double defaultValue) throws SQLException {
@@ -24,6 +32,9 @@ class ConstantTable extends SQLTable {
 			return rs.getDouble("value");
 		} catch (SQLException e) {
 			return defaultValue;
+		} finally {
+			rs.close();
+			ps.close();
 		}
 	}
 }

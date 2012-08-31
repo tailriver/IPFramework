@@ -4,24 +4,26 @@ import java.util.*;
 public class SQLTable {
 	protected Connection conn;
 	protected String tableName;
-	private Map<String, String> columns;
-	private List<String> properties;
+	private Map<String, String> columnDefs;
+	private List<String> constraints;
+	protected boolean isDebugMode;
 
 	public SQLTable(Connection conn, String tableName) {
 		this.conn = conn;
 		this.tableName = tableName;
-		columns = new LinkedHashMap<String, String>();
-		properties = new ArrayList<String>();
+		columnDefs = new LinkedHashMap<String, String>();
+		constraints = new ArrayList<String>();
+		isDebugMode = false;
 	}
 
 	public void create() throws SQLException {
-		Iterator<String> it = columns.keySet().iterator();
+		Iterator<String> it = columnDefs.keySet().iterator();
 		List<String> scheme = new ArrayList<String>();
 		while (it.hasNext()) {
 			String key = it.next();
-			scheme.add(key + " " + columns.get(key));
+			scheme.add(key + " " + columnDefs.get(key));
 		}
-		scheme.addAll(properties);
+		scheme.addAll(constraints);
 
 		StringBuilder sb = new StringBuilder("CREATE TABLE ");
 		sb.append(tableName).append(" (").append(Util.join(", ", scheme)).append(")");
@@ -32,15 +34,25 @@ public class SQLTable {
 		execute("DROP TABLE IF EXISTS " + tableName);
 	}
 
-	protected void addColumn(String key, String value) {
-		columns.put(key, value);
+	public void setDebugMode(boolean b) {
+		isDebugMode = b;
 	}
 
-	protected void addProperty(String property) {
-		properties.add(property);
+	protected void addColumn(String name, String constraint) {
+		columnDefs.put(name, constraint);
+	}
+
+	protected void addTableConstraint(String constraint) {
+		constraints.add(constraint);
 	}
 
 	protected boolean execute(String sql) throws SQLException {
-		return conn.createStatement().execute(sql);
+		if (isDebugMode)
+			System.out.println(sql);
+
+		Statement st = conn.createStatement();
+		boolean r = st.execute(sql);
+		st.close();
+		return r;
 	}
 }

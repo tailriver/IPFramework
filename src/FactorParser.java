@@ -19,9 +19,14 @@ public class FactorParser extends Parser {
 	protected List<FactorList<FactorParserSet>> factors;
 	protected boolean isSameIdContext;
 
-	FactorParser() {
+	public FactorParser() {
 		factors = new ArrayList<FactorList<FactorParserSet>>();
 		isSameIdContext = false;
+	}
+
+	@Override
+	protected void parseBeforeHook(String filename) throws Exception {
+		this.filename = filename;
 	}
 
 	@Override
@@ -65,11 +70,6 @@ public class FactorParser extends Parser {
 		}
 
 		return false;
-	}
-
-	@Override
-	protected void parseAfterHook(String filename) throws Exception {
-		this.filename = filename;
 	}
 
 	/**

@@ -5,11 +5,11 @@ import java.util.*;
 public class FactorTable extends SQLTable implements Identifiable {
 	public FactorTable(Connection conn) {
 		super(conn, "factor");
-		addColumn("id", "integer");
-		addColumn("node", "REFERENCES node");
+		addColumn("id", "INTEGER");
+		addColumn("node", "INTEGER REFERENCES node");
 		addColumn("comp", "TEXT");
 		addColumn("value", "REAL");
-		addProperty("PRIMARY KEY(id,node,comp)");
+		addTableConstraint("PRIMARY KEY(id,node,comp)");
 	}
 
 	public void insert(Id<FactorTable> num, Id<NodeTable> node, FactorSet fs) throws SQLException {
@@ -20,23 +20,33 @@ public class FactorTable extends SQLTable implements Identifiable {
 		ps.setString(3, fs.direction().name());
 		ps.setDouble(4, fs.value());
 		ps.execute();
+		ps.close();
+	}
+
+	public int maxFactorId() throws SQLException {
+		Statement st = conn.createStatement();
+		ResultSet rs = st.executeQuery("SELECT max(id) FROM " + tableName);
+		int max = rs.getInt(1);
+
+		rs.close();
+		st.close();
+		return max;
 	}
 
 	public List<FactorList<FactorSet>> selectAllByFactorNum() throws SQLException {
-		// fetch max of factor.id
-		ResultSet rsMaxId = conn.createStatement().executeQuery("SELECT max(id) FROM " + tableName);
-		int maxId = rsMaxId.getInt(1);
+		int maxFactorId = maxFactorId();
 
 		List<FactorList<FactorSet>> whole = new ArrayList<FactorList<FactorSet>>();
 		PreparedStatement ps =
 				conn.prepareStatement("SELECT * FROM " + tableName + " WHERE id=?");
-		for (int id = 1; id <= maxId; id++) {
+		for (int id = 1; id <= maxFactorId; id++) {
 			ps.setInt(1, id);
 			ResultSet rs = ps.executeQuery();
 			FactorList<FactorSet> fl = new FactorList<FactorSet>(id);
 			fl.addAll(processSelectResult(rs));
 			whole.add(fl);
 		}
+		ps.close();
 		return whole;
 	}
 
@@ -44,7 +54,9 @@ public class FactorTable extends SQLTable implements Identifiable {
 		Statement st = conn.createStatement();
 		ResultSet rs = st.executeQuery("SELECT * FROM " + tableName);
 
-		return processSelectResult(rs);
+		List<FactorSet> fsl = processSelectResult(rs);
+		st.close();
+		return fsl;
 	}
 
 	private List<FactorSet> processSelectResult(ResultSet rs) throws SQLException {
@@ -56,6 +68,7 @@ public class FactorTable extends SQLTable implements Identifiable {
 			Double v = rs.getDouble("value");
 			fsl.add(new FactorSet(fid, num, d, v));
 		}
+		rs.close();
 		return fsl;
 	}
 }

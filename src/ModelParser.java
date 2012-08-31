@@ -9,7 +9,7 @@ public class ModelParser extends Parser {
 	static final Pattern planeNodePattern = Pattern.compile("^([\\d.]+)\\s+([\\d.]+).*");
 
 	@SuppressWarnings("serial")
-	class UnitPlane extends ArrayList<Point> {
+	private class UnitPlane extends ArrayList<Point> {
 		public final double cycleDegree;
 
 		UnitPlane(double cycleDegree) {
@@ -23,11 +23,16 @@ public class ModelParser extends Parser {
 	protected double currentCycleDegree;
 	private boolean isPlaneContext;
 
-	ModelParser() {
+	public ModelParser() {
 		constantMap = new HashMap<String, Double>();
 		unitPlaneList = new ArrayList<UnitPlane>();
 		currentCycleDegree = 180;
 		isPlaneContext = false;
+	}
+
+	@Override
+	protected void parseBeforeHook(String filename) throws Exception {
+		constantMap.put("AUTO:MODEL:" + filename, 0d);
 	}
 
 	@Override
@@ -84,11 +89,6 @@ public class ModelParser extends Parser {
 		return false;
 	}
 
-	@Override
-	protected void parseAfterHook(String filename) throws Exception {
-		constantMap.put("AUTO:MODEL:" + filename, 0d);
-	}
-
 	/**
 	 * モデル定義をデータベースに保存するメソッド<br>
 	 * {@code constant}, {@code node}, {@code element}テーブルを編集する
@@ -112,7 +112,7 @@ public class ModelParser extends Parser {
 			ct.insert(e.getKey(), e.getValue());
 
 		// 繰り返し角度の拡張
-		double maxCycleDegree = ct.select("max_cycle_degree", Model.DEFAULT_MAX_CYCLE_DEGREE);
+		double maxCycleDegree = ct.select("max_cycle_degree", ConstantTable.DEFAULT_MAX_CYCLE_DEGREE);
 
 		for (UnitPlane up : unitPlaneList) {
 			for (int cycle = 0; cycle < maxCycleDegree / up.cycleDegree; cycle++) {

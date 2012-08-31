@@ -1,15 +1,11 @@
 import java.io.*;
 import java.sql.*;
 
-class Model {
-	static final double DEFAULT_RADIUS    = 1;
-	static final double DEFAULT_THICKNESS = 1;
-	static final double DEFAULT_MAX_CYCLE_DEGREE = 180;
-
+public class Model {
 	Connection conn;
 	ModelParser p;
 
-	Model(Connection conn) {
+	public Model(Connection conn) {
 		this.conn = conn;
 		p = new ModelParser();
 	}
@@ -35,8 +31,8 @@ class Model {
 			NodeTable     nt = new NodeTable(conn);
 			ElementTable  et = new ElementTable(conn);
 
-			final double radius    = ct.select("radius", DEFAULT_RADIUS);
-			final double thickness = ct.select("thickness", DEFAULT_THICKNESS);
+			double radius    = ct.select("radius", ConstantTable.DEFAULT_RADIUS);
+			double thickness = ct.select("thickness", ConstantTable.DEFAULT_THICKNESS);
 
 			pw = new PrintWriter(new BufferedWriter(new FileWriter(filename)));
 

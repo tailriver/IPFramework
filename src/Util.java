@@ -16,4 +16,11 @@ class Util {
 	public static <T> String join(CharSequence sep, List<T> list) {
 		return Util.<T>join(sep, (T[]) list.toArray() );
 	}
+
+	public static String repeat(String s, int times) {
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < times; i++)
+			sb.append(s);
+		return sb.toString();
+	}
 }
