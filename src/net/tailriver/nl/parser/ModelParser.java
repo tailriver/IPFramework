@@ -12,7 +12,6 @@ import static net.tailriver.nl.util.Point.*;
 
 public class ModelParser extends Parser {
 	public static final int PLANE_NODE_SIZE = 4;
-	static final Pattern cyclePattern     = Pattern.compile("^##\\s*([\\d.]+).*");
 	static final Pattern planeNodePattern = Pattern.compile("^([\\d.]+)\\s+([\\d.]+).*");
 
 	protected Map<String, Double> constantMap;
@@ -48,7 +47,7 @@ public class ModelParser extends Parser {
 			return true;
 		}
 
-		final Matcher cycleMatcher = cyclePattern.matcher(line);
+		final Matcher cycleMatcher = Parser.CYCLE_PATTERN.matcher(line);
 		if (cycleMatcher.matches()) {
 			currentCycleDegree = Double.valueOf(cycleMatcher.group(1));
 			setIsPlaneContext(false);

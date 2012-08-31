@@ -13,8 +13,9 @@ import java.util.regex.Pattern;
  * @author tailriver
  */
 public abstract class Parser {
-	public static final Pattern CONSTANT_PATTERN = Pattern.compile("^##\\s*(\\w+):\\s*([\\d.]+).*");
-	public static final Pattern COMMENT_PATTERN = Pattern.compile("^#.*");
+	protected static final Pattern CONSTANT_PATTERN = Pattern.compile("^##\\s*(\\w+):\\s*([\\d.]+).*");
+	protected static final Pattern CYCLE_PATTERN    = Pattern.compile("^##\\s*([\\d.]+).*");
+	protected static final Pattern COMMENT_PATTERN  = Pattern.compile("^#.*");
 	public boolean isPrintStackTrace = false;
 
 	/**
