@@ -20,24 +20,24 @@ public class AnsysResultParser extends Parser {
 
 	private FactorId fid;
 	private String filename;
-	protected List<AnsysResultSet> arsList;
-	protected boolean isSkipMode;
+	private boolean isSkipMode;
+	private Collection<AnsysResultSet> parsed;
 
 	public AnsysResultParser() {
-		arsList = new ArrayList<AnsysResultSet>();
 		isSkipMode = true;
+		parsed = new ArrayList<AnsysResultSet>();
 	}
 
 	@Override
 	protected void parseBeforeHook(String filename) throws Exception {
 		this.filename = filename;
-		arsList.clear();
-
 		Matcher filenameMatcher = fidFromFileNamePattern.matcher(this.filename);
 		if (filenameMatcher.matches())
 			fid = new FactorId(Integer.valueOf(filenameMatcher.group(1)));
 		else
 			throw new ParserException("fail to extract factor id from the file name");
+
+		parsed.clear();
 	}
 
 	@Override
@@ -57,7 +57,7 @@ public class AnsysResultParser extends Parser {
 			Double sxy = Double.valueOf(stressMatcher.group(5));
 
 			AnsysResultSet ars = new AnsysResultSet(fid, node, sxx, syy, sxy);
-			arsList.add(ars);
+			parsed.add(ars);
 		}
 		else {
 			isSkipMode = true;
@@ -68,7 +68,7 @@ public class AnsysResultParser extends Parser {
 	@Override
 	public void save(Connection conn) throws SQLException {
 		FactorResultTable frt = new FactorResultTable(conn);
-		frt.insert(arsList);
+		frt.insert(parsed);
 		conn.commit();
 	}
 }

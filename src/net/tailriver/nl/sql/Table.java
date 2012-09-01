@@ -4,19 +4,17 @@ import java.util.*;
 
 import net.tailriver.nl.util.Util;
 
-abstract class Table {
+class Table {
 	protected Connection conn;
 	protected String tableName;
 	private Map<String, String> columnDefs;
 	private List<String> constraints;
-	protected boolean isDebugMode;
 
 	public Table(Connection conn, String tableName) {
 		this.conn = conn;
 		this.tableName = tableName;
 		columnDefs = new LinkedHashMap<String, String>();
 		constraints = new ArrayList<String>();
-		isDebugMode = false;
 	}
 
 	public void create() throws SQLException {
@@ -37,8 +35,8 @@ abstract class Table {
 		execute("DROP TABLE IF EXISTS " + tableName);
 	}
 
+	@Deprecated
 	public void setDebugMode(boolean b) {
-		isDebugMode = b;
 	}
 
 	protected void addColumn(String name, String constraint) {
@@ -50,12 +48,13 @@ abstract class Table {
 	}
 
 	protected boolean execute(String sql) throws SQLException {
-		if (isDebugMode)
-			System.out.println(sql);
-
-		Statement st = conn.createStatement();
-		boolean r = st.execute(sql);
-		st.close();
-		return r;
+		Statement st = null;
+		try {
+			st = conn.createStatement();
+			return st.execute(sql);
+		} finally {
+			if (st != null)
+				st.close();
+		}
 	}
 }

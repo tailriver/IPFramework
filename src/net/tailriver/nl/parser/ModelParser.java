@@ -11,7 +11,6 @@ import static net.tailriver.nl.util.Point.*;
 
 
 public class ModelParser extends Parser {
-	public static final int PLANE_NODE_SIZE = 4;
 	static final Pattern planeNodePattern = Pattern.compile("^([\\d.]+)\\s+([\\d.]+).*");
 
 	protected Map<String, Double> constantMap;
@@ -22,7 +21,7 @@ public class ModelParser extends Parser {
 	public ModelParser() {
 		constantMap = new HashMap<String, Double>();
 		unitPlaneList = new ArrayList<ArrayListWOF<Point, Double>>();
-		currentCycleDegree = 180;
+		currentCycleDegree = ConstantTable.DEFAULT_MAX_CYCLE_DEGREE;
 		isPlaneContext = false;
 	}
 
@@ -104,36 +103,32 @@ public class ModelParser extends Parser {
 		et.create();
 
 		// 定数の追加
-		for (Map.Entry<String, Double> e : constantMap.entrySet())
-			ct.insert(e.getKey(), e.getValue());
+		ct.insert(constantMap);
 
 		// 繰り返し角度の拡張
 		double maxCycleDegree = ct.select("max_cycle_degree", ConstantTable.DEFAULT_MAX_CYCLE_DEGREE);
 
 		for (ArrayListWOF<Point, Double> wof : unitPlaneList) {
 			for (int cycle = 0; cycle < maxCycleDegree / wof.value(); cycle++) {
-				List<NodeId> lowerNodes = new ArrayList<NodeId>();
-				List<NodeId> upperNodes = new ArrayList<NodeId>();
+				NodeId[] elementNodes = new NodeId[ElementTable.ELEMENT_LABELS.length];
 
+				int i = 0;
 				for (Point p : wof) {
 					double r = p.x(0);
 					double t = p.x(1) + cycle * wof.value();
 					double z = calculateDepth(r, t);
 
-					// TODO lastrowid をどこかで使えるはず
-					Point p1 = new Point(Coordinate.Cylindrical, r, t, 0);
-					nt.insert(p1);
-					NodeId lower = nt.select(p1);
-					lowerNodes.add(lower);
+					Point[] points = new Point[2];
+					points[0] = new Point(Coordinate.Cylindrical, r, t, 0);
+					points[1] = new Point(Coordinate.Cylindrical, r, t, z);
 
-					Point p2 = new Point(Coordinate.Cylindrical, r, t, z);
-					nt.insert(p2);
-					NodeId upper = nt.select(p2);
-					upperNodes.add(upper);
+					nt.insert(points);
+					NodeId[] nodes = nt.select(points);
+					elementNodes[i]   = nodes[0];
+					elementNodes[i+4] = nodes[1];
+					i++;
 				}
-
-				lowerNodes.addAll(upperNodes);
-				et.insert(lowerNodes);
+				et.insert(elementNodes);
 			}
 		}
 		conn.commit();
@@ -147,15 +142,16 @@ public class ModelParser extends Parser {
 	 */
 	protected void setIsPlaneContext(boolean newState) throws ParserException {
 		if (!unitPlaneList.isEmpty() && isPlaneContext) {
+			final int planeNodeSize = ElementTable.ELEMENT_LABELS.length / 2;
 			int nodeSize = unitPlaneList.get(unitPlaneList.size() - 1).size();
 
 			// true -> false (lost context)
-			if (!newState && nodeSize < PLANE_NODE_SIZE)
-				throw new ParserException("The number of nodes in a element must be " + PLANE_NODE_SIZE);
+			if (!newState && nodeSize < planeNodeSize)
+				throw new ParserException("The number of nodes in a element must be " + planeNodeSize);
 
 			// true -> true (keep context)
-			if (newState && nodeSize > PLANE_NODE_SIZE)
-				throw new ParserException("The number of nodes in a element must be " + PLANE_NODE_SIZE);
+			if (newState && nodeSize > planeNodeSize)
+				throw new ParserException("The number of nodes in a element must be " + planeNodeSize);
 		}
 		isPlaneContext = newState;
 	}

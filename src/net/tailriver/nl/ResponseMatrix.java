@@ -7,7 +7,6 @@ import java.io.PrintWriter;
 import java.sql.*;
 import java.util.List;
 
-import net.tailriver.nl.dataset.AnsysResultSet;
 import net.tailriver.nl.dataset.DesignSet;
 import net.tailriver.nl.id.DesignId;
 import net.tailriver.nl.id.FactorId;
@@ -37,11 +36,8 @@ public class ResponseMatrix {
 				FactorId fid = new FactorId(c);
 				List<DesignSet> dsl = dt.select(did);
 
-				double rc = 0; // (r,c) component
-				for (DesignSet ds : dsl) {
-					AnsysResultSet ars = frt.select(fid, ds.node());
-					rc += ars.s(ds.component()) * ds.weight();
-				}
+				// (r,c) component of matrix
+				double rc = frt.getMatrixValue(fid, dsl);
 				pw.printf("%.8E\t", rc);
 			}
 			pw.println();

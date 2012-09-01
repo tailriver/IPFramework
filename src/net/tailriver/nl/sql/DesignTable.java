@@ -19,44 +19,56 @@ public class DesignTable extends Table {
 	}
 
 	public void insert(DesignId did, NodeId node, DesignSet ds) throws SQLException {
-		PreparedStatement ps =
-				conn.prepareStatement("INSERT INTO " + tableName + " VALUES (?,?,?,?)");
-		ps.setInt(1, did.id());
-		ps.setInt(2, node.id());
-		ps.setString(3, ds.component().name());
-		ps.setDouble(4, ds.weight());
-		ps.execute();
-		ps.close();
+		PreparedStatement ps = null;
+		try {
+			ps = conn.prepareStatement("INSERT INTO " + tableName + " VALUES (?,?,?,?)");
+			ps.setInt(1, did.id());
+			ps.setInt(2, node.id());
+			ps.setString(3, ds.component().name());
+			ps.setDouble(4, ds.weight());
+			ps.execute();
+		} finally {
+			if (ps != null)
+				ps.close();
+		}
 	}
 
 	public int maxDesignId() throws SQLException {
-		Statement st = conn.createStatement();
-		ResultSet rs = st.executeQuery("SELECT max(id) FROM " + tableName);
-		int max = rs.getInt(1);
-
-		rs.close();
-		st.close();
-		return max;
+		Statement st = null;
+		try {
+			st = conn.createStatement();
+			ResultSet rs = st.executeQuery("SELECT max(id) FROM " + tableName);
+			int max = rs.getInt(1);
+			return max;
+		} finally {
+			if (st != null)
+				st.close();
+		}
 	}
 
 	public List<DesignSet> select(DesignId did) throws SQLException {
-		PreparedStatement ps = conn.prepareStatement("SELECT * FROM " + tableName + " WHERE id=?");
-		ps.setInt(1, did.id());
-		ResultSet rs = ps.executeQuery();
-
-		List<DesignSet> dsl = processSelectResult(rs);
-		rs.close();
-		ps.close();
-		return dsl;
+		PreparedStatement ps = null;
+		try {
+			ps = conn.prepareStatement("SELECT * FROM " + tableName + " WHERE id=?");
+			ps.setInt(1, did.id());
+			ResultSet rs = ps.executeQuery();	
+			return processSelectResult(rs);
+		} finally {
+			if (ps != null)
+				ps.close();
+		}
 	}
 
 	public List<DesignSet> selectAll() throws SQLException {
-		Statement st = conn.createStatement();
-		ResultSet rs = st.executeQuery("SELECT * FROM " + tableName);
-
-		List<DesignSet> dsl = processSelectResult(rs);
-		st.close();
-		return dsl;
+		Statement st = null;
+		try {
+			st = conn.createStatement();
+			ResultSet rs = st.executeQuery("SELECT * FROM " + tableName);
+			return processSelectResult(rs);
+		} finally {
+			if (st != null)
+				st.close();
+		}
 	}
 
 	private List<DesignSet> processSelectResult(ResultSet rs) throws SQLException {
@@ -68,7 +80,6 @@ public class DesignTable extends Table {
 			Double w = rs.getDouble("weight");
 			fsl.add(new DesignSet(did, num, c, w));
 		}
-		rs.close();
 		return fsl;
 	}
 }

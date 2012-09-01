@@ -13,7 +13,7 @@ public class Design {
 	Design(Connection conn) {
 		this.conn = conn;
 		p = new DesignParser();
-		p.isPrintStackTrace = true;
+		p.setParserStackTrace(true);
 	}
 
 	public void run(String filename) throws ParserException, SQLException {
@@ -24,7 +24,7 @@ public class Design {
 	private static void usage() {
 		System.err.println("Required just two arguments.");
 		System.err.println("Usage:");
-		System.err.println("	java DesignParser [dbname] [inputfile]");
+		System.err.println("	java Design [dbname] [inputfile]");
 	}
 
 	public static void main(String[] args) {

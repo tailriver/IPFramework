@@ -17,7 +17,7 @@ public class FactorResult {
 	FactorResult(Connection conn) {
 		this.conn = conn;
 		p = new AnsysResultParser();
-		p.isPrintStackTrace = true;
+		p.setParserStackTrace(true);
 	}
 
 	public void run(String dirname) throws ParserException, SQLException {

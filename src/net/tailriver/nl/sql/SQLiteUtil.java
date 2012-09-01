@@ -3,32 +3,41 @@ import java.sql.*;
 
 
 public class SQLiteUtil {
-	public static Connection getConnection(String dbname) throws SQLException {
+	static {
 		try {
 			Class.forName("org.sqlite.JDBC");
-			Connection conn = DriverManager.getConnection("jdbc:sqlite:" + dbname);
+		} catch (ClassNotFoundException e) {
+			System.err.println("SQLite JDBC Not Found");
+			System.exit(1);
+		}		
+	}
+
+	public static Connection getConnection(String dbname) throws SQLException {
+		Connection conn = null;
+		try {
+			conn = DriverManager.getConnection("jdbc:sqlite:" + dbname);
 
 			// initialize
 			conn.setAutoCommit(false);
-			conn.createStatement().execute("PRAGMA foreign_keys = ON");
+
+			Table t = new Table(conn, null);
+			t.execute("PRAGMA foreign_keys = ON");
 
 			return conn;
-		} catch (ClassNotFoundException e) {
-			System.err.println("SQLite JDBC Not Found");
-			throw new SQLException(e.getMessage());
 		} catch (SQLException e) {
-			System.err.println("Fail to open database...");
+			System.err.println("fail to connect/initialize database");
+			if (conn != null)
+				closeConnection(conn);
 			throw e;
 		}
 	}
 
 	public static void closeConnection(Connection conn) {
-		if (conn != null) {
-			try {
+		try {
+			if (conn != null)
 				conn.close();
-			} catch (SQLException e) {
-				System.err.println("Fail to close database...");
-			}
+		} catch (SQLException e) {
+			System.err.println("fail to close database");
 		}
 	}
 }

@@ -20,7 +20,7 @@ public class Factor {
 	Factor(Connection conn) {
 		this.conn = conn;
 		p = new FactorParser();
-		p.isPrintStackTrace = true;
+		p.setParserStackTrace(true);
 	}
 
 	public void parse(String filename) throws ParserException {

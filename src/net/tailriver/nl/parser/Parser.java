@@ -16,7 +16,7 @@ public abstract class Parser {
 	protected static final Pattern CONSTANT_PATTERN = Pattern.compile("^##\\s*(\\w+):\\s*([\\d.]+).*");
 	protected static final Pattern CYCLE_PATTERN    = Pattern.compile("^##\\s*([\\d.]+).*");
 	protected static final Pattern COMMENT_PATTERN  = Pattern.compile("^#.*");
-	public boolean isPrintStackTrace = false;
+	private boolean isPrintStackTrace = false;
 
 	/**
 	 * {@link #parse(String)}で定義されたフックの一つ。
@@ -79,25 +79,32 @@ public abstract class Parser {
 						throw new ParserException("not matched to any expressions");
 				}
 				parseAfterHook(filename);
+			} catch (IOException e) {
+				throw new ParserException("fail to read " + filename);
 			} catch (Exception e) {
 				if (isPrintStackTrace)
 					e.printStackTrace();
 
-				String s = e.getMessage() + " in " + filename + " at line " + lineNum + ".\n";
-				s += "> " + line;
-				throw new ParserException(s);
+				StringBuilder sb = new StringBuilder();
+				sb.append(e.getMessage()).append(" in ").append(filename)
+				.append(" at line").append(lineNum).append("\n").append("> ").append(line);
+				throw new ParserException(sb.toString());
 			}
 		} catch (FileNotFoundException e) {
-			throw new ParserException(e.toString());
+			throw new ParserException(filename + " not found");
 		} finally {
 			try {
 				if (br != null)
 					br.close();
 			} catch (IOException e) {
-				throw new ParserException("Fail to close " + filename);
+				throw new ParserException("fail to close " + filename);
 			}
 		}
 	}
 
 	abstract public void save(Connection conn) throws SQLException;
+
+	public void setParserStackTrace(boolean b) {
+		isPrintStackTrace = b;
+	}
 }
