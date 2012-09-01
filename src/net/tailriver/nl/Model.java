@@ -2,35 +2,61 @@ package net.tailriver.nl;
 
 import java.io.*;
 import java.sql.*;
+import java.util.Deque;
 
 import net.tailriver.nl.dataset.ElementSet;
 import net.tailriver.nl.dataset.NodeSet;
 import net.tailriver.nl.id.NodeId;
 import net.tailriver.nl.parser.*;
 import net.tailriver.nl.sql.*;
+import net.tailriver.nl.util.TaskIncompleteException;
 import net.tailriver.nl.util.Util;
 
-public class Model {
-	Connection conn;
-	ModelParser p;
+public class Model implements TaskTarget {
+	private Connection conn;
+	private String dbname;
+	private String inputfile;
+	private String ansysModelFile;
 
-	public Model(Connection conn) {
-		this.conn = conn;
-		p = new ModelParser();
+	@Override
+	public void pop(Deque<String> args) {
+		try {
+			dbname         = args.pop();
+			inputfile      = args.pop();
+			ansysModelFile = Task.outputFileCheck( args.pop() );
+		} finally {
+			Task.printPopLog(getClass(), "DB", dbname);
+			Task.printPopLog(getClass(), "< model:   ", inputfile);
+			Task.printPopLog(getClass(), "> Ansys model file:", ansysModelFile);
+		}
 	}
 
-	public void run(String filename) throws ParserException, SQLException {
-		p.parse(filename);
-		p.save(conn);
+	@Override
+	public void run() throws TaskIncompleteException {
+		try {
+			conn = SQLiteUtil.getConnection(dbname);
+
+			// parse and save
+			Parser p = new ModelParser();
+			p.parse(inputfile);
+			p.save(conn);
+
+			// for ANSYS
+			generateAnsysInput();
+
+			// TODO output for gnuplot?
+		} catch (ParserException e) {
+			System.err.println(e.getMessage());
+			throw new TaskIncompleteException();
+		} catch (SQLException e) {
+			System.err.println(e.getMessage());
+			throw new TaskIncompleteException();
+		} finally {
+			SQLiteUtil.closeConnection(conn);
+		}
 	}
 
-	private static void usage() {
-		System.err.println("Required just two arguments.");
-		System.err.println("Usage:");
-		System.err.println("	java Model [dbname] [inputfile]");
-	}
-
-	public void generateAnsysInput(String filename) throws SQLException {
+	private void generateAnsysInput() throws SQLException {
 		PrintWriter pw = null;
 		try {
 			ConstantTable ct = new ConstantTable(conn);
@@ -40,7 +66,7 @@ public class Model {
 			double radius    = ct.select("radius", ConstantTable.DEFAULT_RADIUS);
 			double thickness = ct.select("thickness", ConstantTable.DEFAULT_THICKNESS);
 
-			pw = new PrintWriter(new BufferedWriter(new FileWriter(filename)));
+			pw = new PrintWriter(new BufferedWriter(new FileWriter(ansysModelFile)));
 
 			// node information
 			pw.println("CSYS,1");
@@ -70,37 +96,6 @@ public class Model {
 		} finally {
 			if (pw != null)
 				pw.close();
-		}
-	}
-
-	public static void main(String[] args) {
-		if (args.length != 2) {
-			usage();
-			System.exit(1);
-		}
-
-		String dbname    = args[0];
-		String inputfile = args[1];
-
-		Connection conn = null;
-		try {
-			conn = SQLiteUtil.getConnection(dbname);
-			Model m = new Model(conn);
-
-			// parse and save
-			m.run(inputfile);
-
-			// for ANSYS
-			m.generateAnsysInput("model.ansys.txt");
-
-			// TODO output for gnuplot?
-		} catch (ParserException e) {
-			System.err.println(e.getMessage());
-		} catch (SQLException e) {
-			System.err.println(e.getMessage());
-			e.printStackTrace();
-		} finally {
-			SQLiteUtil.closeConnection(conn);
 		}
 	}
 }

@@ -5,6 +5,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.*;
+import java.util.Deque;
 import java.util.List;
 
 import net.tailriver.nl.dataset.DesignSet;
@@ -14,20 +15,46 @@ import net.tailriver.nl.sql.DesignTable;
 import net.tailriver.nl.sql.FactorResultTable;
 import net.tailriver.nl.sql.FactorTable;
 import net.tailriver.nl.sql.SQLiteUtil;
+import net.tailriver.nl.util.TaskIncompleteException;
 
-public class ResponseMatrix {
-	Connection conn;
+public class ResponseMatrix implements TaskTarget {
+	private Connection conn;
+	private String dbname;
+	private String matrixFile;
 
-	ResponseMatrix(Connection conn) {
-		this.conn = conn;
+	@Override
+	public void pop(Deque<String> args) {
+		try {
+			dbname = args.pop();
+			matrixFile = Task.outputFileCheck( args.pop() );
+		} finally {
+			Task.printPopLog(getClass(), "DB", dbname);
+			Task.printPopLog(getClass(), "> matrix file:", matrixFile);
+		}
 	}
 
-	public void run(String filename) throws IOException, SQLException {
+	@Override
+	public void run() throws TaskIncompleteException {
+		try {
+			conn = SQLiteUtil.getConnection(dbname);
+			generateResponseMatrix();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new TaskIncompleteException(e.getMessage());
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new TaskIncompleteException(e.getMessage());
+		} finally {
+			SQLiteUtil.closeConnection(conn);
+		}
+	}
+
+	private void generateResponseMatrix() throws IOException, SQLException {
 		DesignTable dt = new DesignTable(conn);
 		FactorTable ft = new FactorTable(conn);
 		FactorResultTable frt = new FactorResultTable(conn);
 
-		PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(filename)));
+		PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(matrixFile)));
 		int nRow = dt.maxDesignId();
 		int nCol = ft.maxFactorId();
 		for (int r = 1; r <= nRow; r++) {
@@ -47,36 +74,5 @@ public class ResponseMatrix {
 				System.out.println((int)(100d*r/nRow) + "% ...");
 		}
 		pw.close();
-	}
-
-	private static void usage() {
-		System.err.println("Required just one arguments");
-		System.err.println("Usage:");
-		System.err.println("	java ResponseMatrix [dbname]");
-	}
-
-	public static void main(String[] args) {
-		if (args.length != 1) {
-			usage();
-			System.exit(1);
-		}
-
-		String dbname    = args[0];
-
-		Connection conn = null;
-		try {
-			conn = SQLiteUtil.getConnection(dbname);
-			ResponseMatrix m = new ResponseMatrix(conn);
-
-			m.run("responsematrix.txt");
-		} catch (SQLException e) {
-			System.err.println(e.getMessage());
-			e.printStackTrace();
-		} catch (IOException e) {
-			System.err.println(e.getMessage());
-			e.printStackTrace();
-		} finally {
-			SQLiteUtil.closeConnection(conn);
-		}
 	}
 }

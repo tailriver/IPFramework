@@ -45,7 +45,7 @@ public abstract class Parser {
 	 * @throws Exception re-throw as a {@link ParserException} in {@link #parse(String)}
 	 */
 	protected void parseAfterHook(String filename) throws Exception {
-		System.out.println(this.getClass().getName() + ": " + filename);
+		System.out.println(this.getClass().getSimpleName() + ": " + filename);
 	}
 
 	/**

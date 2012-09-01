@@ -1,47 +1,39 @@
 package net.tailriver.nl;
 
 import java.sql.*;
+import java.util.Deque;
 
 import net.tailriver.nl.parser.DesignParser;
+import net.tailriver.nl.parser.Parser;
 import net.tailriver.nl.parser.ParserException;
 import net.tailriver.nl.sql.SQLiteUtil;
+import net.tailriver.nl.util.TaskIncompleteException;
 
-public class Design {
-	Connection conn;
-	DesignParser p;
+public class Design implements TaskTarget {
+	private Connection conn;
+	private String dbname;
+	private String inputfile;
 
-	Design(Connection conn) {
-		this.conn = conn;
-		p = new DesignParser();
-		p.setParserStackTrace(true);
-	}
-
-	public void run(String filename) throws ParserException, SQLException {
-		p.parse(filename);
-		p.save(conn);
-	}
-
-	private static void usage() {
-		System.err.println("Required just two arguments.");
-		System.err.println("Usage:");
-		System.err.println("	java Design [dbname] [inputfile]");
-	}
-
-	public static void main(String[] args) {
-		if (args.length != 2) {
-			usage();
-			System.exit(1);
+	@Override
+	public void pop(Deque<String> args) {
+		try {
+			dbname    = args.pop();
+			inputfile = args.pop();
+		} finally {
+			Task.printPopLog(getClass(), "DB", dbname);
+			Task.printPopLog(getClass(), "< design:", inputfile);
 		}
+	}
 
-		String dbname    = args[0];
-		String inputfile = args[1];
-
-		Connection conn = null;
+	@Override
+	public void run() throws TaskIncompleteException {
 		try {
 			conn = SQLiteUtil.getConnection(dbname);
-			Design m = new Design(conn);
 
-			m.run(inputfile);
+			Parser p = new DesignParser();
+			p.setParserStackTrace(true);
+			p.parse(inputfile);
+			p.save(conn);
 		} catch (ParserException e) {
 			System.err.println(e.getMessage());
 			e.printStackTrace();

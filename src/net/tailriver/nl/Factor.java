@@ -3,38 +3,66 @@ package net.tailriver.nl;
 import java.io.*;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Deque;
 import java.util.List;
 
 import net.tailriver.nl.dataset.FactorSet;
 import net.tailriver.nl.id.FactorId;
 import net.tailriver.nl.parser.FactorParser;
+import net.tailriver.nl.parser.Parser;
 import net.tailriver.nl.parser.ParserException;
 import net.tailriver.nl.sql.FactorTable;
 import net.tailriver.nl.sql.SQLiteUtil;
 import net.tailriver.nl.util.ArrayListWOF;
+import net.tailriver.nl.util.TaskIncompleteException;
 
-public class Factor {
-	Connection conn;
-	FactorParser p;
+public class Factor implements TaskTarget {
+	private Connection conn;
+	private String dbname;
+	private String inputfile;
+	private String ansysLoopFile;
+	private String ansysConstFile;
 
-	Factor(Connection conn) {
-		this.conn = conn;
-		p = new FactorParser();
-		p.setParserStackTrace(true);
+	@Override
+	public void pop(Deque<String> args) {
+		try {
+			dbname    = args.pop();
+			inputfile = args.pop();
+			ansysLoopFile  = Task.outputFileCheck( args.pop() );
+			ansysConstFile = Task.outputFileCheck( args.pop() );
+		} finally {
+			Task.printPopLog(getClass(), "DB", dbname);
+			Task.printPopLog(getClass(), "< factor:", inputfile);
+			Task.printPopLog(getClass(), "> Ansys loop file:", ansysLoopFile);
+			Task.printPopLog(getClass(), "> Ansys const file:", ansysConstFile);
+		}
 	}
 
-	public void run(String filename) throws ParserException, SQLException {
-		p.parse(filename);
-		p.save(conn);
+	@Override
+	public void run() throws TaskIncompleteException {
+		try {
+			conn = SQLiteUtil.getConnection(dbname);
+
+			// parse and save
+			Parser p = new FactorParser();
+			p.setParserStackTrace(true);
+			p.parse(inputfile);
+			p.save(conn);
+
+			// for ANSYS
+			generateAnsysInput();
+		} catch (ParserException e) {
+			System.err.println(e.getMessage());
+			e.printStackTrace();
+		} catch (SQLException e) {
+			System.err.println(e.getMessage());
+			e.printStackTrace();
+		} finally {
+			SQLiteUtil.closeConnection(conn);
+		}
 	}
 
-	private static void usage() {
-		System.err.println("Required just two arguments.");
-		System.err.println("Usage:");
-		System.err.println("	java Factor [dbname] [inputfile]");
-	}
-
-	public void generateAnsysInput(String loopfile, String constfile) throws SQLException {
+	private void generateAnsysInput() throws SQLException {
 		PrintWriter lpw = null;
 		PrintWriter cpw = null;
 		try {
@@ -42,7 +70,7 @@ public class Factor {
 			List<ArrayListWOF<FactorSet, FactorId>> factors = et.selectAllByFactorNum();
 
 			// case information
-			lpw = new PrintWriter(new BufferedWriter(new FileWriter(loopfile)));
+			lpw = new PrintWriter(new BufferedWriter(new FileWriter(ansysLoopFile)));
 			for (ArrayListWOF<FactorSet, FactorId> wof : factors) {
 				lpw.println("*IF,%FACTOR_ID%,EQ," + wof.value().id() + ",THEN");
 				lpw.println("ALLSEL");
@@ -54,7 +82,7 @@ public class Factor {
 			}
 
 			// constant information
-			cpw = new PrintWriter(new BufferedWriter(new FileWriter(constfile)));
+			cpw = new PrintWriter(new BufferedWriter(new FileWriter(ansysConstFile)));
 			cpw.println("*SET,FACTOR_ID_MAX," + factors.size());
 		} catch (IOException e) {
 			// TODO
@@ -63,38 +91,6 @@ public class Factor {
 				lpw.close();
 			if (cpw != null)
 				cpw.close();
-		}
-	}
-
-	public static void main(String[] args) {
-		if (args.length != 2) {
-			usage();
-			System.exit(1);
-		}
-
-		String dbname    = args[0];
-		String inputfile = args[1];
-
-		Connection conn = null;
-		try {
-			conn = SQLiteUtil.getConnection(dbname);
-			Factor m = new Factor(conn);
-
-			// parse and save
-			m.run(inputfile);
-
-			// for ANSYS
-			m.generateAnsysInput("factor.ansys.txt", "factor_max.ansys.txt");
-
-			// TODO output for gnuplot?
-		} catch (ParserException e) {
-			System.err.println(e.getMessage());
-			e.printStackTrace();
-		} catch (SQLException e) {
-			System.err.println(e.getMessage());
-			e.printStackTrace();
-		} finally {
-			SQLiteUtil.closeConnection(conn);
 		}
 	}
 }
