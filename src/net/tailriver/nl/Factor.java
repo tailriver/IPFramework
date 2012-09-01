@@ -23,11 +23,8 @@ public class Factor {
 		p.setParserStackTrace(true);
 	}
 
-	public void parse(String filename) throws ParserException {
+	public void run(String filename) throws ParserException, SQLException {
 		p.parse(filename);
-	}
-
-	public void save(Connection conn) throws SQLException {
 		p.save(conn);
 	}
 
@@ -83,9 +80,8 @@ public class Factor {
 			conn = SQLiteUtil.getConnection(dbname);
 			Factor m = new Factor(conn);
 
-			// parse
-			m.parse(inputfile);
-			m.save(conn);
+			// parse and save
+			m.run(inputfile);
 
 			// for ANSYS
 			m.generateAnsysInput("factor.ansys.txt", "factor_max.ansys.txt");

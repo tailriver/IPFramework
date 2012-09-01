@@ -19,11 +19,8 @@ public class Model {
 		p = new ModelParser();
 	}
 
-	public void parse(String filename) throws ParserException {
+	public void run(String filename) throws ParserException, SQLException {
 		p.parse(filename);
-	}
-
-	public void save(Connection conn) throws SQLException {
 		p.save(conn);
 	}
 
@@ -90,9 +87,8 @@ public class Model {
 			conn = SQLiteUtil.getConnection(dbname);
 			Model m = new Model(conn);
 
-			// parse
-			m.parse(inputfile);
-			m.save(conn);
+			// parse and save
+			m.run(inputfile);
 
 			// for ANSYS
 			m.generateAnsysInput("model.ansys.txt");
