@@ -22,8 +22,8 @@ public class Util {
 		return sb.toString();
 	}
 
-	public static String getCallerClass() {
-		String fqclass = Thread.currentThread().getStackTrace()[3].getClassName();
+	public static String getCallerClass(int stackTraceOrder) {
+		String fqclass = Thread.currentThread().getStackTrace()[stackTraceOrder].getClassName();
 		return fqclass.substring(fqclass.lastIndexOf(".") + 1);
 	}
 }

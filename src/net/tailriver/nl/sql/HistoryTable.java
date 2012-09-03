@@ -31,7 +31,7 @@ public class HistoryTable extends Table {
 		PreparedStatement ps = null;
 		try {
 			ps = conn.prepareStatement("INSERT INTO " + tableName + " (class,history) VALUES (?,?)");
-			ps.setString(1, Util.getCallerClass());
+			ps.setString(1, Util.getCallerClass(4));
 			for (String m : logMessages) {
 				ps.setString(2, m);
 				ps.addBatch();

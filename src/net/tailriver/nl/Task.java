@@ -130,6 +130,6 @@ public class Task implements TaskTarget {
 	 * @param s string(s)
 	 */
 	public static void printPopLog(String... s) {
-		System.out.println("[" + Util.getCallerClass() + "] " + Util.join(" ", s));
+		System.out.println("[" + Util.getCallerClass(3) + "] " + Util.join(" ", s));
 	}
 }
