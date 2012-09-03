@@ -7,11 +7,14 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import net.tailriver.nl.dataset.FactorSet;
 import net.tailriver.nl.id.FactorId;
 import net.tailriver.nl.id.NodeId;
 import net.tailriver.nl.util.ArrayListWOF;
+import net.tailriver.nl.util.Force;
+import net.tailriver.nl.util.Tensor1;
 
 
 public class FactorTable extends Table {
@@ -24,15 +27,18 @@ public class FactorTable extends Table {
 		addTableConstraint("PRIMARY KEY(id,node,comp)");
 	}
 
-	public boolean insert(FactorId fid, NodeId node, FactorSet fs) throws SQLException {
+	public int[] insert(FactorId fid, NodeId nid, Force force) throws SQLException {
 		PreparedStatement ps = null;
 		try {
 			ps = conn.prepareStatement("INSERT INTO " + tableName + " VALUES (?,?,?,?)");
 			ps.setInt(1, fid.id());
-			ps.setInt(2, node.id());
-			ps.setString(3, fs.direction().name());
-			ps.setDouble(4, fs.value());
-			return ps.execute();
+			ps.setInt(2, nid.id());
+			for (Map.Entry<Tensor1, Double> f : force.entrySet()) {
+				ps.setString(3, f.getKey().name());
+				ps.setDouble(4, f.getValue());
+				ps.addBatch();
+			}
+			return ps.executeBatch();
 		} finally {
 			if (ps != null)
 				ps.close();
@@ -83,10 +89,9 @@ public class FactorTable extends Table {
 		List<FactorSet> fsl = new ArrayList<FactorSet>();
 		while (rs.next()) {
 			FactorId fid = new FactorId(rs.getInt("id"));
-			NodeId num = new NodeId(rs.getInt("node"));
-			String d = rs.getString("comp");
-			Double v = rs.getDouble("value");
-			fsl.add(new FactorSet(fid, num, d, v));
+			NodeId nid = new NodeId(rs.getInt("node"));
+			Force f = new Force(rs.getString("comp"), rs.getDouble("value"));
+			fsl.add(new FactorSet(fid, nid, f));
 		}
 		return fsl;
 	}

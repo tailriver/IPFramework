@@ -7,25 +7,17 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.tailriver.nl.dataset.FactorSet;
 import net.tailriver.nl.id.FactorId;
 import net.tailriver.nl.id.NodeId;
 import net.tailriver.nl.sql.FactorTable;
 import net.tailriver.nl.sql.NodeTable;
 import net.tailriver.nl.util.ArrayListWOF;
+import net.tailriver.nl.util.Force;
 import net.tailriver.nl.util.Point;
 import net.tailriver.nl.util.Point.Coordinate;
 
 
 public class FactorParser extends Parser {
-	class FactorParserSet extends FactorSet {
-		public final Point p;
-		FactorParserSet(FactorId fid, Point p, String d, Double v) {
-			super(fid, null, d, v);
-			this.p = p;
-		}
-	}
-
 	static final Pattern factorPattern =
 			Pattern.compile("([\\d.]+)\\s+([\\d.]+)\\s+([\\d.]+)\\s+([XYZ])\\s+([-\\d.]+)");
 
@@ -56,7 +48,7 @@ public class FactorParser extends Parser {
 			if (!isSameIdContext) {
 				// 頂点定義の文脈でなければ新しく要素を作り、それを対象とする
 				FactorId fid = new FactorId(factors.size() + 1);
-				factorSub = new ArrayListWOF<FactorParser.FactorParserSet, FactorId>(fid);
+				factorSub = new ArrayListWOF<FactorParserSet, FactorId>(fid);
 				factors.add(factorSub);
 			}
 			else {
@@ -71,7 +63,8 @@ public class FactorParser extends Parser {
 			Double value = Double.valueOf(factorMatcher.group(5));
 
 			Point p = new Point(Coordinate.Cylindrical, r, t, z);
-			factorSub.add(new FactorParserSet(factorSub.value(), p, direction, value));
+			Force f = new Force(direction, value);
+			factorSub.add(new FactorParserSet(p, f));
 
 			isSameIdContext = true;
 			return true;
@@ -96,29 +89,20 @@ public class FactorParser extends Parser {
 		for (ArrayListWOF<FactorParserSet, FactorId> wof : factors) {
 			FactorId fid = wof.value();
 			for  (FactorParserSet f : wof) {
-				NodeId node = nt.select(f.p);
-				ft.insert(fid, node, f);
+				NodeId nid = nt.select(f.p);
+				ft.insert(fid, nid, f.f);
 			}
 		}
 		conn.commit();
 	}
+}
 
-	/**
-	 * ファイルをきちんと読み込めているか<br>
-	 * {@link #parse(String)}後に呼び出すと、定数と頂点の定義を一覧表示する
-	 */
-	@Override
-	public String toString() {
-		String n = "\n";
-		String t = "\t";
-		StringBuilder sb = new StringBuilder();
-		sb.append("Factor Parser").append(n);
-		for (List<FactorParserSet> up : factors) {
-			for(FactorParserSet f : up) {
-				sb.append(f.p).append(t).append(f.direction()).append(t).append(f.value()).append(n);
-			}
-			sb.append(n);
-		}
-		return sb.toString();
+
+class FactorParserSet {
+	final Point p;
+	final Force f;
+	FactorParserSet(Point p, Force f) {
+		this.p = p;
+		this.f = f;
 	}
 }

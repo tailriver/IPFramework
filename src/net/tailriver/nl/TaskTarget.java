@@ -8,8 +8,6 @@ import java.util.Queue;
  *
  */
 public interface TaskTarget {
-	public static final String CLASS_TOKEN = "--";
-
 	/**
 	 * You have to fetch arguments here to {@link #run()}.
 	 * @param args - Arguments passed by {@link Main#main(String[])}.

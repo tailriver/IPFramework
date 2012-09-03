@@ -7,6 +7,7 @@ import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 
 import net.tailriver.nl.dataset.FactorSet;
@@ -18,6 +19,7 @@ import net.tailriver.nl.sql.FactorTable;
 import net.tailriver.nl.sql.HistoryTable;
 import net.tailriver.nl.sql.SQLiteUtil;
 import net.tailriver.nl.util.ArrayListWOF;
+import net.tailriver.nl.util.Tensor1;
 
 public class Factor implements TaskTarget {
 	private Connection conn;
@@ -83,7 +85,8 @@ public class Factor implements TaskTarget {
 				lpw.println("*IF,%FACTOR_ID%,EQ," + wof.value().id() + ",THEN");
 				lpw.println("ALLSEL");
 				for (FactorSet fs : wof) {
-					lpw.printf("F,%d,F%s,%.5f\n", fs.node().id(), fs.direction(), fs.value());
+					for (Map.Entry<Tensor1, Double> f : fs.force().entrySet())
+						lpw.printf("F,%d,F%s,%.5f\n", fs.node().id(), f.getKey().name(), f.getValue());
 				}
 				lpw.println("*ENDIF");
 				lpw.println();

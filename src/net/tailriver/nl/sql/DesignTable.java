@@ -8,10 +8,13 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import net.tailriver.nl.dataset.DesignSet;
 import net.tailriver.nl.id.DesignId;
 import net.tailriver.nl.id.NodeId;
+import net.tailriver.nl.util.Stress;
+import net.tailriver.nl.util.Tensor2;
 
 
 public class DesignTable extends Table {
@@ -24,15 +27,18 @@ public class DesignTable extends Table {
 		addTableConstraint("PRIMARY KEY(id,node,comp)");
 	}
 
-	public boolean insert(DesignId did, NodeId node, DesignSet ds) throws SQLException {
+	public int[] insert(DesignId did, NodeId node, Stress stress) throws SQLException {
 		PreparedStatement ps = null;
 		try {
 			ps = conn.prepareStatement("INSERT INTO " + tableName + " VALUES (?,?,?,?)");
 			ps.setInt(1, did.id());
 			ps.setInt(2, node.id());
-			ps.setString(3, ds.component().name());
-			ps.setDouble(4, ds.weight());
-			return ps.execute();
+			for (Map.Entry<Tensor2, Double> s : stress.entrySet()) {
+				ps.setString(3, s.getKey().name());
+				ps.setDouble(4, s.getValue());
+				ps.addBatch();
+			}
+			return ps.executeBatch();
 		} finally {
 			if (ps != null)
 				ps.close();
@@ -72,10 +78,9 @@ public class DesignTable extends Table {
 		List<DesignSet> fsl = new ArrayList<DesignSet>();
 		while (rs.next()) {
 			DesignId did = new DesignId(rs.getInt("id"));
-			NodeId num = new NodeId(rs.getInt("node"));
-			String c = rs.getString("comp");
-			Double w = rs.getDouble("weight");
-			fsl.add(new DesignSet(did, num, c, w));
+			NodeId nid = new NodeId(rs.getInt("node"));
+			Stress s = new Stress(rs.getString("comp"), rs.getDouble("weight"));
+			fsl.add(new DesignSet(did, nid, s));
 		}
 		return fsl;
 	}

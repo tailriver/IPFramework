@@ -12,7 +12,7 @@ public class Id {
 		this.id = id != null ? id.id : null;
 	}
 
-	public int id() {
+	public Integer id() {
 		return id;
 	}
 

@@ -11,6 +11,8 @@ import net.tailriver.nl.dataset.AnsysResultSet;
 import net.tailriver.nl.id.FactorId;
 import net.tailriver.nl.id.NodeId;
 import net.tailriver.nl.sql.FactorResultTable;
+import net.tailriver.nl.util.Stress;
+import net.tailriver.nl.util.Tensor2;
 import net.tailriver.nl.util.Util;
 
 
@@ -54,11 +56,12 @@ public class AnsysResultParser extends Parser {
 		final Matcher stressMatcher = stressPattern.matcher(line);
 		if (stressMatcher.lookingAt()) {
 			NodeId nid = new NodeId(Integer.valueOf(stressMatcher.group(1)));
-			Double sxx = Double.valueOf(stressMatcher.group(2));
-			Double syy = Double.valueOf(stressMatcher.group(3));
-			Double sxy = Double.valueOf(stressMatcher.group(5));
+			Stress s = new Stress();
+			s.put(Tensor2.XX, Double.valueOf(stressMatcher.group(2)));
+			s.put(Tensor2.YY, Double.valueOf(stressMatcher.group(3)));
+			s.put(Tensor2.XY, Double.valueOf(stressMatcher.group(5)));
 
-			AnsysResultSet ars = new AnsysResultSet(fid, nid, sxx, syy, sxy);
+			AnsysResultSet ars = new AnsysResultSet(fid, nid, s);
 			parsed.add(ars);
 		}
 		else {

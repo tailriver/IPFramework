@@ -7,7 +7,13 @@ import java.util.Queue;
 
 
 public class Main {
-	private static int MAX_QUEUE_SIZE = 2000;
+	private static final String CLASS_TOKEN = "--";
+	private static final String DEFAULT_TASK_FILE = "task.txt";
+	private static final int MAX_QUEUE_SIZE = 2000;
+
+	static {
+		Task.addTaskPackage(Main.class.getPackage());		
+	}
 
 	private static void usage() {
 		System.out.println("Usage: (stub)");
@@ -18,8 +24,8 @@ public class Main {
 
 		// default arguments
 		if (q.size() == 0) {
-			q.add("--Task");
-			q.add("task.txt");
+			q.add(CLASS_TOKEN + Task.class.getSimpleName());
+			q.add(DEFAULT_TASK_FILE);
 		}
 
 		while (!q.isEmpty()) {
@@ -30,7 +36,7 @@ public class Main {
 				continue;
 
 			// first argument must be start with double hyphens
-			if (!arg.startsWith(TaskTarget.CLASS_TOKEN)) {
+			if (!arg.startsWith(CLASS_TOKEN)) {
 				usage();
 				System.exit(1);
 			}
@@ -41,7 +47,7 @@ public class Main {
 				System.exit(2);
 			}
 
-			String taskName = arg.substring(TaskTarget.CLASS_TOKEN.length());
+			String taskName = arg.substring(CLASS_TOKEN.length());
 			try {
 				TaskTarget t = Task.getTask(taskName);
 				t.pop(q);

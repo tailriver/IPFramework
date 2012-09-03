@@ -2,36 +2,29 @@ package net.tailriver.nl.dataset;
 
 import net.tailriver.nl.id.FactorId;
 import net.tailriver.nl.id.NodeId;
+import net.tailriver.nl.util.Force;
 
 public class FactorSet extends FactorId {
-	public enum Direction {X, Y, Z};
+	private final NodeId nid;
+	private final Force force;
 
-	private final NodeId n;
-	private final Direction d;
-	private final double v;
-
-	public FactorSet(FactorId fid, NodeId nid, String direction, double value) {
+	public FactorSet(FactorId fid, NodeId nid, Force force) {
 		super(fid);
-		this.n = nid;
-		this.d = Direction.valueOf(direction);
-		this.v = value;
+		this.nid = nid;
+		this.force = force;
 	}
 
 	public NodeId node() {
-		return n;
+		return nid;
 	}
 
-	public Direction direction() {
-		return d;
-	}
-
-	public double value() {
-		return v;
+	public Force force() {
+		return force;
 	}
 
 	@Override
 	public String toString() {
 		return getClass().getSimpleName() + "@{" +
-				super.toString() + "," + n + ",d=" + d + ",v=" + v + "}";
+				super.toString() + "," + nid + "," + force + "}";
 	}
 }

@@ -1,36 +1,34 @@
 package net.tailriver.nl.dataset;
 
-import java.util.EnumMap;
-
-import net.tailriver.nl.dataset.DesignSet.Component;
 import net.tailriver.nl.id.FactorId;
 import net.tailriver.nl.id.NodeId;
+import net.tailriver.nl.util.Stress;
+import net.tailriver.nl.util.Tensor2;
 
 public class AnsysResultSet extends FactorId {
-	private final NodeId n;
-	private final EnumMap<Component, Double> s;
+	private final NodeId nid;
+	private final Stress stress;
 
-	public AnsysResultSet(FactorId fid, NodeId nid, Double sxx, Double syy, Double sxy) {
+	public AnsysResultSet(FactorId fid, NodeId nid, Stress stress) {
 		super(fid);
-		this.n = nid;
-		this.s = new EnumMap<Component, Double>(Component.class);
-		s.put(Component.XX, sxx);
-		s.put(Component.YY, syy);
-		s.put(Component.XY, sxy);
+		this.nid = nid;
+		this.stress = stress;
 	}
 
 	public NodeId node() {
-		return n;
+		return nid;
 	}
 
-	public Double s(Component c) {
-		if (!s.containsKey(c))
-			throw new IllegalArgumentException("unsupported component");
-		return s.get(c);
+	public Stress stress() {
+		return stress;
+	}
+
+	public Double stress(Tensor2 component) {
+		return stress.get(component);
 	}
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + "@{" + super.toString() + "," + n + "," + s + "}";
+		return getClass().getSimpleName() + "@{" + super.toString() + "," + nid + "," + stress + "}";
 	}
 }

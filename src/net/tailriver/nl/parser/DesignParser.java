@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.tailriver.nl.dataset.DesignSet;
 import net.tailriver.nl.id.DesignId;
 import net.tailriver.nl.id.NodeId;
 import net.tailriver.nl.sql.ConstantTable;
@@ -16,17 +15,10 @@ import net.tailriver.nl.sql.NodeTable;
 import net.tailriver.nl.util.ArrayListWOF;
 import net.tailriver.nl.util.Point;
 import net.tailriver.nl.util.Point.Coordinate;
+import net.tailriver.nl.util.Stress;
 
 
 public class DesignParser extends Parser {
-	private class DesignParserSet extends DesignSet {
-		public final Point p;
-		DesignParserSet(DesignId did, Point p, String d, Double v) {
-			super(did, null, d, v);
-			this.p = p;
-		}
-	}
-
 	static final Pattern designPattern =
 			Pattern.compile("([\\d.]+)\\s+([\\d.]+)\\s+([\\d.]+)\\s+([XYZ]{1,2})\\s+([-\\d.]+)");
 
@@ -82,7 +74,8 @@ public class DesignParser extends Parser {
 				component += component;
 
 			Point p = new Point(Coordinate.Cylindrical, r, t, z);
-			factorSub.add(new DesignParserSet(null, p, component, weight));
+			Stress s = new Stress(component, weight);
+			factorSub.add(new DesignParserSet(p, s));
 
 			isPackedContext = true;
 			return true;
@@ -120,15 +113,25 @@ public class DesignParser extends Parser {
 				for (DesignParserSet dps : wof) {
 					double r = dps.p.x(0);
 					double t = dps.p.x(1) + cycle * wof.value();
-					double z = dps.p.x(2); // TODO relative? absolute?
+					double z = dps.p.x(2);
 
 					Point p = new Point(dps.p.coordinate(), r, t, z);
 					NodeId node = nt.select(p);
-					dt.insert(did, node, dps);
+					dt.insert(did, node, dps.s);
 				}
 				designIdNum++;
 			}
 		}
 		conn.commit();
+	}
+}
+
+
+class DesignParserSet {
+	final Point p;
+	final Stress s;
+	DesignParserSet(Point p, Stress s) {
+		this.p = p;
+		this.s = s;
 	}
 }

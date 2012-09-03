@@ -28,8 +28,8 @@ public class Shell implements TaskTarget {
 		ProcessBuilder pb = new ProcessBuilder(commands);
 		pb.redirectErrorStream(true);
 		Map<String, String> env = pb.environment();
-		env.put("IPF_QUEUE_ARGV", Util.<String>join(",", new ArrayList<String>(q)));
-		env.put("IPF_QUEUE_ARGC", String.valueOf(q.size()));
+		env.put("NL_TASK_LIST", Util.<String>join(",", new ArrayList<String>(q)));
+		env.put("NL_TASK_SIZE", String.valueOf(q.size()));
 
 		Process pr = null;
 		BufferedReader stdin = null;

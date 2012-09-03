@@ -3,8 +3,10 @@ package net.tailriver.nl;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Queue;
@@ -18,14 +20,20 @@ import net.tailriver.nl.util.Util;
  * @author tailriver
  */
 public class Task implements TaskTarget {
-	public static final Pattern variableDefinition =
+	public static final Pattern VARIABLE_DEFINITION =
 			Pattern.compile("[!#]\\s*(\\w+)\\s*[:=]\\s*(.*?)\\s*$");
-	public static final Pattern variableSubstring  = Pattern.compile("\\$\\((\\w+)\\)");
-	public static final Pattern commentDefinition  = Pattern.compile("[!#]");
-	public static final Map<String, String> variableTable = new HashMap<String, String>();
-	public static final String outputFileCheckerPrefix = ">";
+	public static final Pattern VARIABLE_EXPANSION = Pattern.compile("\\$\\((\\w+)\\)");
+	public static final Pattern COMMENT_LINE = Pattern.compile("[!#]");
+	public static final String OUTPUT_FILE_CHECKER_PREFIX = ">";
+	private static final Map<String, String> variableTable;
+	private static final List<Package> taskPackages;
 	private Queue<String> q;
 	private String taskFile;
+
+	static {
+		variableTable = new HashMap<String, String>();
+		taskPackages = new ArrayList<Package>();
+	}
 
 	/**
 	 * It consumes just one argument.
@@ -56,19 +64,19 @@ public class Task implements TaskTarget {
 				line.trim();
 
 				// variable definition
-				Matcher md = variableDefinition.matcher(line);
+				Matcher md = VARIABLE_DEFINITION.matcher(line);
 				if (md.lookingAt()) {
 					variableTable.put(md.group(1), md.group(2));
 					continue;
 				}
 
 				// comment skip
-				Matcher mc = commentDefinition.matcher(line);
+				Matcher mc = COMMENT_LINE.matcher(line);
 				if (mc.lookingAt())
 					continue;
 
 				// variable substitution
-				Matcher ms = variableSubstring.matcher(line);
+				Matcher ms = VARIABLE_EXPANSION.matcher(line);
 				StringBuffer sb = new StringBuffer();
 				while (ms.find()) {
 					String k = ms.group(1);
@@ -94,16 +102,24 @@ public class Task implements TaskTarget {
 		}
 	}
 
+	public static void addTaskPackage(Package p) {
+		taskPackages.add(0, p);
+	}
+
 	public static TaskTarget getTask(String className) throws ClassNotFoundException {
-		// adds package identifier if argument does not follow package name style
-		if (!className.matches("^[A-Z]"))
-			className = TaskTarget.class.getPackage().getName() + "." + className;
-	
 		try {
-			Object o = Class.forName(className).newInstance();
-			if (o instanceof TaskTarget)
-				return (TaskTarget)o;
-			throw new ClassNotFoundException("Tasks must implement TaskTarget interface");
+			for (Package p : taskPackages) {
+				Object o = null;
+				try {
+					o = Class.forName(p.getName() + "." + className).newInstance();
+				} catch (ClassNotFoundException e) {
+					continue;
+				}
+				if (o instanceof TaskTarget)
+					return (TaskTarget)o;
+				throw new ClassNotFoundException("Tasks must implement TaskTarget interface");
+			}
+			throw new ClassNotFoundException("requested task package not found");
 		} catch (ClassNotFoundException e) {
 			throw e;
 		} catch (Exception e) {
@@ -115,12 +131,12 @@ public class Task implements TaskTarget {
 	/**
 	 * It helps you from misplaced arguments.
 	 * @param filename - The candidate file name you will output.
-	 * @return filename (It already removed {@link #outputFileCheckerPrefix}).
+	 * @return filename (It already removed {@link #OUTPUT_FILE_CHECKER_PREFIX}).
 	 * @throws NoSuchElementException if the candidate failed the test.
 	 */
 	public static String outputFileCheck(String filename) throws NoSuchElementException {
-		if (filename.startsWith(outputFileCheckerPrefix))
-			return filename.substring(outputFileCheckerPrefix.length());
+		if (filename.startsWith(OUTPUT_FILE_CHECKER_PREFIX))
+			return filename.substring(OUTPUT_FILE_CHECKER_PREFIX.length());
 		throw new NoSuchElementException("output file fail-safe checker detected: " + filename);
 	}
 

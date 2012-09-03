@@ -2,36 +2,28 @@ package net.tailriver.nl.dataset;
 
 import net.tailriver.nl.id.DesignId;
 import net.tailriver.nl.id.NodeId;
+import net.tailriver.nl.util.Stress;
 
 public class DesignSet extends DesignId {
-	public enum Component {XX, YY, ZZ, XY, YZ, ZX};
+	private final NodeId nid;
+	private final Stress stress;
 
-	private final NodeId n;
-	private final Component c;
-	private final double w;
-
-	public DesignSet(DesignId did, NodeId nid, String component, double weight) {
+	public DesignSet(DesignId did, NodeId nid, Stress stress) {
 		super(did);
-		this.n = nid;
-		this.c = Component.valueOf(component);
-		this.w = weight;
+		this.nid = nid;
+		this.stress = stress;
 	}
 
 	public NodeId node() {
-		return n;
+		return nid;
 	}
 
-	public Component component() {
-		return c;
-	}
-
-	public double weight() {
-		return w;
+	public Stress stress() {
+		return stress;
 	}
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + "@{" +
-				super.toString() + "," + n + ",c=" + c + ",w=" + w + "}";
+		return getClass().getSimpleName() + "@{" + super.toString() + "," + nid + "," + stress + "}";
 	}
 }

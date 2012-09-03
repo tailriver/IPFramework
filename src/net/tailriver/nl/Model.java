@@ -10,7 +10,6 @@ import java.util.Queue;
 
 import net.tailriver.nl.dataset.ElementSet;
 import net.tailriver.nl.dataset.NodeSet;
-import net.tailriver.nl.id.NodeId;
 import net.tailriver.nl.parser.ModelParser;
 import net.tailriver.nl.parser.Parser;
 import net.tailriver.nl.parser.ParserException;
@@ -84,14 +83,17 @@ public class Model implements TaskTarget {
 
 			// node information
 			pw.println("CSYS,1");
-			for (NodeSet r : nt.selectAll())
-				pw.printf("N,%d,%.4e,%s,%.4e\n",
-						r.id(), r.p(0) * radius * 1e-5, r.p(1), r.p(2) * thickness * 1e-3);
+			for (NodeSet ns : nt.selectAll()) {
+				double r = ns.p(0) * radius * 1e-5;
+				double t = ns.p(1);
+				double z = ns.p(2) * thickness * calculateDepth(r, t) * 1e-3;
+				pw.printf("N,%d,%.4e,%s,%.4e\n", ns.id(), r, t, z);
+			}
 
 			// element information
 			pw.println("ET,1,SOLID185");
 			for (ElementSet r : et.selectAll())
-				pw.printf("EN,%d,%s\n", r.id(), Util.<NodeId>join(",", r.nodes()));
+				pw.printf("EN,%d,%s\n", r.id(), Util.<Integer>join(",", r.nodes_id()));
 
 			// constraint information
 			pw.println("ALLSEL");
@@ -111,5 +113,16 @@ public class Model implements TaskTarget {
 			if (pw != null)
 				pw.close();
 		}
+	}
+
+	/**
+	 * 高さ計算用メソッド Overrideすることで曲面を作成可能<br>
+	 * デフォルトでは、どのような入力に対しても単位高さ (1) を返す
+	 * @param r 無次元半径方向座標 [0,100] (%)
+	 * @param t 周方向座標 [0,360) (degree)
+	 * @return z 無次元軸方向座標
+	 */
+	private double calculateDepth(double r, double t) {
+		return 1;
 	}
 }
