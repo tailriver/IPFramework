@@ -1,6 +1,14 @@
 package net.tailriver.nl.sql;
-import java.sql.*;
-import java.util.*;
+
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 import net.tailriver.nl.util.Util;
 
@@ -17,7 +25,7 @@ class Table {
 		constraints = new ArrayList<String>();
 	}
 
-	public void create() throws SQLException {
+	public boolean create() throws SQLException {
 		Iterator<String> it = columnDefs.keySet().iterator();
 		List<String> scheme = new ArrayList<String>();
 		while (it.hasNext()) {
@@ -26,32 +34,40 @@ class Table {
 		}
 		scheme.addAll(constraints);
 
-		StringBuilder sb = new StringBuilder("CREATE TABLE ");
+		StringBuilder sb = new StringBuilder("CREATE TABLE IF NOT EXISTS ");
 		sb.append(tableName).append(" (").append(Util.join(", ", scheme)).append(")");
-		execute(sb.toString());
+		return execute(sb.toString());
 	}
 
-	public void drop() throws SQLException {
-		execute("DROP TABLE IF EXISTS " + tableName);
+	public boolean drop() throws SQLException {
+		return execute("DROP TABLE IF EXISTS " + tableName);
 	}
 
-	@Deprecated
-	public void setDebugMode(boolean b) {
+	protected String addColumn(String name, String constraint) {
+		return columnDefs.put(name, constraint);
 	}
 
-	protected void addColumn(String name, String constraint) {
-		columnDefs.put(name, constraint);
+	protected boolean addTableConstraint(String constraint) {
+		return constraints.add(constraint);
 	}
 
-	protected void addTableConstraint(String constraint) {
-		constraints.add(constraint);
-	}
-
-	protected boolean execute(String sql) throws SQLException {
+	public boolean execute(String sql) throws SQLException {
 		Statement st = null;
 		try {
 			st = conn.createStatement();
 			return st.execute(sql);
+		} finally {
+			if (st != null)
+				st.close();
+		}
+	}
+
+	public int executeQueryAndGetInt1(String sql) throws SQLException {
+		Statement st = null;
+		try {
+			st = conn.createStatement();
+			ResultSet rs = st.executeQuery(sql);
+			return rs.getInt(1);
 		} finally {
 			if (st != null)
 				st.close();

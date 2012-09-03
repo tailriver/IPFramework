@@ -1,5 +1,6 @@
 package net.tailriver.nl.util;
-import java.util.*;
+
+import java.util.List;
 
 public class Util {
 	public static <T> String join(CharSequence sep, T[] array) {
@@ -19,5 +20,10 @@ public class Util {
 		for (int i = 0; i < times; i++)
 			sb.append(s);
 		return sb.toString();
+	}
+
+	public static String getCallerClass() {
+		String fqclass = Thread.currentThread().getStackTrace()[3].getClassName();
+		return fqclass.substring(fqclass.lastIndexOf(".") + 1);
 	}
 }

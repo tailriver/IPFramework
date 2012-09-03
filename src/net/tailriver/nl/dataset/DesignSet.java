@@ -1,5 +1,7 @@
 package net.tailriver.nl.dataset;
-import net.tailriver.nl.id.*;
+
+import net.tailriver.nl.id.DesignId;
+import net.tailriver.nl.id.NodeId;
 
 public class DesignSet extends DesignId {
 	public enum Component {XX, YY, ZZ, XY, YZ, ZX};
@@ -8,9 +10,9 @@ public class DesignSet extends DesignId {
 	private final Component c;
 	private final double w;
 
-	public DesignSet(DesignId did, NodeId node, String component, double weight) {
+	public DesignSet(DesignId did, NodeId nid, String component, double weight) {
 		super(did);
-		this.n = node;
+		this.n = nid;
 		this.c = Component.valueOf(component);
 		this.w = weight;
 	}
@@ -29,6 +31,7 @@ public class DesignSet extends DesignId {
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + "@{D#" + id() + ";N#" + n + ";Comp:" + c + ";W:" + w + "}";
+		return getClass().getSimpleName() + "@{" +
+				super.toString() + "," + n + ",c=" + c + ",w=" + w + "}";
 	}
 }

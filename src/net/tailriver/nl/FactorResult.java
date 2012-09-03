@@ -1,17 +1,17 @@
 package net.tailriver.nl;
 
 import java.io.File;
-import java.sql.*;
-import java.util.Deque;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.Queue;
 
 import net.tailriver.nl.parser.AnsysResultParser;
 import net.tailriver.nl.parser.Parser;
 import net.tailriver.nl.parser.ParserException;
-import net.tailriver.nl.sql.ConstantTable;
 import net.tailriver.nl.sql.FactorResultTable;
 import net.tailriver.nl.sql.FactorTable;
+import net.tailriver.nl.sql.HistoryTable;
 import net.tailriver.nl.sql.SQLiteUtil;
-import net.tailriver.nl.util.TaskIncompleteException;
 
 public class FactorResult implements TaskTarget {
 	private Connection conn;
@@ -19,13 +19,13 @@ public class FactorResult implements TaskTarget {
 	private String inputdir;
 
 	@Override
-	public void pop(Deque<String> args) {
+	public void pop(Queue<String> args) {
 		try {
-			dbname   = args.pop();
-			inputdir = args.pop();
+			dbname   = args.remove();
+			inputdir = args.remove();
 		} finally {
-			Task.printPopLog(getClass(), "DB", dbname);
-			Task.printPopLog(getClass(), "< directory:", inputdir);
+			Task.printPopLog("DB", dbname);
+			Task.printPopLog("< directory:", inputdir);
 		}
 	}
 
@@ -63,8 +63,8 @@ public class FactorResult implements TaskTarget {
 			p.save(conn);
 		}
 
-		ConstantTable ct = new ConstantTable(conn);
-		ct.insert("AUTO:FACTOR_RESULT:" + inputdir, 0d);
+		HistoryTable ht = new HistoryTable(conn);
+		ht.insert(inputdir);
 		conn.commit();
 	}
 }

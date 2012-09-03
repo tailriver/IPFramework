@@ -55,22 +55,21 @@ public class Point {
 	}
 
 	@Override
-	public boolean equals(Object o) {
-		if (o instanceof Point) {
-			Point p = (Point) o;
+	public boolean equals(Object obj) {
+		if (obj instanceof Point) {
+			Point p = (Point) obj;
 			return this.c.equals(p.c) && this.x.equals(p.x);
 		}
-		return false;
+		return super.equals(obj);
 	}
 
-	public boolean equals(Coordinate c) {
+	public boolean hasCoordinate(Coordinate c) {
 		return this.c == c;
 	}
 
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("[").append(c.name()).append(": ").append(Util.<Double>join(",", x())).append("]");
-		return sb.toString();
+		return getClass().getSimpleName() + "@{" +
+				c.name() + ",(" + Util.<Double>join(",", x()) + ")}";
 	}
 }

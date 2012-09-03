@@ -5,7 +5,12 @@ public class FactorId extends Id {
 		super(id);
 	}
 
-	public FactorId(FactorId id) {
-		super(id);
+	public FactorId(FactorId fid) {
+		super(fid);
+	}
+
+	@Override
+	public String toString() {
+		return "F#" + id;
 	}
 }

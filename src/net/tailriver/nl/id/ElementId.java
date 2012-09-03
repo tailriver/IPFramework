@@ -5,7 +5,12 @@ public class ElementId extends Id {
 		super(id);
 	}
 
-	public ElementId(ElementId id) {
-		super(id);
+	public ElementId(ElementId eid) {
+		super(eid);
+	}
+
+	@Override
+	public String toString() {
+		return "E#" + id;
 	}
 }

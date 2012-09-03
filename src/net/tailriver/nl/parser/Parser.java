@@ -1,7 +1,11 @@
 package net.tailriver.nl.parser;
 
-import java.io.*;
-import java.sql.*;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.regex.Pattern;
 
 /**
@@ -13,9 +17,9 @@ import java.util.regex.Pattern;
  * @author tailriver
  */
 public abstract class Parser {
-	protected static final Pattern CONSTANT_PATTERN = Pattern.compile("^##\\s*(\\w+):\\s*([\\d.]+).*");
-	protected static final Pattern CYCLE_PATTERN    = Pattern.compile("^##\\s*([\\d.]+).*");
-	protected static final Pattern COMMENT_PATTERN  = Pattern.compile("^#.*");
+	public static final Pattern CONSTANT_PATTERN = Pattern.compile("[!#]+\\s*(\\w+):\\s*([\\d.]+)");
+	public static final Pattern CYCLE_PATTERN    = Pattern.compile("[!#]+\\s*([\\d.]+)");
+	public static final Pattern COMMENT_PATTERN  = Pattern.compile("[!#]");
 	private boolean isPrintStackTrace = false;
 
 	/**
@@ -34,7 +38,6 @@ public abstract class Parser {
 	 * ファイルが開かれ、最初の行の読み込みが始まる直前に読み込まれる。<br>
 	 * デフォルトは何もしないので、必要であれば Override する。
 	 * @throws Exception re-throw as a {@link ParserException} in {@link #parse(String)}
-
 	 */
 	protected void parseBeforeHook(String filename) throws Exception {}
 
@@ -45,7 +48,7 @@ public abstract class Parser {
 	 * @throws Exception re-throw as a {@link ParserException} in {@link #parse(String)}
 	 */
 	protected void parseAfterHook(String filename) throws Exception {
-		System.out.println(this.getClass().getSimpleName() + ": " + filename);
+		System.out.println("[" + this.getClass().getSimpleName() + "] " + filename);
 	}
 
 	/**
@@ -87,7 +90,7 @@ public abstract class Parser {
 
 				StringBuilder sb = new StringBuilder();
 				sb.append(e.getMessage()).append(" in ").append(filename)
-				.append(" at line").append(lineNum).append("\n").append("> ").append(line);
+				.append(" at line ").append(lineNum).append("\n").append("> ").append(line);
 				throw new ParserException(sb.toString());
 			}
 		} catch (FileNotFoundException e) {

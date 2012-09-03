@@ -4,9 +4,10 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.*;
-import java.util.Deque;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
+import java.util.Queue;
 
 import net.tailriver.nl.dataset.DesignSet;
 import net.tailriver.nl.id.DesignId;
@@ -15,7 +16,6 @@ import net.tailriver.nl.sql.DesignTable;
 import net.tailriver.nl.sql.FactorResultTable;
 import net.tailriver.nl.sql.FactorTable;
 import net.tailriver.nl.sql.SQLiteUtil;
-import net.tailriver.nl.util.TaskIncompleteException;
 
 public class ResponseMatrix implements TaskTarget {
 	private Connection conn;
@@ -23,13 +23,13 @@ public class ResponseMatrix implements TaskTarget {
 	private String matrixFile;
 
 	@Override
-	public void pop(Deque<String> args) {
+	public void pop(Queue<String> args) {
 		try {
-			dbname = args.pop();
-			matrixFile = Task.outputFileCheck( args.pop() );
+			dbname = args.remove();
+			matrixFile = Task.outputFileCheck( args.remove() );
 		} finally {
-			Task.printPopLog(getClass(), "DB", dbname);
-			Task.printPopLog(getClass(), "> matrix file:", matrixFile);
+			Task.printPopLog("DB", dbname);
+			Task.printPopLog("> matrix file:", matrixFile);
 		}
 	}
 

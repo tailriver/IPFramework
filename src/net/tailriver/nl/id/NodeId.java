@@ -5,7 +5,12 @@ public class NodeId extends Id {
 		super(id);
 	}
 
-	public NodeId(NodeId id) {
-		super(id);
+	public NodeId(NodeId nid) {
+		super(nid);
+	}
+
+	@Override
+	public String toString() {
+		return "N#" + id;
 	}
 }

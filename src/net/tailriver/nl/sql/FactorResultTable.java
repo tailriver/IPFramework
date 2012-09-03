@@ -1,11 +1,15 @@
 package net.tailriver.nl.sql;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Collection;
 import net.tailriver.nl.dataset.AnsysResultSet;
 import net.tailriver.nl.dataset.DesignSet;
 import net.tailriver.nl.dataset.DesignSet.Component;
-import net.tailriver.nl.id.*;
+import net.tailriver.nl.id.FactorId;
+import net.tailriver.nl.id.NodeId;
 
 
 public class FactorResultTable extends Table {
@@ -19,7 +23,7 @@ public class FactorResultTable extends Table {
 		addTableConstraint("PRIMARY KEY(factor,node)");
 	}
 
-	public void insert(Collection<AnsysResultSet> arsArray) throws SQLException {
+	public int[] insert(Collection<AnsysResultSet> arsArray) throws SQLException {
 		PreparedStatement ps = null;
 		try {
 			ps = conn.prepareStatement("INSERT INTO " + tableName + " VALUES (?,?,?,?,?)");
@@ -31,7 +35,7 @@ public class FactorResultTable extends Table {
 				ps.setDouble(5, ars.s(Component.XY));
 				ps.addBatch();
 			}
-			ps.executeBatch();
+			return ps.executeBatch();
 		} finally {
 			if (ps != null)
 				ps.close();

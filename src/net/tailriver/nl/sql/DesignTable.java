@@ -1,7 +1,13 @@
 package net.tailriver.nl.sql;
 
-import java.sql.*;
-import java.util.*;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 import net.tailriver.nl.dataset.DesignSet;
 import net.tailriver.nl.id.DesignId;
@@ -18,7 +24,7 @@ public class DesignTable extends Table {
 		addTableConstraint("PRIMARY KEY(id,node,comp)");
 	}
 
-	public void insert(DesignId did, NodeId node, DesignSet ds) throws SQLException {
+	public boolean insert(DesignId did, NodeId node, DesignSet ds) throws SQLException {
 		PreparedStatement ps = null;
 		try {
 			ps = conn.prepareStatement("INSERT INTO " + tableName + " VALUES (?,?,?,?)");
@@ -26,7 +32,7 @@ public class DesignTable extends Table {
 			ps.setInt(2, node.id());
 			ps.setString(3, ds.component().name());
 			ps.setDouble(4, ds.weight());
-			ps.execute();
+			return ps.execute();
 		} finally {
 			if (ps != null)
 				ps.close();
@@ -34,16 +40,7 @@ public class DesignTable extends Table {
 	}
 
 	public int maxDesignId() throws SQLException {
-		Statement st = null;
-		try {
-			st = conn.createStatement();
-			ResultSet rs = st.executeQuery("SELECT max(id) FROM " + tableName);
-			int max = rs.getInt(1);
-			return max;
-		} finally {
-			if (st != null)
-				st.close();
-		}
+		return executeQueryAndGetInt1("SELECT max(id) FROM " + tableName);
 	}
 
 	public List<DesignSet> select(DesignId did) throws SQLException {

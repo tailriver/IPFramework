@@ -1,17 +1,18 @@
 package net.tailriver.nl.dataset;
+
 import java.util.EnumMap;
 
 import net.tailriver.nl.dataset.DesignSet.Component;
-import net.tailriver.nl.id.*;
-import net.tailriver.nl.util.Util;
+import net.tailriver.nl.id.FactorId;
+import net.tailriver.nl.id.NodeId;
 
 public class AnsysResultSet extends FactorId {
-	private NodeId n;
+	private final NodeId n;
 	private final EnumMap<Component, Double> s;
 
-	public AnsysResultSet(FactorId fid, NodeId node, Double sxx, Double syy, Double sxy) {
+	public AnsysResultSet(FactorId fid, NodeId nid, Double sxx, Double syy, Double sxy) {
 		super(fid);
-		this.n = node;
+		this.n = nid;
 		this.s = new EnumMap<Component, Double>(Component.class);
 		s.put(Component.XX, sxx);
 		s.put(Component.YY, syy);
@@ -30,9 +31,6 @@ public class AnsysResultSet extends FactorId {
 
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("N").append(n.id()).append(" F").append(id()).append(";");
-		sb.append(Util.<Double>join(", ", (Double[])s.values().toArray()));
-		return sb.toString();
+		return getClass().getSimpleName() + "@{" + super.toString() + "," + n + "," + s + "}";
 	}
 }

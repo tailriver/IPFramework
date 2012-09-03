@@ -1,17 +1,26 @@
 package net.tailriver.nl.parser;
 
-import java.sql.*;
-import java.util.*;
-import java.util.regex.*;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import net.tailriver.nl.id.NodeId;
-import net.tailriver.nl.sql.*;
-import net.tailriver.nl.util.*;
-import static net.tailriver.nl.util.Point.*;
+import net.tailriver.nl.sql.ConstantTable;
+import net.tailriver.nl.sql.ElementTable;
+import net.tailriver.nl.sql.NodeTable;
+import net.tailriver.nl.util.ArrayListWOF;
+import net.tailriver.nl.util.Point;
+import net.tailriver.nl.util.Point.Coordinate;
+import net.tailriver.nl.util.Util;
 
 
 public class ModelParser extends Parser {
-	static final Pattern planeNodePattern = Pattern.compile("^([\\d.]+)\\s+([\\d.]+).*");
+	protected static final Pattern planeNodePattern = Pattern.compile("([\\d.]+)\\s+([\\d.]+)");
 
 	protected Map<String, Double> constantMap;
 	protected List<ArrayListWOF<Point, Double>> unitPlaneList;
@@ -26,11 +35,6 @@ public class ModelParser extends Parser {
 	}
 
 	@Override
-	protected void parseBeforeHook(String filename) throws Exception {
-		constantMap.put("AUTO:MODEL:" + filename, 0d);
-	}
-
-	@Override
 	protected boolean parseLoopHook(String line) throws Exception {
 		if (line.isEmpty()) {
 			setIsPlaneContext(false);
@@ -38,7 +42,7 @@ public class ModelParser extends Parser {
 		}
 
 		final Matcher constantMatcher = Parser.CONSTANT_PATTERN.matcher(line);
-		if (constantMatcher.matches()) {
+		if (constantMatcher.lookingAt()) {
 			String key = constantMatcher.group(1).toLowerCase();
 			double value = Double.valueOf(constantMatcher.group(2));
 			constantMap.put(key, value);
@@ -47,20 +51,20 @@ public class ModelParser extends Parser {
 		}
 
 		final Matcher cycleMatcher = Parser.CYCLE_PATTERN.matcher(line);
-		if (cycleMatcher.matches()) {
+		if (cycleMatcher.lookingAt()) {
 			currentCycleDegree = Double.valueOf(cycleMatcher.group(1));
 			setIsPlaneContext(false);
 			return true;
 		}
 
 		final Matcher commentMatcher = Parser.COMMENT_PATTERN.matcher(line);
-		if (commentMatcher.matches()) {
+		if (commentMatcher.lookingAt()) {
 			// 一行だけ変えたいという需要があるかもしれないので isPlaneContext は変更しない
 			return true;
 		}
 
 		final Matcher planeNodeMatcher = planeNodePattern.matcher(line);
-		if (planeNodeMatcher.matches()) {
+		if (planeNodeMatcher.lookingAt()) {
 			ArrayListWOF<Point, Double> currentUnitPlane;
 			if (!isPlaneContext) {
 				// 頂点定義の文脈でなければ新しく要素を作り、それを対象とする
@@ -118,14 +122,14 @@ public class ModelParser extends Parser {
 					double t = p.x(1) + cycle * wof.value();
 					double z = calculateDepth(r, t);
 
-					Point[] points = new Point[2];
-					points[0] = new Point(Coordinate.Cylindrical, r, t, 0);
-					points[1] = new Point(Coordinate.Cylindrical, r, t, z);
-
+					List<Point> points = new ArrayList<Point>();
+					points.add(new Point(Coordinate.Cylindrical, r, t, 0));
+					points.add(new Point(Coordinate.Cylindrical, r, t, z));
 					nt.insert(points);
-					NodeId[] nodes = nt.select(points);
-					elementNodes[i]   = nodes[0];
-					elementNodes[i+4] = nodes[1];
+
+					List<NodeId> nodes = nt.select(points);
+					elementNodes[i]   = nodes.get(0);
+					elementNodes[i+4] = nodes.get(1);
 					i++;
 				}
 				et.insert(elementNodes);

@@ -1,15 +1,15 @@
 package net.tailriver.nl.id;
 
 
-public abstract class Id {
-	private final int id;
+public class Id {
+	protected final Integer id;
 
-	public Id(int id) {
+	protected Id(Integer id) {
 		this.id = id;
 	}
 
-	public Id(Id idn) {
-		this.id = idn != null ? idn.id : -1;
+	protected <T extends Id> Id(T id) {
+		this.id = id != null ? id.id : null;
 	}
 
 	public int id() {
@@ -25,6 +25,6 @@ public abstract class Id {
 	public boolean equals(Object obj) {
 		if (obj instanceof Id)
 			return id == ((Id) obj).id;
-		return false;
+		return super.equals(obj);
 	}
 }

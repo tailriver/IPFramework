@@ -1,12 +1,17 @@
 package net.tailriver.nl.sql;
 
-import java.sql.*;
-import java.util.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 import net.tailriver.nl.dataset.FactorSet;
 import net.tailriver.nl.id.FactorId;
 import net.tailriver.nl.id.NodeId;
-import net.tailriver.nl.util.*;
+import net.tailriver.nl.util.ArrayListWOF;
 
 
 public class FactorTable extends Table {
@@ -19,7 +24,7 @@ public class FactorTable extends Table {
 		addTableConstraint("PRIMARY KEY(id,node,comp)");
 	}
 
-	public void insert(FactorId fid, NodeId node, FactorSet fs) throws SQLException {
+	public boolean insert(FactorId fid, NodeId node, FactorSet fs) throws SQLException {
 		PreparedStatement ps = null;
 		try {
 			ps = conn.prepareStatement("INSERT INTO " + tableName + " VALUES (?,?,?,?)");
@@ -27,7 +32,7 @@ public class FactorTable extends Table {
 			ps.setInt(2, node.id());
 			ps.setString(3, fs.direction().name());
 			ps.setDouble(4, fs.value());
-			ps.execute();
+			return ps.execute();
 		} finally {
 			if (ps != null)
 				ps.close();
@@ -35,16 +40,7 @@ public class FactorTable extends Table {
 	}
 
 	public int maxFactorId() throws SQLException {
-		Statement st = null;
-		try {
-			st = conn.createStatement();
-			ResultSet rs = st.executeQuery("SELECT max(id) FROM " + tableName);
-			int max = rs.getInt(1);
-			return max;
-		} finally {
-			if (st != null)
-				st.close();
-		}
+		return executeQueryAndGetInt1("SELECT max(id) FROM " + tableName);
 	}
 
 	public List<ArrayListWOF<FactorSet, FactorId>> selectAllByFactorNum() throws SQLException {

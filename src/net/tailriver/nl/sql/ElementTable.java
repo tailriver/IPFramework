@@ -1,12 +1,17 @@
 package net.tailriver.nl.sql;
 
-import java.sql.*;
-import java.util.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 import net.tailriver.nl.dataset.ElementSet;
 import net.tailriver.nl.id.ElementId;
 import net.tailriver.nl.id.NodeId;
-import net.tailriver.nl.util.*;
+import net.tailriver.nl.util.Util;
 
 
 public class ElementTable extends Table {
@@ -19,14 +24,14 @@ public class ElementTable extends Table {
 			addColumn(label, "INTEGER REFERENCES node");
 	}
 
-	public void insert(NodeId[] nodes) throws SQLException {
+	public boolean insert(NodeId[] nodes) throws SQLException {
 		PreparedStatement ps = null;
 		try {
 			ps = conn.prepareStatement("INSERT INTO " + tableName 
 					+ " ("+ Util.join(",", ELEMENT_LABELS) + ") VALUES (?,?,?,?,?,?,?,?)");
 			for (int i = 0; i < ELEMENT_LABELS.length; i++)
 				ps.setInt(i+1, nodes[i].id());
-			ps.execute();
+			return ps.execute();
 		} finally {
 			if (ps != null)
 				ps.close();

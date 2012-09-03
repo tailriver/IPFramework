@@ -1,12 +1,13 @@
 package net.tailriver.nl.dataset;
+
 import net.tailriver.nl.id.NodeId;
 import net.tailriver.nl.util.Point;
 
 public class NodeSet extends NodeId {
 	private final Point p;
 
-	public NodeSet(NodeId num, Point p) {
-		super(num);
+	public NodeSet(NodeId nid, Point p) {
+		super(nid);
 		this.p = p;
 	}
 
@@ -16,5 +17,10 @@ public class NodeSet extends NodeId {
 
 	public double p(int i) {
 		return p.x(i);
+	}
+
+	@Override
+	public String toString() {
+		return getClass().getSimpleName() + "@{" + super.toString() + "," + p + "}";
 	}
 }

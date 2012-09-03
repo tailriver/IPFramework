@@ -1,15 +1,20 @@
 package net.tailriver.nl.parser;
 
-import java.sql.*;
-import java.util.*;
-import java.util.regex.*;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import net.tailriver.nl.dataset.*;
+import net.tailriver.nl.dataset.FactorSet;
 import net.tailriver.nl.id.FactorId;
 import net.tailriver.nl.id.NodeId;
-import net.tailriver.nl.sql.*;
-import net.tailriver.nl.util.*;
-import net.tailriver.nl.util.Point.*;
+import net.tailriver.nl.sql.FactorTable;
+import net.tailriver.nl.sql.NodeTable;
+import net.tailriver.nl.util.ArrayListWOF;
+import net.tailriver.nl.util.Point;
+import net.tailriver.nl.util.Point.Coordinate;
 
 
 public class FactorParser extends Parser {
@@ -22,20 +27,14 @@ public class FactorParser extends Parser {
 	}
 
 	static final Pattern factorPattern =
-			Pattern.compile("^([\\d.]+)\\s+([\\d.]+)\\s+([\\d.]+)\\s+([XYZ])\\s+([-\\d.]+).*");
+			Pattern.compile("([\\d.]+)\\s+([\\d.]+)\\s+([\\d.]+)\\s+([XYZ])\\s+([-\\d.]+)");
 
-	private String filename;
 	protected List<ArrayListWOF<FactorParserSet, FactorId>> factors;
 	protected boolean isSameIdContext;
 
 	public FactorParser() {
 		factors = new ArrayList<ArrayListWOF<FactorParserSet,FactorId>>();
 		isSameIdContext = false;
-	}
-
-	@Override
-	protected void parseBeforeHook(String filename) throws Exception {
-		this.filename = filename;
 	}
 
 	@Override
@@ -46,13 +45,13 @@ public class FactorParser extends Parser {
 		}
 
 		final Matcher commentMatcher = Parser.COMMENT_PATTERN.matcher(line);
-		if (commentMatcher.matches()) {
+		if (commentMatcher.lookingAt()) {
 			// 一行だけ変えたいという需要があるかもしれないので isPlaneContext は変更しない
 			return true;
 		}
 
 		final Matcher factorMatcher = factorPattern.matcher(line);
-		if (factorMatcher.matches()) {
+		if (factorMatcher.lookingAt()) {
 			ArrayListWOF<FactorParserSet, FactorId> factorSub;
 			if (!isSameIdContext) {
 				// 頂点定義の文脈でなければ新しく要素を作り、それを対象とする
@@ -87,12 +86,8 @@ public class FactorParser extends Parser {
 	 */
 	@Override
 	public void save(Connection conn) throws SQLException {
-		ConstantTable ct = new ConstantTable(conn);
 		NodeTable     nt = new NodeTable(conn);
 		FactorTable   ft = new FactorTable(conn);
-
-		// 定数の追加
-		ct.insert("AUTO:FACTOR:" + filename, 0d);
 
 		// テーブルの作成
 		ft.drop();

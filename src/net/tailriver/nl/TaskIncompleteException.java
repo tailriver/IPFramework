@@ -1,4 +1,4 @@
-package net.tailriver.nl.util;
+package net.tailriver.nl;
 
 @SuppressWarnings("serial")
 public class TaskIncompleteException extends Exception {
@@ -9,5 +9,4 @@ public class TaskIncompleteException extends Exception {
 	public TaskIncompleteException(String message) {
 		super(message);
 	}
-
 }

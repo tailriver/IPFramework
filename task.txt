@@ -1,22 +1,38 @@
+#--Shell
+#ls
+#-Al
+
+
+--Shell
+echo
+Hello world
+
+# db_file : foo.db
+
 --Model
-foo.db
+$(db_file)
 data/model.txt
 >model.ansys.txt
 
 --Factor
-foo.db
+$(db_file)
 data/factor_maximum_rtz.txt
 >factor.ansys.txt
 >factor_max.ansys.txt
 
 --FactorResult
-foo.db
+$(db_file)
 data/factor_result/
 
 --Design
-foo.db
+$(db_file)
 data/design_node_extent.txt
 
 --ResponseMatrix
-foo.db
+$(db_file)
 >responsematrix.txt
+
+#--Quit
+
+#--Task
+#anothertask.txt

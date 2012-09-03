@@ -5,7 +5,12 @@ public class DesignId extends Id {
 		super(id);
 	}
 
-	public DesignId(DesignId id) {
-		super(id);
+	public DesignId(DesignId did) {
+		super(did);
+	}
+
+	@Override
+	public String toString() {
+		return "D#" + id;
 	}
 }

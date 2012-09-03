@@ -1,6 +1,9 @@
 package net.tailriver.nl.sql;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Collections;
 import java.util.Map;
 
@@ -16,11 +19,11 @@ public class ConstantTable extends Table {
 		addColumn("value", "REAL");
 	}
 
-	public void insert(String key, double value) throws SQLException {
-		insert(Collections.singletonMap(key, value));
+	public int insert(String key, double value) throws SQLException {
+		return insert(Collections.singletonMap(key, value))[0];
 	}
 
-	public void insert(Map<String, Double> map) throws SQLException {
+	public int[] insert(Map<String, Double> map) throws SQLException {
 		PreparedStatement ps = null;
 		try {
 			ps = conn.prepareStatement("INSERT INTO " + tableName + " VALUES (?,?)");
@@ -29,9 +32,9 @@ public class ConstantTable extends Table {
 				ps.setDouble(2, e.getValue());
 				ps.addBatch();
 			}
-			ps.executeBatch();
+			return ps.executeBatch();
 		} finally {
-			if(ps != null)
+			if (ps != null)
 				ps.close();
 		}
 	}

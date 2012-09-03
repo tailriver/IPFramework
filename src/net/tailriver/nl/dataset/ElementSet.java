@@ -1,5 +1,7 @@
 package net.tailriver.nl.dataset;
-import net.tailriver.nl.id.*;
+
+import net.tailriver.nl.id.ElementId;
+import net.tailriver.nl.id.NodeId;
 
 public class ElementSet extends ElementId {
 	private final NodeId[] nodes;
@@ -11,5 +13,10 @@ public class ElementSet extends ElementId {
 
 	public NodeId[] nodes() {
 		return nodes;
+	}
+
+	@Override
+	public String toString() {
+		return getClass().getSimpleName() + "@{" + super.toString() + "," + nodes + "}";
 	}
 }

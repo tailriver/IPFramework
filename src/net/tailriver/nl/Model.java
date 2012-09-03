@@ -1,15 +1,24 @@
 package net.tailriver.nl;
 
-import java.io.*;
-import java.sql.*;
-import java.util.Deque;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.Queue;
 
 import net.tailriver.nl.dataset.ElementSet;
 import net.tailriver.nl.dataset.NodeSet;
 import net.tailriver.nl.id.NodeId;
-import net.tailriver.nl.parser.*;
-import net.tailriver.nl.sql.*;
-import net.tailriver.nl.util.TaskIncompleteException;
+import net.tailriver.nl.parser.ModelParser;
+import net.tailriver.nl.parser.Parser;
+import net.tailriver.nl.parser.ParserException;
+import net.tailriver.nl.sql.ConstantTable;
+import net.tailriver.nl.sql.ElementTable;
+import net.tailriver.nl.sql.HistoryTable;
+import net.tailriver.nl.sql.NodeTable;
+import net.tailriver.nl.sql.SQLiteUtil;
 import net.tailriver.nl.util.Util;
 
 public class Model implements TaskTarget {
@@ -19,15 +28,15 @@ public class Model implements TaskTarget {
 	private String ansysModelFile;
 
 	@Override
-	public void pop(Deque<String> args) {
+	public void pop(Queue<String> args) {
 		try {
-			dbname         = args.pop();
-			inputfile      = args.pop();
-			ansysModelFile = Task.outputFileCheck( args.pop() );
+			dbname         = args.remove();
+			inputfile      = args.remove();
+			ansysModelFile = Task.outputFileCheck( args.remove() );
 		} finally {
-			Task.printPopLog(getClass(), "DB", dbname);
-			Task.printPopLog(getClass(), "< model:   ", inputfile);
-			Task.printPopLog(getClass(), "> Ansys model file:", ansysModelFile);
+			Task.printPopLog("DB", dbname);
+			Task.printPopLog("< model:   ", inputfile);
+			Task.printPopLog("> Ansys model file:", ansysModelFile);
 		}
 	}
 
@@ -40,6 +49,11 @@ public class Model implements TaskTarget {
 			Parser p = new ModelParser();
 			p.parse(inputfile);
 			p.save(conn);
+
+			// save history
+			HistoryTable ht = new HistoryTable(conn);
+			ht.insert(inputfile);
+			conn.commit();
 
 			// for ANSYS
 			generateAnsysInput();

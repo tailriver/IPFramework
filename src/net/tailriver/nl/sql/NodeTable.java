@@ -1,12 +1,20 @@
 package net.tailriver.nl.sql;
 
-import java.sql.*;
-import java.util.*;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 import net.tailriver.nl.dataset.NodeSet;
 import net.tailriver.nl.id.NodeId;
-import net.tailriver.nl.util.*;
-import static net.tailriver.nl.util.Point.*;
+import net.tailriver.nl.util.Point;
+import net.tailriver.nl.util.Point.Coordinate;
 
 
 public class NodeTable extends Table {
@@ -22,23 +30,23 @@ public class NodeTable extends Table {
 		addTableConstraint("UNIQUE(r,t,z)");
 	}
 
-	public void insert(Point p) throws SQLException {
-		insert(new Point[]{p});
+	public int insert(Point p) throws SQLException {
+		return insert(Collections.singletonList(p))[0];
 	}
 
-	public void insert(Point[] points) throws SQLException {
+	public int[] insert(Collection<Point> points) throws SQLException {
 		PreparedStatement ps = null;
 		try {
 			ps = conn.prepareStatement("INSERT OR IGNORE INTO " + tableName + " (r,t,z) VALUES (?,?,?)");
 			for (Point p : points) {
-				if (!p.equals(NODE_CSYS))
+				if (!p.hasCoordinate(NODE_CSYS))
 					throw new IllegalArgumentException("incompatible coordinate system");
 
 				for (int i = 0; i < DIMENSION; i++)
 					ps.setDouble(i+1, p.x(i));
 				ps.addBatch();
 			}
-			ps.executeBatch();
+			return ps.executeBatch();
 		} finally {
 			if (ps != null)
 				ps.close();
@@ -46,42 +54,33 @@ public class NodeTable extends Table {
 	}
 
 	public int maxNodeId() throws SQLException {
-		Statement st = null;
-		try {
-			st = conn.createStatement();
-			ResultSet rs = st.executeQuery("SELECT max(num) FROM " + tableName);
-			int max = rs.getInt(1);
-			return max;
-		} finally {
-			if (st != null)
-				st.close();
-		}
+		return executeQueryAndGetInt1("SELECT max(num) FROM " + tableName);
 	}
 
-	public NodeId select(Point p) throws SQLException {
-		return select(new Point[]{p})[0];
+	public NodeId select(Point point) throws SQLException {
+		return select(Collections.singletonList(point)).get(0);
 	}
 
-	public NodeId[] select(Point[] p) throws SQLException {
+	public List<NodeId> select(List<Point> points) throws SQLException {
 		PreparedStatement ps = null;
 		try {
 			ps = conn.prepareStatement("SELECT num FROM node WHERE r=? AND t=? AND z=?");
-			NodeId[] nodes = new NodeId[p.length];
-			for (int i = 0; i < p.length; i++) {
-				if (!p[i].equals(NODE_CSYS))
+			List<NodeId> nodes = new ArrayList<NodeId>();
+			for (Point p : points) {
+				if (!p.hasCoordinate(NODE_CSYS))
 					throw new IllegalArgumentException("Incompatible coordinate system");
 
-				for (int j = 0; j < DIMENSION; j++)
-					ps.setDouble(j+1, p[i].x(j));
+				for (int i = 0; i < DIMENSION; i++)
+					ps.setDouble(i+1, p.x(i));
 
 				ResultSet rs = ps.executeQuery();
 				try {
 					int n = rs.getInt("num");
-					nodes[i] = new NodeId(n);
+					nodes.add(new NodeId(n));
 				} catch (SQLException e) {
 					System.err.println("node not found: " + p);
-					nodes[i] = null;
-				}
+					nodes.add(null);
+				}				
 			}
 			return nodes;
 		} finally {

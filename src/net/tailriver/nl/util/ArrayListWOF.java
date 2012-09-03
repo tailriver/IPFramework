@@ -1,4 +1,5 @@
 package net.tailriver.nl.util;
+
 import java.util.ArrayList;
 
 /** ArrayList w/ one field. */
@@ -13,5 +14,10 @@ public class ArrayListWOF<E, T> extends ArrayList<E> {
 
 	public T value() {
 		return v;
+	}
+
+	@Override
+	public String toString() {
+		return getClass().getSimpleName() + "@{v=" + v + ";" + super.toString() + "}";
 	}
 }

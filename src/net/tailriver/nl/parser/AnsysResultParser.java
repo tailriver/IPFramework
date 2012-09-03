@@ -1,12 +1,16 @@
 package net.tailriver.nl.parser;
 
-import java.sql.*;
-import java.util.*;
-import java.util.regex.*;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import net.tailriver.nl.dataset.*;
-import net.tailriver.nl.id.*;
-import net.tailriver.nl.sql.*;
+import net.tailriver.nl.dataset.AnsysResultSet;
+import net.tailriver.nl.id.FactorId;
+import net.tailriver.nl.id.NodeId;
+import net.tailriver.nl.sql.FactorResultTable;
 import net.tailriver.nl.util.Util;
 
 
@@ -14,12 +18,11 @@ public class AnsysResultParser extends Parser {
 	static final Pattern fidFromFileNamePattern =
 			Pattern.compile(".*[^\\d](\\d+)\\.txt$");
 	static final Pattern skipStopPattern =
-			Pattern.compile("\\s*NODE\\s+SX\\s+SY\\s+SZ\\s+.*");
+			Pattern.compile("\\s*NODE\\s+SX\\s+SY\\s+SZ");
 	static final Pattern stressPattern =
-			Pattern.compile("^\\s*(\\d+)" + Util.repeat("\\s+([-+.E\\d]+)", 6) + ".*");
+			Pattern.compile("\\s*(\\d+)" + Util.repeat("\\s+([-+.E\\d]+)", 6));
 
 	private FactorId fid;
-	private String filename;
 	private boolean isSkipMode;
 	private Collection<AnsysResultSet> parsed;
 
@@ -30,8 +33,7 @@ public class AnsysResultParser extends Parser {
 
 	@Override
 	protected void parseBeforeHook(String filename) throws Exception {
-		this.filename = filename;
-		Matcher filenameMatcher = fidFromFileNamePattern.matcher(this.filename);
+		Matcher filenameMatcher = fidFromFileNamePattern.matcher(filename);
 		if (filenameMatcher.matches())
 			fid = new FactorId(Integer.valueOf(filenameMatcher.group(1)));
 		else
@@ -44,19 +46,19 @@ public class AnsysResultParser extends Parser {
 	protected boolean parseLoopHook(String line) throws Exception {
 		if (isSkipMode) {
 			Matcher skipStopMatcher = skipStopPattern.matcher(line);
-			if (skipStopMatcher.matches())
+			if (skipStopMatcher.lookingAt())
 				isSkipMode = false;
 			return true;
 		}
 
 		final Matcher stressMatcher = stressPattern.matcher(line);
-		if (stressMatcher.matches()) {
-			NodeId node = new NodeId(Integer.valueOf(stressMatcher.group(1)));
+		if (stressMatcher.lookingAt()) {
+			NodeId nid = new NodeId(Integer.valueOf(stressMatcher.group(1)));
 			Double sxx = Double.valueOf(stressMatcher.group(2));
 			Double syy = Double.valueOf(stressMatcher.group(3));
 			Double sxy = Double.valueOf(stressMatcher.group(5));
 
-			AnsysResultSet ars = new AnsysResultSet(fid, node, sxx, syy, sxy);
+			AnsysResultSet ars = new AnsysResultSet(fid, nid, sxx, syy, sxy);
 			parsed.add(ars);
 		}
 		else {

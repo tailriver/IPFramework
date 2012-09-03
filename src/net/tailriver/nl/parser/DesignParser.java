@@ -1,19 +1,25 @@
 package net.tailriver.nl.parser;
 
-import java.sql.*;
-import java.util.*;
-import java.util.regex.*;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import net.tailriver.nl.dataset.*;
+import net.tailriver.nl.dataset.DesignSet;
 import net.tailriver.nl.id.DesignId;
 import net.tailriver.nl.id.NodeId;
-import net.tailriver.nl.sql.*;
-import net.tailriver.nl.util.*;
-import net.tailriver.nl.util.Point.*;
+import net.tailriver.nl.sql.ConstantTable;
+import net.tailriver.nl.sql.DesignTable;
+import net.tailriver.nl.sql.NodeTable;
+import net.tailriver.nl.util.ArrayListWOF;
+import net.tailriver.nl.util.Point;
+import net.tailriver.nl.util.Point.Coordinate;
 
 
 public class DesignParser extends Parser {
-	class DesignParserSet extends DesignSet {
+	private class DesignParserSet extends DesignSet {
 		public final Point p;
 		DesignParserSet(DesignId did, Point p, String d, Double v) {
 			super(did, null, d, v);
@@ -22,9 +28,8 @@ public class DesignParser extends Parser {
 	}
 
 	static final Pattern designPattern =
-			Pattern.compile("^([\\d.]+)\\s+([\\d.]+)\\s+([\\d.]+)\\s+([XYZ]{1,2})\\s+([-\\d.]+).*");
+			Pattern.compile("([\\d.]+)\\s+([\\d.]+)\\s+([\\d.]+)\\s+([XYZ]{1,2})\\s+([-\\d.]+)");
 
-	private String filename;
 	protected List<ArrayListWOF<DesignParserSet, Double>> designNodes;
 	protected Double currentCycleDegree;
 	protected boolean isPackedContext;
@@ -36,11 +41,6 @@ public class DesignParser extends Parser {
 	}
 
 	@Override
-	protected void parseBeforeHook(String filename) throws Exception {
-		this.filename = filename;
-	}
-
-	@Override
 	protected boolean parseLoopHook(String line) throws Exception {
 		if (line.isEmpty()) {
 			isPackedContext = false;
@@ -48,20 +48,20 @@ public class DesignParser extends Parser {
 		}
 
 		final Matcher cycleMatcher = Parser.CYCLE_PATTERN.matcher(line);
-		if (cycleMatcher.matches()) {
+		if (cycleMatcher.lookingAt()) {
 			currentCycleDegree = Double.valueOf(cycleMatcher.group(1));
 			isPackedContext = false;
 			return true;
 		}
 
 		final Matcher commentMatcher = Parser.COMMENT_PATTERN.matcher(line);
-		if (commentMatcher.matches()) {
+		if (commentMatcher.lookingAt()) {
 			// 一行だけ変えたいという需要があるかもしれないので isPlaneContext は変更しない
 			return true;
 		}
 
 		final Matcher factorMatcher = designPattern.matcher(line);
-		if (factorMatcher.matches()) {
+		if (factorMatcher.lookingAt()) {
 			ArrayListWOF<DesignParserSet, Double> factorSub;
 			if (!isPackedContext) {
 				factorSub = new ArrayListWOF<DesignParserSet, Double>(currentCycleDegree);
@@ -100,9 +100,6 @@ public class DesignParser extends Parser {
 		ConstantTable ct = new ConstantTable(conn);
 		NodeTable     nt = new NodeTable(conn);
 		DesignTable   dt = new DesignTable(conn);
-
-		// 定数の追加
-		ct.insert("AUTO:DESIGN:" + filename, 0d);
 
 		// テーブルの作成
 		dt.drop();

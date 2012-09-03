@@ -1,4 +1,5 @@
 package net.tailriver.nl.parser;
+
 /**
  * Exception class for file reading and processing in {@link Parser} and derived.
  * @author tailriver
