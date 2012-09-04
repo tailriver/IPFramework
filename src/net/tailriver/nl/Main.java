@@ -5,6 +5,11 @@ import java.util.LinkedList;
 import java.util.NoSuchElementException;
 import java.util.Queue;
 
+import net.tailriver.java.task.Task;
+import net.tailriver.java.task.TaskIncompleteException;
+import net.tailriver.java.task.TaskTarget;
+import net.tailriver.java.task.TaskUtil;
+
 
 public class Main {
 	private static final String CLASS_TOKEN = "--";
@@ -12,7 +17,7 @@ public class Main {
 	private static final int MAX_QUEUE_SIZE = 2000;
 
 	static {
-		Task.addTaskPackage(Main.class.getPackage());		
+		TaskUtil.addTaskPackage(Main.class.getPackage());		
 	}
 
 	private static void usage() {
@@ -20,7 +25,7 @@ public class Main {
 	}
 
 	public static void main(String[] args) {
-		Queue<String> q = new LinkedList<String>(Arrays.asList(args));
+		Queue<String> q = new LinkedList<>(Arrays.asList(args));
 
 		// default arguments
 		if (q.size() == 0) {
@@ -49,7 +54,7 @@ public class Main {
 
 			String taskName = arg.substring(CLASS_TOKEN.length());
 			try {
-				TaskTarget t = Task.getTask(taskName);
+				TaskTarget t = TaskUtil.getTask(taskName);
 				t.pop(q);
 				t.run();
 			} catch (ClassNotFoundException e) {

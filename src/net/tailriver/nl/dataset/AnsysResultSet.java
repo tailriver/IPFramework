@@ -2,8 +2,8 @@ package net.tailriver.nl.dataset;
 
 import net.tailriver.nl.id.FactorId;
 import net.tailriver.nl.id.NodeId;
-import net.tailriver.nl.util.Stress;
-import net.tailriver.nl.util.Tensor2;
+import net.tailriver.nl.science.OrthogonalTensor2;
+import net.tailriver.nl.science.Stress;
 
 public class AnsysResultSet extends FactorId {
 	private final NodeId nid;
@@ -23,7 +23,7 @@ public class AnsysResultSet extends FactorId {
 		return stress;
 	}
 
-	public Double stress(Tensor2 component) {
+	public Double stress(OrthogonalTensor2 component) {
 		return stress.get(component);
 	}
 

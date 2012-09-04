@@ -7,13 +7,13 @@ import java.util.Collection;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.tailriver.java.Util;
 import net.tailriver.nl.dataset.AnsysResultSet;
 import net.tailriver.nl.id.FactorId;
 import net.tailriver.nl.id.NodeId;
+import net.tailriver.nl.science.OrthogonalTensor2;
+import net.tailriver.nl.science.Stress;
 import net.tailriver.nl.sql.FactorResultTable;
-import net.tailriver.nl.util.Stress;
-import net.tailriver.nl.util.Tensor2;
-import net.tailriver.nl.util.Util;
 
 
 public class AnsysResultParser extends Parser {
@@ -57,9 +57,9 @@ public class AnsysResultParser extends Parser {
 		if (stressMatcher.lookingAt()) {
 			NodeId nid = new NodeId(Integer.valueOf(stressMatcher.group(1)));
 			Stress s = new Stress();
-			s.put(Tensor2.XX, Double.valueOf(stressMatcher.group(2)));
-			s.put(Tensor2.YY, Double.valueOf(stressMatcher.group(3)));
-			s.put(Tensor2.XY, Double.valueOf(stressMatcher.group(5)));
+			s.put(OrthogonalTensor2.XX, Double.valueOf(stressMatcher.group(2)));
+			s.put(OrthogonalTensor2.YY, Double.valueOf(stressMatcher.group(3)));
+			s.put(OrthogonalTensor2.XY, Double.valueOf(stressMatcher.group(5)));
 
 			AnsysResultSet ars = new AnsysResultSet(fid, nid, s);
 			parsed.add(ars);

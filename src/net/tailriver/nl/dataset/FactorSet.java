@@ -2,7 +2,7 @@ package net.tailriver.nl.dataset;
 
 import net.tailriver.nl.id.FactorId;
 import net.tailriver.nl.id.NodeId;
-import net.tailriver.nl.util.Force;
+import net.tailriver.nl.science.Force;
 
 public class FactorSet extends FactorId {
 	private final NodeId nid;

@@ -5,12 +5,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.tailriver.nl.util.Util;
+import net.tailriver.java.Util;
 
 class Table {
 	protected Connection conn;
@@ -21,17 +20,14 @@ class Table {
 	public Table(Connection conn, String tableName) {
 		this.conn = conn;
 		this.tableName = tableName;
-		columnDefs = new LinkedHashMap<String, String>();
-		constraints = new ArrayList<String>();
+		columnDefs = new LinkedHashMap<>();
+		constraints = new ArrayList<>();
 	}
 
 	public boolean create() throws SQLException {
-		Iterator<String> it = columnDefs.keySet().iterator();
-		List<String> scheme = new ArrayList<String>();
-		while (it.hasNext()) {
-			String key = it.next();
-			scheme.add(key + " " + columnDefs.get(key));
-		}
+		List<String> scheme = new ArrayList<>();
+		for (Map.Entry<String, String> cd : columnDefs.entrySet())
+			scheme.add(cd.getKey() + " " + cd.getValue());
 		scheme.addAll(constraints);
 
 		StringBuilder sb = new StringBuilder("CREATE TABLE IF NOT EXISTS ");

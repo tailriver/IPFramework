@@ -8,10 +8,10 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.tailriver.java.Util;
 import net.tailriver.nl.dataset.ElementSet;
 import net.tailriver.nl.id.ElementId;
 import net.tailriver.nl.id.NodeId;
-import net.tailriver.nl.util.Util;
 
 
 public class ElementTable extends Table {
@@ -43,7 +43,7 @@ public class ElementTable extends Table {
 		try {
 			st = conn.createStatement();
 			ResultSet rs = st.executeQuery("SELECT * FROM " + tableName);
-			List<ElementSet> rows = new ArrayList<ElementSet>();
+			List<ElementSet> rows = new ArrayList<>();
 			while (rs.next()) {
 				ElementId eid = new ElementId(rs.getInt("id"));
 				NodeId[] nodes = new NodeId[ELEMENT_LABELS.length];

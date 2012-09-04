@@ -13,14 +13,11 @@ import java.util.List;
 
 import net.tailriver.nl.dataset.NodeSet;
 import net.tailriver.nl.id.NodeId;
-import net.tailriver.nl.util.Point;
-import net.tailriver.nl.util.Point.Coordinate;
+import net.tailriver.nl.science.CylindricalPoint;
+import net.tailriver.nl.science.CylindricalTensor1;
 
 
 public class NodeTable extends Table {
-	public static final Coordinate NODE_CSYS = Coordinate.Cylindrical;
-	private static final int DIMENSION = NODE_CSYS.getDimension();
-
 	public NodeTable(Connection conn) {
 		super(conn, "node");
 		addColumn("num", "INTEGER PRIMARY KEY");
@@ -30,20 +27,18 @@ public class NodeTable extends Table {
 		addTableConstraint("UNIQUE(r,t,z)");
 	}
 
-	public int insert(Point p) throws SQLException {
+	public int insert(CylindricalPoint p) throws SQLException {
 		return insert(Collections.singletonList(p))[0];
 	}
 
-	public int[] insert(Collection<Point> points) throws SQLException {
+	public int[] insert(Collection<CylindricalPoint> points) throws SQLException {
 		PreparedStatement ps = null;
 		try {
 			ps = conn.prepareStatement("INSERT OR IGNORE INTO " + tableName + " (r,t,z) VALUES (?,?,?)");
-			for (Point p : points) {
-				if (!p.hasCoordinate(NODE_CSYS))
-					throw new IllegalArgumentException("incompatible coordinate system");
-
-				for (int i = 0; i < DIMENSION; i++)
-					ps.setDouble(i+1, p.x(i));
+			for (CylindricalPoint p : points) {
+				ps.setDouble(1, p.get(CylindricalTensor1.R));
+				ps.setDouble(2, p.get(CylindricalTensor1.T));
+				ps.setDouble(3, p.get(CylindricalTensor1.Z));
 				ps.addBatch();
 			}
 			return ps.executeBatch();
@@ -57,21 +52,19 @@ public class NodeTable extends Table {
 		return executeQueryAndGetInt1("SELECT max(num) FROM " + tableName);
 	}
 
-	public NodeId select(Point point) throws SQLException {
+	public NodeId select(CylindricalPoint point) throws SQLException {
 		return select(Collections.singletonList(point)).get(0);
 	}
 
-	public List<NodeId> select(List<Point> points) throws SQLException {
+	public List<NodeId> select(List<CylindricalPoint> points) throws SQLException {
 		PreparedStatement ps = null;
 		try {
 			ps = conn.prepareStatement("SELECT num FROM node WHERE r=? AND t=? AND z=?");
 			List<NodeId> nodes = new ArrayList<NodeId>();
-			for (Point p : points) {
-				if (!p.hasCoordinate(NODE_CSYS))
-					throw new IllegalArgumentException("Incompatible coordinate system");
-
-				for (int i = 0; i < DIMENSION; i++)
-					ps.setDouble(i+1, p.x(i));
+			for (CylindricalPoint p : points) {
+				ps.setDouble(1, p.get(CylindricalTensor1.R));
+				ps.setDouble(2, p.get(CylindricalTensor1.T));
+				ps.setDouble(3, p.get(CylindricalTensor1.Z));
 
 				ResultSet rs = ps.executeQuery();
 				try {
@@ -103,7 +96,7 @@ public class NodeTable extends Table {
 				double z = rs.getDouble("z");
 
 				NodeId num = new NodeId(n);
-				Point p = new Point(Coordinate.Cylindrical, r, t, z);
+				CylindricalPoint p = new CylindricalPoint(r, t, z);
 				rows.add(new NodeSet(num, p));
 			}
 			return rows;			

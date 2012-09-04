@@ -10,16 +10,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 
+import net.tailriver.java.FieldArrayList;
+import net.tailriver.java.task.TaskIncompleteException;
+import net.tailriver.java.task.TaskTarget;
+import net.tailriver.java.task.TaskUtil;
 import net.tailriver.nl.dataset.FactorSet;
 import net.tailriver.nl.id.FactorId;
 import net.tailriver.nl.parser.FactorParser;
 import net.tailriver.nl.parser.Parser;
 import net.tailriver.nl.parser.ParserException;
+import net.tailriver.nl.science.OrthogonalTensor1;
 import net.tailriver.nl.sql.FactorTable;
 import net.tailriver.nl.sql.HistoryTable;
 import net.tailriver.nl.sql.SQLiteUtil;
-import net.tailriver.nl.util.ArrayListWOF;
-import net.tailriver.nl.util.Tensor1;
 
 public class Factor implements TaskTarget {
 	private Connection conn;
@@ -33,13 +36,13 @@ public class Factor implements TaskTarget {
 		try {
 			dbname    = args.remove();
 			inputfile = args.remove();
-			ansysLoopFile  = Task.outputFileCheck( args.remove() );
-			ansysConstFile = Task.outputFileCheck( args.remove() );
+			ansysLoopFile  = TaskUtil.outputFileCheck( args.remove() );
+			ansysConstFile = TaskUtil.outputFileCheck( args.remove() );
 		} finally {
-			Task.printPopLog("DB", dbname);
-			Task.printPopLog("< factor:", inputfile);
-			Task.printPopLog("> Ansys loop file:", ansysLoopFile);
-			Task.printPopLog("> Ansys const file:", ansysConstFile);
+			TaskUtil.printPopLog("DB", dbname);
+			TaskUtil.printPopLog("< factor:", inputfile);
+			TaskUtil.printPopLog("> Ansys loop file:", ansysLoopFile);
+			TaskUtil.printPopLog("> Ansys const file:", ansysConstFile);
 		}
 	}
 
@@ -77,15 +80,15 @@ public class Factor implements TaskTarget {
 		PrintWriter cpw = null;
 		try {
 			FactorTable et = new FactorTable(conn);
-			List<ArrayListWOF<FactorSet, FactorId>> factors = et.selectAllByFactorNum();
+			List<FieldArrayList<FactorSet, FactorId>> factors = et.selectAllByFactorNum();
 
 			// case information
 			lpw = new PrintWriter(new BufferedWriter(new FileWriter(ansysLoopFile)));
-			for (ArrayListWOF<FactorSet, FactorId> wof : factors) {
-				lpw.println("*IF,%FACTOR_ID%,EQ," + wof.value().id() + ",THEN");
+			for (FieldArrayList<FactorSet, FactorId> wof : factors) {
+				lpw.println("*IF,%FACTOR_ID%,EQ," + wof.get().id() + ",THEN");
 				lpw.println("ALLSEL");
 				for (FactorSet fs : wof) {
-					for (Map.Entry<Tensor1, Double> f : fs.force().entrySet())
+					for (Map.Entry<OrthogonalTensor1, Double> f : fs.force().entrySet())
 						lpw.printf("F,%d,F%s,%.5f\n", fs.node().id(), f.getKey().name(), f.getValue());
 				}
 				lpw.println("*ENDIF");

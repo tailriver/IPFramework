@@ -4,6 +4,9 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Queue;
 
+import net.tailriver.java.task.TaskIncompleteException;
+import net.tailriver.java.task.TaskTarget;
+import net.tailriver.java.task.TaskUtil;
 import net.tailriver.nl.parser.DesignParser;
 import net.tailriver.nl.parser.Parser;
 import net.tailriver.nl.parser.ParserException;
@@ -21,8 +24,8 @@ public class Design implements TaskTarget {
 			dbname    = args.remove();
 			inputfile = args.remove();
 		} finally {
-			Task.printPopLog("DB", dbname);
-			Task.printPopLog("< design:", inputfile);
+			TaskUtil.printPopLog("DB", dbname);
+			TaskUtil.printPopLog("< design:", inputfile);
 		}
 	}
 

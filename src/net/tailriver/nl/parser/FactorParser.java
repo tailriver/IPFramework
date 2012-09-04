@@ -7,25 +7,24 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.tailriver.java.FieldArrayList;
 import net.tailriver.nl.id.FactorId;
 import net.tailriver.nl.id.NodeId;
+import net.tailriver.nl.science.CylindricalPoint;
+import net.tailriver.nl.science.Force;
 import net.tailriver.nl.sql.FactorTable;
 import net.tailriver.nl.sql.NodeTable;
-import net.tailriver.nl.util.ArrayListWOF;
-import net.tailriver.nl.util.Force;
-import net.tailriver.nl.util.Point;
-import net.tailriver.nl.util.Point.Coordinate;
 
 
 public class FactorParser extends Parser {
 	static final Pattern factorPattern =
 			Pattern.compile("([\\d.]+)\\s+([\\d.]+)\\s+([\\d.]+)\\s+([XYZ])\\s+([-\\d.]+)");
 
-	protected List<ArrayListWOF<FactorParserSet, FactorId>> factors;
+	protected List<FieldArrayList<FactorParserSet, FactorId>> factors;
 	protected boolean isSameIdContext;
 
 	public FactorParser() {
-		factors = new ArrayList<ArrayListWOF<FactorParserSet,FactorId>>();
+		factors = new ArrayList<>();
 		isSameIdContext = false;
 	}
 
@@ -44,15 +43,13 @@ public class FactorParser extends Parser {
 
 		final Matcher factorMatcher = factorPattern.matcher(line);
 		if (factorMatcher.lookingAt()) {
-			ArrayListWOF<FactorParserSet, FactorId> factorSub;
+			FieldArrayList<FactorParserSet, FactorId> factorSub;
 			if (!isSameIdContext) {
-				// 頂点定義の文脈でなければ新しく要素を作り、それを対象とする
-				FactorId fid = new FactorId(factors.size() + 1);
-				factorSub = new ArrayListWOF<FactorParserSet, FactorId>(fid);
+				factorSub = new FieldArrayList<>();
+				factorSub.set(new FactorId(factors.size() + 1));
 				factors.add(factorSub);
 			}
 			else {
-				// 頂点定義の文脈であれば（前の行でも頂点を定義しているなら）最後の要素が対象
 				factorSub = factors.get(factors.size() - 1);
 			}
 
@@ -62,7 +59,7 @@ public class FactorParser extends Parser {
 			String direction = factorMatcher.group(4).toUpperCase();
 			Double value = Double.valueOf(factorMatcher.group(5));
 
-			Point p = new Point(Coordinate.Cylindrical, r, t, z);
+			CylindricalPoint p = new CylindricalPoint(r, t, z);
 			Force f = new Force(direction, value);
 			factorSub.add(new FactorParserSet(p, f));
 
@@ -86,8 +83,8 @@ public class FactorParser extends Parser {
 		ft.drop();
 		ft.create();
 
-		for (ArrayListWOF<FactorParserSet, FactorId> wof : factors) {
-			FactorId fid = wof.value();
+		for (FieldArrayList<FactorParserSet, FactorId> wof : factors) {
+			FactorId fid = wof.get();
 			for  (FactorParserSet f : wof) {
 				NodeId nid = nt.select(f.p);
 				ft.insert(fid, nid, f.f);
@@ -99,9 +96,9 @@ public class FactorParser extends Parser {
 
 
 class FactorParserSet {
-	final Point p;
+	final CylindricalPoint p;
 	final Force f;
-	FactorParserSet(Point p, Force f) {
+	FactorParserSet(CylindricalPoint p, Force f) {
 		this.p = p;
 		this.f = f;
 	}

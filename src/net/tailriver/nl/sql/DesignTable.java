@@ -13,8 +13,8 @@ import java.util.Map;
 import net.tailriver.nl.dataset.DesignSet;
 import net.tailriver.nl.id.DesignId;
 import net.tailriver.nl.id.NodeId;
-import net.tailriver.nl.util.Stress;
-import net.tailriver.nl.util.Tensor2;
+import net.tailriver.nl.science.OrthogonalTensor2;
+import net.tailriver.nl.science.Stress;
 
 
 public class DesignTable extends Table {
@@ -33,7 +33,7 @@ public class DesignTable extends Table {
 			ps = conn.prepareStatement("INSERT INTO " + tableName + " VALUES (?,?,?,?)");
 			ps.setInt(1, did.id());
 			ps.setInt(2, node.id());
-			for (Map.Entry<Tensor2, Double> s : stress.entrySet()) {
+			for (Map.Entry<OrthogonalTensor2, Double> s : stress.entrySet()) {
 				ps.setString(3, s.getKey().name());
 				ps.setDouble(4, s.getValue());
 				ps.addBatch();
@@ -75,7 +75,7 @@ public class DesignTable extends Table {
 	}
 
 	private List<DesignSet> processSelectResult(ResultSet rs) throws SQLException {
-		List<DesignSet> fsl = new ArrayList<DesignSet>();
+		List<DesignSet> fsl = new ArrayList<>();
 		while (rs.next()) {
 			DesignId did = new DesignId(rs.getInt("id"));
 			NodeId nid = new NodeId(rs.getInt("node"));

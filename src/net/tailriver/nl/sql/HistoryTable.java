@@ -6,7 +6,7 @@ import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
 
-import net.tailriver.nl.util.Util;
+import net.tailriver.java.Util;
 
 public class HistoryTable extends Table {
 	public HistoryTable(Connection conn) {

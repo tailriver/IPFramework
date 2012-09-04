@@ -2,7 +2,7 @@ package net.tailriver.nl.dataset;
 
 import net.tailriver.nl.id.DesignId;
 import net.tailriver.nl.id.NodeId;
-import net.tailriver.nl.util.Stress;
+import net.tailriver.nl.science.Stress;
 
 public class DesignSet extends DesignId {
 	private final NodeId nid;
@@ -18,7 +18,7 @@ public class DesignSet extends DesignId {
 		return nid;
 	}
 
-	public Stress stress() {
+	public Stress tensorQuantity() {
 		return stress;
 	}
 

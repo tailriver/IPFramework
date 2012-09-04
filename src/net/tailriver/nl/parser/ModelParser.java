@@ -9,27 +9,26 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.tailriver.java.FieldArrayList;
 import net.tailriver.nl.id.NodeId;
+import net.tailriver.nl.science.CylindricalPoint;
+import net.tailriver.nl.science.CylindricalTensor1;
 import net.tailriver.nl.sql.ConstantTable;
 import net.tailriver.nl.sql.ElementTable;
 import net.tailriver.nl.sql.NodeTable;
-import net.tailriver.nl.util.ArrayListWOF;
-import net.tailriver.nl.util.Point;
-import net.tailriver.nl.util.Point.Coordinate;
-import net.tailriver.nl.util.Util;
 
 
 public class ModelParser extends Parser {
 	protected static final Pattern planeNodePattern = Pattern.compile("([\\d.]+)\\s+([\\d.]+)");
 
 	protected Map<String, Double> constantMap;
-	protected List<ArrayListWOF<Point, Double>> unitPlaneList;
+	protected List<FieldArrayList<CylindricalPoint, Double>> unitPlaneList;
 	protected double currentCycleDegree;
 	private boolean isPlaneContext;
 
 	public ModelParser() {
 		constantMap = new HashMap<String, Double>();
-		unitPlaneList = new ArrayList<ArrayListWOF<Point, Double>>();
+		unitPlaneList = new ArrayList<>();
 		currentCycleDegree = ConstantTable.DEFAULT_MAX_CYCLE_DEGREE;
 		isPlaneContext = false;
 	}
@@ -65,10 +64,11 @@ public class ModelParser extends Parser {
 
 		final Matcher planeNodeMatcher = planeNodePattern.matcher(line);
 		if (planeNodeMatcher.lookingAt()) {
-			ArrayListWOF<Point, Double> currentUnitPlane;
+			FieldArrayList<CylindricalPoint, Double> currentUnitPlane;
 			if (!isPlaneContext) {
 				// 頂点定義の文脈でなければ新しく要素を作り、それを対象とする
-				currentUnitPlane = new ArrayListWOF<Point, Double>(currentCycleDegree);
+				currentUnitPlane = new FieldArrayList<>();
+				currentUnitPlane.set(currentCycleDegree);
 				unitPlaneList.add(currentUnitPlane);
 			}
 			else {
@@ -78,7 +78,7 @@ public class ModelParser extends Parser {
 
 			Double r = Double.valueOf(planeNodeMatcher.group(1));
 			Double t = Double.valueOf(planeNodeMatcher.group(2));
-			Point p = new Point(Coordinate.Polar, r, t);
+			CylindricalPoint p = new CylindricalPoint(r, t, null);
 			currentUnitPlane.add(p);
 
 			setIsPlaneContext(true);
@@ -112,19 +112,18 @@ public class ModelParser extends Parser {
 		// 繰り返し角度の拡張
 		double maxCycleDegree = ct.select("max_cycle_degree", ConstantTable.DEFAULT_MAX_CYCLE_DEGREE);
 
-		for (ArrayListWOF<Point, Double> wof : unitPlaneList) {
-			for (int cycle = 0; cycle < maxCycleDegree / wof.value(); cycle++) {
+		for (FieldArrayList<CylindricalPoint, Double> wof : unitPlaneList) {
+			for (int cycle = 0; cycle < maxCycleDegree / wof.get(); cycle++) {
 				NodeId[] elementNodes = new NodeId[ElementTable.ELEMENT_LABELS.length];
 
 				int i = 0;
-				for (Point p : wof) {
-					double r = p.x(0);
-					double t = p.x(1) + cycle * wof.value();
-					double z = calculateDepth(r, t);
+				for (CylindricalPoint p : wof) {
+					Double r = p.get(CylindricalTensor1.R);
+					Double t = p.get(CylindricalTensor1.T) + cycle * wof.get();
 
-					List<Point> points = new ArrayList<Point>();
-					points.add(new Point(Coordinate.Cylindrical, r, t, 0));
-					points.add(new Point(Coordinate.Cylindrical, r, t, z));
+					List<CylindricalPoint> points = new ArrayList<CylindricalPoint>();
+					points.add(new CylindricalPoint(r, t, 0d));
+					points.add(new CylindricalPoint(r, t, 1d));
 					nt.insert(points);
 
 					List<NodeId> nodes = nt.select(points);
@@ -158,39 +157,5 @@ public class ModelParser extends Parser {
 				throw new ParserException("The number of nodes in a element must be " + planeNodeSize);
 		}
 		isPlaneContext = newState;
-	}
-
-	/**
-	 * 高さ計算用メソッド Overrideすることで曲面を作成可能<br>
-	 * デフォルトでは、どのような入力に対しても単位高さ (1) を返す
-	 * @param r 無次元半径方向座標 [0,100] (%)
-	 * @param t 周方向座標 [0,360) (degree)
-	 * @return z 無次元軸方向座標
-	 */
-	protected double calculateDepth(double r, double t) {
-		return 1;
-	}
-
-	/**
-	 * ファイルをきちんと読み込めているか<br>
-	 * {@link #parse(String)}後に呼び出すと、定数と頂点の定義を一覧表示する
-	 */
-	@Override
-	public String toString() {
-		String n = "\n";
-		StringBuilder sb = new StringBuilder();
-		sb.append("CONSTANT TABLE").append(n);
-		for (Map.Entry<String, Double> e : constantMap.entrySet()) {
-			sb.append(e.getKey()).append(" : ").append(e.getValue()).append(n);
-		}
-		sb.append(n);
-		sb.append("ELEMENT TABLE").append(n);
-		for (ArrayListWOF<Point, Double> wof : unitPlaneList) {
-			sb.append("Cycle: ").append(wof.value()).append(n);
-			for (Point p : wof) {
-				sb.append("  ").append(Util.<Double>join(", ", p.x())).append(n);
-			}
-		}
-		return sb.toString();
 	}
 }

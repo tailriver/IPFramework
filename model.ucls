@@ -10,8 +10,8 @@
   </class>  
   <package id="2" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.dataset" project="SQLiteSample" 
     file="/SQLiteSample/src/net/tailriver/nl/dataset" binary="false">    
-    <position height="-1" width="-1" x="1049" y="227"/>    
-    <display autosize="true" stereotype="true"/>  
+    <position height="-1" width="-1" x="1063" y="243"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true"/>  
   </package>  
   <class id="3" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.dataset.AnsysResultSet" 
     project="SQLiteSample" file="/SQLiteSample/src/net/tailriver/nl/dataset/AnsysResultSet.java" binary="false">    
@@ -21,55 +21,39 @@
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </class>  
-  <enumeration id="4" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.dataset.DesignSet.Component" 
-    project="SQLiteSample" file="/SQLiteSample/src/net/tailriver/nl/dataset/DesignSet.java" binary="false">    
-    <position height="-1" width="-1" x="848" y="292"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true"/>      
-      <operations public="true" package="true" protected="true" private="true"/>    
-    </display>  
-  </enumeration>  
-  <class id="5" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.dataset.DesignSet" project="SQLiteSample" 
+  <class id="4" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.dataset.DesignSet" project="SQLiteSample" 
     file="/SQLiteSample/src/net/tailriver/nl/dataset/DesignSet.java" binary="false">    
-    <position height="-1" width="-1" x="1091" y="337"/>    
+    <position height="-1" width="-1" x="1109" y="341"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true"/>      
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </class>  
-  <class id="6" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.dataset.ElementSet" project="SQLiteSample" 
+  <class id="5" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.dataset.ElementSet" project="SQLiteSample" 
     file="/SQLiteSample/src/net/tailriver/nl/dataset/ElementSet.java" binary="false">    
-    <position height="-1" width="-1" x="1532" y="581"/>    
+    <position height="-1" width="-1" x="1560" y="602"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true"/>      
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </class>  
-  <enumeration id="7" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.dataset.FactorSet.Direction" 
-    project="SQLiteSample" file="/SQLiteSample/src/net/tailriver/nl/dataset/FactorSet.java" binary="false">    
-    <position height="-1" width="-1" x="848" y="454"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true"/>      
-      <operations public="true" package="true" protected="true" private="true"/>    
-    </display>  
-  </enumeration>  
-  <class id="8" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.dataset.FactorSet" project="SQLiteSample" 
+  <class id="6" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.dataset.FactorSet" project="SQLiteSample" 
     file="/SQLiteSample/src/net/tailriver/nl/dataset/FactorSet.java" binary="false">    
-    <position height="-1" width="-1" x="1192" y="498"/>    
+    <position height="-1" width="-1" x="1192" y="512"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true"/>      
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </class>  
-  <class id="9" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.dataset.NodeSet" project="SQLiteSample" 
+  <class id="7" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.dataset.NodeSet" project="SQLiteSample" 
     file="/SQLiteSample/src/net/tailriver/nl/dataset/NodeSet.java" binary="false">    
-    <position height="-1" width="-1" x="1342" y="636"/>    
+    <position height="-1" width="-1" x="1379" y="569"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true"/>      
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </class>  
-  <class id="10" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.id.Id" project="SQLiteSample" 
+  <class id="8" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.id.Id" project="SQLiteSample" 
     file="/SQLiteSample/src/net/tailriver/nl/id/Id.java" binary="false">    
     <position height="-1" width="-1" x="1594" y="287"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
@@ -77,15 +61,15 @@
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </class>  
-  <class id="11" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.id.NodeId" project="SQLiteSample" 
+  <class id="9" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.id.NodeId" project="SQLiteSample" 
     file="/SQLiteSample/src/net/tailriver/nl/id/NodeId.java" binary="false">    
-    <position height="-1" width="-1" x="1414" y="386"/>    
+    <position height="-1" width="-1" x="1423" y="403"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true"/>      
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </class>  
-  <class id="12" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.id.DesignId" project="SQLiteSample" 
+  <class id="10" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.id.DesignId" project="SQLiteSample" 
     file="/SQLiteSample/src/net/tailriver/nl/id/DesignId.java" binary="false">    
     <position height="-1" width="-1" x="1420" y="90"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
@@ -93,7 +77,7 @@
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </class>  
-  <class id="13" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.id.ElementId" project="SQLiteSample" 
+  <class id="11" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.id.ElementId" project="SQLiteSample" 
     file="/SQLiteSample/src/net/tailriver/nl/id/ElementId.java" binary="false">    
     <position height="-1" width="-1" x="1599" y="449"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
@@ -101,20 +85,20 @@
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </class>  
-  <class id="14" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.id.FactorId" project="SQLiteSample" 
+  <class id="12" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.id.FactorId" project="SQLiteSample" 
     file="/SQLiteSample/src/net/tailriver/nl/id/FactorId.java" binary="false">    
-    <position height="-1" width="-1" x="1400" y="240"/>    
+    <position height="-1" width="-1" x="1411" y="252"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true"/>      
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </class>  
-  <package id="15" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.id" project="SQLiteSample" 
+  <package id="13" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.id" project="SQLiteSample" 
     file="/SQLiteSample/src/net/tailriver/nl/id" binary="false">    
     <position height="-1" width="-1" x="1601" y="176"/>    
-    <display autosize="true" stereotype="true"/>  
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true"/>  
   </package>  
-  <class id="16" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.parser.AnsysResultParser" 
+  <class id="14" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.parser.AnsysResultParser" 
     project="SQLiteSample" file="/SQLiteSample/src/net/tailriver/nl/parser/AnsysResultParser.java" binary="false">    
     <position height="-1" width="-1" x="629" y="119"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
@@ -122,39 +106,7 @@
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </class>  
-  <class id="17" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.parser.DesignParser" 
-    project="SQLiteSample" file="/SQLiteSample/src/net/tailriver/nl/parser/DesignParser.java" binary="false">    
-    <position height="-1" width="-1" x="328" y="645"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true"/>      
-      <operations public="true" package="true" protected="true" private="true"/>    
-    </display>  
-  </class>  
-  <class id="18" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.parser.DesignParser.DesignParserSet" 
-    project="SQLiteSample" file="/SQLiteSample/src/net/tailriver/nl/parser/DesignParser.java" binary="false">    
-    <position height="-1" width="-1" x="907" y="696"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true"/>      
-      <operations public="true" package="true" protected="true" private="true"/>    
-    </display>  
-  </class>  
-  <class id="19" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.parser.FactorParser" 
-    project="SQLiteSample" file="/SQLiteSample/src/net/tailriver/nl/parser/FactorParser.java" binary="false">    
-    <position height="-1" width="-1" x="180" y="434"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true"/>      
-      <operations public="true" package="true" protected="true" private="true"/>    
-    </display>  
-  </class>  
-  <class id="20" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.parser.FactorParser.FactorParserSet" 
-    project="SQLiteSample" file="/SQLiteSample/src/net/tailriver/nl/parser/FactorParser.java" binary="false">    
-    <position height="-1" width="-1" x="679" y="607"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true"/>      
-      <operations public="true" package="true" protected="true" private="true"/>    
-    </display>  
-  </class>  
-  <class id="21" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.parser.ModelParser" project="SQLiteSample" 
+  <class id="15" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.parser.ModelParser" project="SQLiteSample" 
     file="/SQLiteSample/src/net/tailriver/nl/parser/ModelParser.java" binary="false">    
     <position height="-1" width="-1" x="128" y="198"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
@@ -162,15 +114,15 @@
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </class>  
-  <class id="22" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.parser.Parser" project="SQLiteSample" 
+  <class id="16" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.parser.Parser" project="SQLiteSample" 
     file="/SQLiteSample/src/net/tailriver/nl/parser/Parser.java" binary="false">    
-    <position height="-1" width="-1" x="584" y="394"/>    
+    <position height="-1" width="-1" x="520" y="394"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true"/>      
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </class>  
-  <class id="23" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.parser.ParserException" 
+  <class id="17" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.parser.ParserException" 
     project="SQLiteSample" file="/SQLiteSample/src/net/tailriver/nl/parser/ParserException.java" binary="false">    
     <position height="-1" width="-1" x="435" y="60"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
@@ -178,7 +130,7 @@
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </class>  
-  <class id="24" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.sql.ConstantTable" project="SQLiteSample" 
+  <class id="18" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.sql.ConstantTable" project="SQLiteSample" 
     file="/SQLiteSample/src/net/tailriver/nl/sql/ConstantTable.java" binary="false">    
     <position height="-1" width="-1" x="1539" y="1077"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
@@ -186,7 +138,7 @@
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </class>  
-  <class id="25" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.sql.DesignTable" project="SQLiteSample" 
+  <class id="19" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.sql.DesignTable" project="SQLiteSample" 
     file="/SQLiteSample/src/net/tailriver/nl/sql/DesignTable.java" binary="false">    
     <position height="-1" width="-1" x="1525" y="899"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
@@ -194,7 +146,7 @@
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </class>  
-  <class id="26" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.sql.ElementTable" project="SQLiteSample" 
+  <class id="20" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.sql.ElementTable" project="SQLiteSample" 
     file="/SQLiteSample/src/net/tailriver/nl/sql/ElementTable.java" binary="false">    
     <position height="-1" width="-1" x="1275" y="809"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
@@ -202,7 +154,7 @@
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </class>  
-  <class id="27" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.sql.FactorResultTable" 
+  <class id="21" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.sql.FactorResultTable" 
     project="SQLiteSample" file="/SQLiteSample/src/net/tailriver/nl/sql/FactorResultTable.java" binary="false">    
     <position height="-1" width="-1" x="1122" y="1258"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
@@ -210,7 +162,7 @@
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </class>  
-  <class id="28" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.sql.FactorTable" project="SQLiteSample" 
+  <class id="22" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.sql.FactorTable" project="SQLiteSample" 
     file="/SQLiteSample/src/net/tailriver/nl/sql/FactorTable.java" binary="false">    
     <position height="-1" width="-1" x="1482" y="1258"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
@@ -218,7 +170,7 @@
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </class>  
-  <class id="29" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.sql.NodeTable" project="SQLiteSample" 
+  <class id="23" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.sql.NodeTable" project="SQLiteSample" 
     file="/SQLiteSample/src/net/tailriver/nl/sql/NodeTable.java" binary="false">    
     <position height="-1" width="-1" x="1039" y="1067"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
@@ -226,7 +178,7 @@
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </class>  
-  <class id="30" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.sql.Table" project="SQLiteSample" 
+  <class id="24" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.sql.Table" project="SQLiteSample" 
     file="/SQLiteSample/src/net/tailriver/nl/sql/Table.java" binary="false">    
     <position height="-1" width="-1" x="1250" y="1019"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
@@ -234,7 +186,7 @@
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </class>  
-  <class id="31" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.sql.SQLiteUtil" project="SQLiteSample" 
+  <class id="25" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.sql.SQLiteUtil" project="SQLiteSample" 
     file="/SQLiteSample/src/net/tailriver/nl/sql/SQLiteUtil.java" binary="false">    
     <position height="-1" width="-1" x="1563" y="753"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
@@ -242,44 +194,47 @@
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </class>  
-  <package id="32" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.sql" project="SQLiteSample" 
+  <package id="26" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.sql" project="SQLiteSample" 
     file="/SQLiteSample/src/net/tailriver/nl/sql" binary="false">    
     <position height="-1" width="-1" x="1029" y="934"/>    
-    <display autosize="true" stereotype="true"/>  
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true"/>  
   </package>  
-  <class id="33" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.util.ArrayListWOF" project="SQLiteSample" 
-    file="/SQLiteSample/src/net/tailriver/nl/util/ArrayListWOF.java" binary="false">    
-    <position height="-1" width="-1" x="433" y="170"/>    
+  <class id="27" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.java.FieldArrayList" 
+    project="tailriver-JavaLibrary" file="/tailriver-JavaLibrary/src/net/tailriver/java/FieldArrayList.java" 
+    binary="false">    
+    <position height="-1" width="-1" x="442" y="193"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true"/>      
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </class>  
-  <class id="34" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.util.Point" project="SQLiteSample" 
-    file="/SQLiteSample/src/net/tailriver/nl/util/Point.java" binary="false">    
+  <class id="28" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.java.science.Point" 
+    project="tailriver-JavaLibrary" file="/tailriver-JavaLibrary/src/net/tailriver/java/science/Point.java" 
+    binary="false">    
     <position height="-1" width="-1" x="805" y="936"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true"/>      
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </class>  
-  <enumeration id="35" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.util.Point.Coordinate" 
-    project="SQLiteSample" file="/SQLiteSample/src/net/tailriver/nl/util/Point.java" binary="false">    
+  <enumeration id="29" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.java.science.Point.Coordinate" 
+    project="tailriver-JavaLibrary" file="/tailriver-JavaLibrary/src/net/tailriver/java/science/Point.java" 
+    binary="false">    
     <position height="-1" width="-1" x="760" y="1206"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true"/>      
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </enumeration>  
-  <class id="36" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.util.Util" project="SQLiteSample" 
-    file="/SQLiteSample/src/net/tailriver/nl/util/Util.java" binary="false">    
+  <class id="30" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.java.Util" project="tailriver-JavaLibrary" 
+    file="/tailriver-JavaLibrary/src/net/tailriver/java/Util.java" binary="false">    
     <position height="-1" width="-1" x="570" y="806"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true"/>      
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </class>  
-  <class id="37" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.FactorResult" project="SQLiteSample" 
+  <class id="31" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.FactorResult" project="SQLiteSample" 
     file="/SQLiteSample/src/net/tailriver/nl/FactorResult.java" binary="false">    
     <position height="-1" width="-1" x="92" y="1046"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
@@ -287,7 +242,7 @@
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </class>  
-  <class id="38" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.Factor" project="SQLiteSample" 
+  <class id="32" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.Factor" project="SQLiteSample" 
     file="/SQLiteSample/src/net/tailriver/nl/Factor.java" binary="false">    
     <position height="-1" width="-1" x="323" y="903"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
@@ -295,7 +250,7 @@
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </class>  
-  <class id="39" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.Design" project="SQLiteSample" 
+  <class id="33" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.Design" project="SQLiteSample" 
     file="/SQLiteSample/src/net/tailriver/nl/Design.java" binary="false">    
     <position height="-1" width="-1" x="286" y="1258"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
@@ -303,7 +258,7 @@
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </class>  
-  <class id="40" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.ResponseMatrix" project="SQLiteSample" 
+  <class id="34" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.ResponseMatrix" project="SQLiteSample" 
     file="/SQLiteSample/src/net/tailriver/nl/ResponseMatrix.java" binary="false">    
     <position height="-1" width="-1" x="494" y="1150"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
@@ -311,36 +266,38 @@
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </class>  
-  <package id="41" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.parser" project="SQLiteSample" 
+  <package id="35" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.parser" project="SQLiteSample" 
     file="/SQLiteSample/src/net/tailriver/nl/parser" binary="false">    
     <position height="-1" width="-1" x="93" y="37"/>    
-    <display autosize="true" stereotype="true"/>  
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true"/>  
   </package>  
-  <class id="42" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.util.TaskIncompleteException" 
-    project="SQLiteSample" file="/SQLiteSample/src/net/tailriver/nl/util/TaskIncompleteException.java" binary="false">    
+  <class id="36" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.java.task.TaskIncompleteException" 
+    project="tailriver-JavaLibrary" 
+    file="/tailriver-JavaLibrary/src/net/tailriver/java/task/TaskIncompleteException.java" binary="false">    
     <position height="-1" width="-1" x="490" y="1292"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true"/>      
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </class>  
-  <interface id="43" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.TaskTarget" project="SQLiteSample" 
-    file="/SQLiteSample/src/net/tailriver/nl/TaskTarget.java" binary="false">    
+  <interface id="37" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.java.task.TaskTarget" 
+    project="tailriver-JavaLibrary" file="/tailriver-JavaLibrary/src/net/tailriver/java/task/TaskTarget.java" 
+    binary="false">    
     <position height="-1" width="-1" x="286" y="1096"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true"/>      
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </interface>  
-  <class id="44" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.Task" project="SQLiteSample" 
-    file="/SQLiteSample/src/net/tailriver/nl/Task.java" binary="false">    
+  <class id="38" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.java.task.Task" 
+    project="tailriver-JavaLibrary" file="/tailriver-JavaLibrary/src/net/tailriver/java/task/Task.java" binary="false">    
     <position height="-1" width="-1" x="120" y="858"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true"/>      
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </class>  
-  <class id="45" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.Main" project="SQLiteSample" 
+  <class id="39" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.Main" project="SQLiteSample" 
     file="/SQLiteSample/src/net/tailriver/nl/Main.java" binary="false">    
     <position height="-1" width="-1" x="506" y="989"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
@@ -348,262 +305,363 @@
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </class>  
-  <generalization id="46">    
-    <end type="SOURCE" refId="25"/>    
-    <end type="TARGET" refId="30"/>  
+  <class id="40" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.sql.HistoryTable" project="SQLiteSample" 
+    file="/SQLiteSample/src/net/tailriver/nl/sql/HistoryTable.java" binary="false">    
+    <position height="-1" width="-1" x="1078" y="810"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="41" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.java.task.Quit" 
+    project="tailriver-JavaLibrary" file="/tailriver-JavaLibrary/src/net/tailriver/java/task/Quit.java" binary="false">    
+    <position height="111" width="162" x="445" y="818"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="42" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.java.task.Shell" 
+    project="tailriver-JavaLibrary" file="/tailriver-JavaLibrary/src/net/tailriver/java/task/Shell.java" binary="false">    
+    <position height="-1" width="-1" x="374" y="800"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="43" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.parser.DesignParser" 
+    project="SQLiteSample" file="/SQLiteSample/src/net/tailriver/nl/parser/DesignParser.java" binary="false">    
+    <position height="-1" width="-1" x="193" y="552"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="44" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.parser.DesignParserSet" 
+    project="SQLiteSample" file="/SQLiteSample/src/net/tailriver/nl/parser/DesignParser.java" binary="false">    
+    <position height="-1" width="-1" x="727" y="618"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="45" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.parser.FactorParserSet" 
+    project="SQLiteSample" file="/SQLiteSample/src/net/tailriver/nl/parser/FactorParser.java" binary="false">    
+    <position height="-1" width="-1" x="1003" y="654"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="46" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.parser.FactorParser" 
+    project="SQLiteSample" file="/SQLiteSample/src/net/tailriver/nl/parser/FactorParser.java" binary="false">    
+    <position height="-1" width="-1" x="135" y="388"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="47" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.science.Force" project="SQLiteSample" 
+    file="/SQLiteSample/src/net/tailriver/nl/science/Force.java" binary="false">    
+    <position height="-1" width="-1" x="939" y="512"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="48" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.java.science.TensorQuantity" 
+    project="tailriver-JavaLibrary" file="/tailriver-JavaLibrary/src/net/tailriver/java/science/TensorQuantity.java" 
+    binary="false">    
+    <position height="-1" width="-1" x="848" y="340"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <enumeration id="49" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.science.OrthogonalTensor1" 
+    project="SQLiteSample" file="/SQLiteSample/src/net/tailriver/nl/science/OrthogonalTensor1.java" binary="false">    
+    <position height="-1" width="-1" x="524" y="634"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </enumeration>  
+  <enumeration id="50" corner="BOTTOM_RIGHT" language="java" name="net.tailriver.nl.science.OrthogonalTensor2" 
+    project="SQLiteSample" file="/SQLiteSample/src/net/tailriver/nl/science/OrthogonalTensor2.java" binary="false">    
+    <position height="179" width="135" x="587" y="383"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </enumeration>  
+  <generalization id="51">    
+    <end type="SOURCE" refId="4"/>    
+    <end type="TARGET" refId="10"/>  
   </generalization>  
-  <nesting id="47">    
-    <end type="SOURCE" refId="17"/>    
-    <end type="TARGET" refId="18"/>  
-  </nesting>  
-  <realization id="48">    
-    <end type="SOURCE" refId="44"/>    
-    <end type="TARGET" refId="43"/>  
+  <generalization id="52">    
+    <end type="SOURCE" refId="14"/>    
+    <end type="TARGET" refId="16"/>  
+  </generalization>  
+  <association id="53">    
+    <end type="SOURCE" refId="28" navigable="false">      
+      <attribute id="54" name="c"/>      
+      <multiplicity id="55" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="29" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <realization id="56">    
+    <end type="SOURCE" refId="34"/>    
+    <end type="TARGET" refId="37"/>  
   </realization>  
-  <generalization id="49">    
-    <end type="SOURCE" refId="12"/>    
-    <end type="TARGET" refId="10"/>  
-  </generalization>  
-  <association id="50">    
-    <end type="SOURCE" refId="8" navigable="false">      
-      <attribute id="51" name="n"/>      
-      <multiplicity id="52" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="11" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <generalization id="53">    
-    <end type="SOURCE" refId="19"/>    
-    <end type="TARGET" refId="22"/>  
-  </generalization>  
-  <generalization id="54">    
-    <end type="SOURCE" refId="6"/>    
-    <end type="TARGET" refId="13"/>  
-  </generalization>  
-  <generalization id="55">    
-    <end type="SOURCE" refId="11"/>    
-    <end type="TARGET" refId="10"/>  
-  </generalization>  
-  <association id="56">    
-    <end type="SOURCE" refId="20" navigable="false">      
-      <attribute id="57" name="p"/>      
-      <multiplicity id="58" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="34" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <generalization id="59">    
-    <end type="SOURCE" refId="16"/>    
-    <end type="TARGET" refId="22"/>  
-  </generalization>  
-  <generalization id="60">    
-    <end type="SOURCE" refId="5"/>    
+  <generalization id="57">    
+    <end type="SOURCE" refId="3"/>    
     <end type="TARGET" refId="12"/>  
   </generalization>  
-  <generalization id="61">    
-    <end type="SOURCE" refId="14"/>    
-    <end type="TARGET" refId="10"/>  
-  </generalization>  
+  <nesting id="58">    
+    <end type="SOURCE" refId="28"/>    
+    <end type="TARGET" refId="29"/>  
+  </nesting>  
+  <association id="59">    
+    <end type="SOURCE" refId="46" navigable="false">      
+      <attribute id="60" name="factors"/>      
+      <multiplicity id="61" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="27" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
   <association id="62">    
-    <end type="SOURCE" refId="9" navigable="false">      
+    <end type="SOURCE" refId="7" navigable="false">      
       <attribute id="63" name="p"/>      
       <multiplicity id="64" minimum="0" maximum="1"/>    
     </end>    
-    <end type="TARGET" refId="34" navigable="true"/>    
+    <end type="TARGET" refId="28" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <generalization id="65">    
-    <end type="SOURCE" refId="9"/>    
-    <end type="TARGET" refId="11"/>  
-  </generalization>  
-  <generalization id="66">    
-    <end type="SOURCE" refId="8"/>    
-    <end type="TARGET" refId="14"/>  
-  </generalization>  
-  <realization id="67">    
-    <end type="SOURCE" refId="40"/>    
-    <end type="TARGET" refId="43"/>  
-  </realization>  
-  <association id="68">    
-    <end type="SOURCE" refId="29" navigable="false">      
-      <attribute id="69" name="NODE_CSYS"/>      
-      <multiplicity id="70" minimum="0" maximum="1"/>    
+  <association id="65">    
+    <end type="SOURCE" refId="15" navigable="false">      
+      <attribute id="66" name="unitPlaneList"/>      
+      <multiplicity id="67" minimum="0" maximum="2147483647"/>    
     </end>    
-    <end type="TARGET" refId="35" navigable="true"/>    
+    <end type="TARGET" refId="27" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <generalization id="71">    
-    <end type="SOURCE" refId="18"/>    
-    <end type="TARGET" refId="5"/>  
+  <generalization id="68">    
+    <end type="SOURCE" refId="10"/>    
+    <end type="TARGET" refId="8"/>  
   </generalization>  
-  <generalization id="72">    
-    <end type="SOURCE" refId="13"/>    
-    <end type="TARGET" refId="10"/>  
+  <generalization id="69">    
+    <end type="SOURCE" refId="20"/>    
+    <end type="TARGET" refId="24"/>  
   </generalization>  
-  <association id="73">    
-    <end type="SOURCE" refId="8" navigable="false">      
-      <attribute id="74" name="d"/>      
-      <multiplicity id="75" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="7" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <association id="76">    
-    <end type="SOURCE" refId="16" navigable="false">      
-      <attribute id="77" name="parsed"/>      
-      <multiplicity id="78" minimum="0" maximum="2147483647"/>    
+  <association id="70">    
+    <end type="SOURCE" refId="14" navigable="false">      
+      <attribute id="71" name="parsed"/>      
+      <multiplicity id="72" minimum="0" maximum="2147483647"/>    
     </end>    
     <end type="TARGET" refId="3" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <generalization id="79">    
-    <end type="SOURCE" refId="21"/>    
-    <end type="TARGET" refId="22"/>  
-  </generalization>  
-  <association id="80">    
+  <association id="73">    
     <end type="SOURCE" refId="6" navigable="false">      
-      <attribute id="81" name="nodes"/>      
-      <multiplicity id="82" minimum="0" maximum="2147483647"/>    
+      <attribute id="74" name="nid"/>      
+      <multiplicity id="75" minimum="0" maximum="1"/>    
     </end>    
-    <end type="TARGET" refId="11" navigable="true"/>    
+    <end type="TARGET" refId="9" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <nesting id="83">    
-    <end type="SOURCE" refId="5"/>    
-    <end type="TARGET" refId="4"/>  
-  </nesting>  
-  <generalization id="84">    
-    <end type="SOURCE" refId="29"/>    
-    <end type="TARGET" refId="30"/>  
-  </generalization>  
-  <realization id="85">    
-    <end type="SOURCE" refId="38"/>    
-    <end type="TARGET" refId="43"/>  
-  </realization>  
-  <association id="86">    
-    <end type="SOURCE" refId="18" navigable="false">      
-      <attribute id="87" name="p"/>      
-      <multiplicity id="88" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="34" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <realization id="89">    
+  <realization id="76">    
     <end type="SOURCE" refId="1"/>    
-    <end type="TARGET" refId="43"/>  
+    <end type="TARGET" refId="37"/>  
   </realization>  
-  <realization id="90">    
-    <end type="SOURCE" refId="37"/>    
-    <end type="TARGET" refId="43"/>  
-  </realization>  
-  <association id="91">    
-    <end type="SOURCE" refId="34" navigable="false">      
-      <attribute id="92" name="c"/>      
-      <multiplicity id="93" minimum="0" maximum="1"/>    
+  <association id="77">    
+    <end type="SOURCE" refId="44" navigable="false">      
+      <attribute id="78" name="s"/>      
+      <multiplicity id="79" minimum="0" maximum="1"/>    
     </end>    
-    <end type="TARGET" refId="35" navigable="true"/>    
+    <end type="TARGET" refId="48" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <association id="94">    
-    <end type="SOURCE" refId="21" navigable="false">      
-      <attribute id="95" name="unitPlaneList"/>      
-      <multiplicity id="96" minimum="0" maximum="2147483647"/>    
-    </end>    
-    <end type="TARGET" refId="33" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <generalization id="97">    
-    <end type="SOURCE" refId="17"/>    
-    <end type="TARGET" refId="22"/>  
+  <realization id="80">    
+    <end type="SOURCE" refId="38"/>    
+    <end type="TARGET" refId="37"/>  
+  </realization>  
+  <realization id="81">    
+    <end type="SOURCE" refId="33"/>    
+    <end type="TARGET" refId="37"/>  
+  </realization>  
+  <generalization id="82">    
+    <end type="SOURCE" refId="22"/>    
+    <end type="TARGET" refId="24"/>  
   </generalization>  
+  <generalization id="83">    
+    <end type="SOURCE" refId="15"/>    
+    <end type="TARGET" refId="16"/>  
+  </generalization>  
+  <association id="84">    
+    <end type="SOURCE" refId="45" navigable="false">      
+      <attribute id="85" name="p"/>      
+      <multiplicity id="86" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="28" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="87">    
+    <end type="SOURCE" refId="14" navigable="false">      
+      <attribute id="88" name="fid"/>      
+      <multiplicity id="89" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="12" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <generalization id="90">    
+    <end type="SOURCE" refId="12"/>    
+    <end type="TARGET" refId="8"/>  
+  </generalization>  
+  <generalization id="91">    
+    <end type="SOURCE" refId="43"/>    
+    <end type="TARGET" refId="16"/>  
+  </generalization>  
+  <association id="92">    
+    <end type="SOURCE" refId="23" navigable="false">      
+      <attribute id="93" name="NODE_CSYS"/>      
+      <multiplicity id="94" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="29" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="95">    
+    <end type="SOURCE" refId="44" navigable="false">      
+      <attribute id="96" name="p"/>      
+      <multiplicity id="97" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="28" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
   <generalization id="98">    
-    <end type="SOURCE" refId="28"/>    
-    <end type="TARGET" refId="30"/>  
+    <end type="SOURCE" refId="7"/>    
+    <end type="TARGET" refId="9"/>  
   </generalization>  
   <generalization id="99">    
-    <end type="SOURCE" refId="27"/>    
-    <end type="TARGET" refId="30"/>  
-  </generalization>  
-  <nesting id="100">    
     <end type="SOURCE" refId="19"/>    
-    <end type="TARGET" refId="20"/>  
-  </nesting>  
-  <nesting id="101">    
-    <end type="SOURCE" refId="34"/>    
-    <end type="TARGET" refId="35"/>  
-  </nesting>  
+    <end type="TARGET" refId="24"/>  
+  </generalization>  
+  <generalization id="100">    
+    <end type="SOURCE" refId="23"/>    
+    <end type="TARGET" refId="24"/>  
+  </generalization>  
+  <generalization id="101">    
+    <end type="SOURCE" refId="21"/>    
+    <end type="TARGET" refId="24"/>  
+  </generalization>  
   <association id="102">    
-    <end type="SOURCE" refId="3" navigable="false">      
-      <attribute id="103" name="n"/>      
+    <end type="SOURCE" refId="4" navigable="false">      
+      <attribute id="103" name="stress"/>      
       <multiplicity id="104" minimum="0" maximum="1"/>    
     </end>    
-    <end type="TARGET" refId="11" navigable="true"/>    
+    <end type="TARGET" refId="48" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
   <generalization id="105">    
-    <end type="SOURCE" refId="24"/>    
-    <end type="TARGET" refId="30"/>  
-  </generalization>  
-  <association id="106">    
-    <end type="SOURCE" refId="17" navigable="false">      
-      <attribute id="107" name="designNodes"/>      
-      <multiplicity id="108" minimum="0" maximum="2147483647"/>    
-    </end>    
-    <end type="TARGET" refId="33" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <association id="109">    
-    <end type="SOURCE" refId="19" navigable="false">      
-      <attribute id="110" name="factors"/>      
-      <multiplicity id="111" minimum="0" maximum="2147483647"/>    
-    </end>    
-    <end type="TARGET" refId="33" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <realization id="112">    
-    <end type="SOURCE" refId="39"/>    
-    <end type="TARGET" refId="43"/>  
-  </realization>  
-  <nesting id="113">    
-    <end type="SOURCE" refId="8"/>    
-    <end type="TARGET" refId="7"/>  
-  </nesting>  
-  <association id="114">    
-    <end type="SOURCE" refId="5" navigable="false">      
-      <attribute id="115" name="n"/>      
-      <multiplicity id="116" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="11" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <generalization id="117">    
-    <end type="SOURCE" refId="26"/>    
-    <end type="TARGET" refId="30"/>  
-  </generalization>  
-  <association id="118">    
-    <end type="SOURCE" refId="5" navigable="false">      
-      <attribute id="119" name="c"/>      
-      <multiplicity id="120" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="4" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <association id="121">    
-    <end type="SOURCE" refId="16" navigable="false">      
-      <attribute id="122" name="fid"/>      
-      <multiplicity id="123" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="14" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <generalization id="124">    
-    <end type="SOURCE" refId="20"/>    
+    <end type="SOURCE" refId="9"/>    
     <end type="TARGET" refId="8"/>  
   </generalization>  
-  <generalization id="125">    
-    <end type="SOURCE" refId="3"/>    
-    <end type="TARGET" refId="14"/>  
+  <realization id="106">    
+    <end type="SOURCE" refId="32"/>    
+    <end type="TARGET" refId="37"/>  
+  </realization>  
+  <realization id="107">    
+    <end type="SOURCE" refId="41"/>    
+    <end type="TARGET" refId="37"/>  
+  </realization>  
+  <generalization id="108">    
+    <end type="SOURCE" refId="46"/>    
+    <end type="TARGET" refId="16"/>  
   </generalization>  
+  <generalization id="109">    
+    <end type="SOURCE" refId="6"/>    
+    <end type="TARGET" refId="12"/>  
+  </generalization>  
+  <association id="110">    
+    <end type="SOURCE" refId="3" navigable="false">      
+      <attribute id="111" name="nid"/>      
+      <multiplicity id="112" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="9" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <generalization id="113">    
+    <end type="SOURCE" refId="5"/>    
+    <end type="TARGET" refId="11"/>  
+  </generalization>  
+  <association id="114">    
+    <end type="SOURCE" refId="6" navigable="false">      
+      <attribute id="115" name="force"/>      
+      <multiplicity id="116" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="47" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <realization id="117">    
+    <end type="SOURCE" refId="42"/>    
+    <end type="TARGET" refId="37"/>  
+  </realization>  
+  <association id="118">    
+    <end type="SOURCE" refId="45" navigable="false">      
+      <attribute id="119" name="f"/>      
+      <multiplicity id="120" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="47" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <generalization id="121">    
+    <end type="SOURCE" refId="11"/>    
+    <end type="TARGET" refId="8"/>  
+  </generalization>  
+  <generalization id="122">    
+    <end type="SOURCE" refId="18"/>    
+    <end type="TARGET" refId="24"/>  
+  </generalization>  
+  <association id="123">    
+    <end type="SOURCE" refId="4" navigable="false">      
+      <attribute id="124" name="nid"/>      
+      <multiplicity id="125" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="9" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="126">    
+    <end type="SOURCE" refId="3" navigable="false">      
+      <attribute id="127" name="stress"/>      
+      <multiplicity id="128" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="48" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <generalization id="129">    
+    <end type="SOURCE" refId="40"/>    
+    <end type="TARGET" refId="24"/>  
+  </generalization>  
+  <realization id="130">    
+    <end type="SOURCE" refId="31"/>    
+    <end type="TARGET" refId="37"/>  
+  </realization>  
+  <association id="131">    
+    <end type="SOURCE" refId="43" navigable="false">      
+      <attribute id="132" name="designNodes"/>      
+      <multiplicity id="133" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="27" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="134">    
+    <end type="SOURCE" refId="5" navigable="false">      
+      <attribute id="135" name="nodes"/>      
+      <multiplicity id="136" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="9" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
   <classifier-display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
     visibility="true">    
     <attributes public="true" package="true" protected="true" private="true"/>    

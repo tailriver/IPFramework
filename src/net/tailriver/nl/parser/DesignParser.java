@@ -7,27 +7,27 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.tailriver.java.FieldArrayList;
 import net.tailriver.nl.id.DesignId;
 import net.tailriver.nl.id.NodeId;
+import net.tailriver.nl.science.CylindricalPoint;
+import net.tailriver.nl.science.CylindricalTensor1;
+import net.tailriver.nl.science.Stress;
 import net.tailriver.nl.sql.ConstantTable;
 import net.tailriver.nl.sql.DesignTable;
 import net.tailriver.nl.sql.NodeTable;
-import net.tailriver.nl.util.ArrayListWOF;
-import net.tailriver.nl.util.Point;
-import net.tailriver.nl.util.Point.Coordinate;
-import net.tailriver.nl.util.Stress;
 
 
 public class DesignParser extends Parser {
 	static final Pattern designPattern =
 			Pattern.compile("([\\d.]+)\\s+([\\d.]+)\\s+([\\d.]+)\\s+([XYZ]{1,2})\\s+([-\\d.]+)");
 
-	protected List<ArrayListWOF<DesignParserSet, Double>> designNodes;
+	protected List<FieldArrayList<DesignParserSet, Double>> designNodes;
 	protected Double currentCycleDegree;
 	protected boolean isPackedContext;
 
 	public DesignParser() {
-		designNodes = new ArrayList<ArrayListWOF<DesignParserSet, Double>>();
+		designNodes = new ArrayList<>();
 		currentCycleDegree = ConstantTable.DEFAULT_MAX_CYCLE_DEGREE;
 		isPackedContext = false;
 	}
@@ -54,9 +54,10 @@ public class DesignParser extends Parser {
 
 		final Matcher factorMatcher = designPattern.matcher(line);
 		if (factorMatcher.lookingAt()) {
-			ArrayListWOF<DesignParserSet, Double> factorSub;
+			FieldArrayList<DesignParserSet, Double> factorSub;
 			if (!isPackedContext) {
-				factorSub = new ArrayListWOF<DesignParserSet, Double>(currentCycleDegree);
+				factorSub = new FieldArrayList<>();
+				factorSub.set(currentCycleDegree);
 				designNodes.add(factorSub);
 			}
 			else {
@@ -73,7 +74,7 @@ public class DesignParser extends Parser {
 			if (component.length() == 1)
 				component += component;
 
-			Point p = new Point(Coordinate.Cylindrical, r, t, z);
+			CylindricalPoint p = new CylindricalPoint(r, t, z);
 			Stress s = new Stress(component, weight);
 			factorSub.add(new DesignParserSet(p, s));
 
@@ -101,21 +102,21 @@ public class DesignParser extends Parser {
 		double maxCycleDegree = ct.select("max_cycle_degree", ConstantTable.DEFAULT_MAX_CYCLE_DEGREE);
 
 		int designIdNum = 1;
-		for (ArrayListWOF<DesignParserSet, Double> wof : designNodes) {
-			if (wof.value() == maxCycleDegree)
+		for (FieldArrayList<DesignParserSet, Double> wof : designNodes) {
+			if (wof.get() == maxCycleDegree)
 				System.err.println("Warning: cycle_degree is equals to its maximum (really expected?)");
 
 			// Note: See condition of the 'for' statement below.
 			//       Here is used [<=] sign although it is [<] sign in ModelParser.
 			//       ModelParser is for element definition; DesignParser want to get node information
-			for (int cycle = 0; cycle <= maxCycleDegree / wof.value(); cycle++) {
+			for (int cycle = 0; cycle <= maxCycleDegree / wof.get(); cycle++) {
 				DesignId did = new DesignId(designIdNum);
 				for (DesignParserSet dps : wof) {
-					double r = dps.p.x(0);
-					double t = dps.p.x(1) + cycle * wof.value();
-					double z = dps.p.x(2);
+					double r = dps.p.get(CylindricalTensor1.R);
+					double t = dps.p.get(CylindricalTensor1.T) + cycle * wof.get();
+					double z = dps.p.get(CylindricalTensor1.Z);
 
-					Point p = new Point(dps.p.coordinate(), r, t, z);
+					CylindricalPoint p = new CylindricalPoint(r, t, z);
 					NodeId node = nt.select(p);
 					dt.insert(did, node, dps.s);
 				}
@@ -128,9 +129,9 @@ public class DesignParser extends Parser {
 
 
 class DesignParserSet {
-	final Point p;
+	final CylindricalPoint p;
 	final Stress s;
-	DesignParserSet(Point p, Stress s) {
+	DesignParserSet(CylindricalPoint p, Stress s) {
 		this.p = p;
 		this.s = s;
 	}

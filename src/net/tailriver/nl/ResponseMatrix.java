@@ -9,6 +9,9 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Queue;
 
+import net.tailriver.java.task.TaskIncompleteException;
+import net.tailriver.java.task.TaskTarget;
+import net.tailriver.java.task.TaskUtil;
 import net.tailriver.nl.dataset.DesignSet;
 import net.tailriver.nl.id.DesignId;
 import net.tailriver.nl.id.FactorId;
@@ -26,10 +29,10 @@ public class ResponseMatrix implements TaskTarget {
 	public void pop(Queue<String> args) {
 		try {
 			dbname = args.remove();
-			matrixFile = Task.outputFileCheck( args.remove() );
+			matrixFile = TaskUtil.outputFileCheck( args.remove() );
 		} finally {
-			Task.printPopLog("DB", dbname);
-			Task.printPopLog("> matrix file:", matrixFile);
+			TaskUtil.printPopLog("DB", dbname);
+			TaskUtil.printPopLog("> matrix file:", matrixFile);
 		}
 	}
 

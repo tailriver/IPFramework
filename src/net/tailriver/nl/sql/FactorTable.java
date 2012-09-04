@@ -9,12 +9,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import net.tailriver.java.FieldArrayList;
 import net.tailriver.nl.dataset.FactorSet;
 import net.tailriver.nl.id.FactorId;
 import net.tailriver.nl.id.NodeId;
-import net.tailriver.nl.util.ArrayListWOF;
-import net.tailriver.nl.util.Force;
-import net.tailriver.nl.util.Tensor1;
+import net.tailriver.nl.science.Force;
+import net.tailriver.nl.science.OrthogonalTensor1;
 
 
 public class FactorTable extends Table {
@@ -33,7 +33,7 @@ public class FactorTable extends Table {
 			ps = conn.prepareStatement("INSERT INTO " + tableName + " VALUES (?,?,?,?)");
 			ps.setInt(1, fid.id());
 			ps.setInt(2, nid.id());
-			for (Map.Entry<Tensor1, Double> f : force.entrySet()) {
+			for (Map.Entry<OrthogonalTensor1, Double> f : force.entrySet()) {
 				ps.setString(3, f.getKey().name());
 				ps.setDouble(4, f.getValue());
 				ps.addBatch();
@@ -49,21 +49,21 @@ public class FactorTable extends Table {
 		return executeQueryAndGetInt1("SELECT max(id) FROM " + tableName);
 	}
 
-	public List<ArrayListWOF<FactorSet, FactorId>> selectAllByFactorNum() throws SQLException {
+	public List<FieldArrayList<FactorSet, FactorId>> selectAllByFactorNum() throws SQLException {
 		int maxFactorId = maxFactorId();
 
 		PreparedStatement ps = null;
 		try {
 			ps = conn.prepareStatement("SELECT * FROM " + tableName + " WHERE id=?");
-			List<ArrayListWOF<FactorSet, FactorId>> whole =
-					new ArrayList<ArrayListWOF<FactorSet, FactorId>>();
+			List<FieldArrayList<FactorSet, FactorId>> whole = new ArrayList<>();
 			for (int id = 1; id <= maxFactorId; id++) {
 				ps.setInt(1, id);
 				ResultSet rs = ps.executeQuery();
 				FactorId fid = new FactorId(id);
-				ArrayListWOF<FactorSet, FactorId> wof = new ArrayListWOF<FactorSet, FactorId>(fid);
-				wof.addAll(processSelectResult(rs));
-				whole.add(wof);
+				FieldArrayList<FactorSet, FactorId> fal = new FieldArrayList<>();
+				fal.set(fid);
+				fal.addAll(processSelectResult(rs));
+				whole.add(fal);
 			}
 			return whole;
 		} finally {
@@ -86,13 +86,13 @@ public class FactorTable extends Table {
 	}
 
 	private List<FactorSet> processSelectResult(ResultSet rs) throws SQLException {
-		List<FactorSet> fsl = new ArrayList<FactorSet>();
+		List<FactorSet> list = new ArrayList<>();
 		while (rs.next()) {
 			FactorId fid = new FactorId(rs.getInt("id"));
 			NodeId nid = new NodeId(rs.getInt("node"));
 			Force f = new Force(rs.getString("comp"), rs.getDouble("value"));
-			fsl.add(new FactorSet(fid, nid, f));
+			list.add(new FactorSet(fid, nid, f));
 		}
-		return fsl;
+		return list;
 	}
 }
