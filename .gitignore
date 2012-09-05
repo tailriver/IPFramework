@@ -1,4 +1,7 @@
 .DS_Store
+.classpath
+.project
 *.db
-bin/
+.settings/
+target/
 data/
