@@ -18,7 +18,7 @@ public class DesignSet extends DesignId {
 		return nid;
 	}
 
-	public Stress tensorQuantity() {
+	public Stress stress() {
 		return stress;
 	}
 

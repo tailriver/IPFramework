@@ -75,7 +75,7 @@ public class FactorResultTable extends Table {
 				ps.setInt(2, ds.node().id());
 				ResultSet rs = ps.executeQuery();
 
-				for (Map.Entry<OrthogonalTensor2, Double> stress : ds.tensorQuantity().entrySet())
+				for (Map.Entry<OrthogonalTensor2, Double> stress : ds.stress().entrySet())
 					total += rs.getDouble(S(stress.getKey())) * stress.getValue();
 			}
 			return total;

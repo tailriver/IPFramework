@@ -82,6 +82,35 @@ public class NodeTable extends Table {
 		}
 	}
 
+	public CylindricalPoint selectPoint(NodeId nid) throws SQLException {
+		return selectPoint(Collections.singletonList(nid)).get(0);
+	}
+
+	public List<CylindricalPoint> selectPoint(List<NodeId> nodes) throws SQLException {
+		PreparedStatement ps = null;
+		try {
+			ps = conn.prepareStatement("SELECT * FROM node WHERE num=?");
+			List<CylindricalPoint> points = new ArrayList<>();
+			for (NodeId nid : nodes) {
+				ps.setInt(1, nid.id());
+				ResultSet rs = ps.executeQuery();
+				try {
+					double r = rs.getDouble("r");
+					double t = rs.getDouble("t");
+					double z = rs.getDouble("z");
+					points.add(new CylindricalPoint(r, t, z));
+				} catch (SQLException e) {
+					System.err.println("node not found: " + nid);
+					points.add(null);
+				}
+			}
+			return points;
+		} finally {
+			if (ps != null)
+				ps.close();
+		}
+	}
+
 	public List<NodeSet> selectAll() throws SQLException {
 		Statement st = null;
 		try {

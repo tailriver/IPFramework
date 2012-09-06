@@ -1,13 +1,12 @@
-#--Shell
-#ls
-#-Al
-
-
---Shell
-echo
-Hello world
-
 # db_file : foo.db
+
+--GA
+/opt/local/bin/Rscript
+responsematrix.txt
+sigmadesign.txt
+>ga/
+
+--Quit
 
 --Model
 $(db_file)
@@ -27,12 +26,13 @@ data/factor_result/
 --Design
 $(db_file)
 data/design_node_extent.txt
+>sigmadesign.txt
 
 --ResponseMatrix
 $(db_file)
 >responsematrix.txt
 
-#--Quit
+--Quit
 
 #--Task
 #anothertask.txt
