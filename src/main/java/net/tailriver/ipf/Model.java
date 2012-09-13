@@ -26,13 +26,16 @@ import net.tailriver.ipf.sql.SQLiteUtil;
 import net.tailriver.ipf.sql.XYMapTable;
 import net.tailriver.java.Util;
 import net.tailriver.java.science.CylindricalPoint;
+import net.tailriver.java.science.Point;
 import net.tailriver.java.science.Point3D;
+import net.tailriver.java.science.PolarPoint;
 import net.tailriver.java.task.TaskIncompleteException;
 import net.tailriver.java.task.TaskTarget;
 import net.tailriver.java.task.TaskUtil;
 
 public class Model implements TaskTarget {
 	public static final int MAP_AMPLITUDE = 100;
+	private static final double epsilon = 1e-8;
 	private Connection conn;
 	private String dbname;
 	private boolean shouldMakeMap;
@@ -138,13 +141,13 @@ public class Model implements TaskTarget {
 		List<Point3D> opoints = new ArrayList<>();
 		for (int x = -MAP_AMPLITUDE; x <= MAP_AMPLITUDE; x++)
 			for (int y = 0; y <= MAP_AMPLITUDE; y++)
-				opoints.add(new Point3D((double)x, (double)y, 0));
+				opoints.add(new Point3D(x, y, 0));
 
 		System.out.println("Find nearest nodes...");
 		List<NodeId> nearestNodes = nt.selectNearest(opoints);
 		List<XYMapSet> xyMap = new ArrayList<>();
 		for (int i = 0; i < nearestNodes.size(); i++) {
-			Point3D p0 = opoints.get(i);
+			Point p0 = opoints.get(i);
 			XYMapSet mapSet = new XYMapSet(p0);
 			xyMap.add(mapSet);
 
@@ -156,28 +159,27 @@ public class Model implements TaskTarget {
 
 			// surrounded Element id from NodeId
 			for (ElementSet es : et.select(nearestNid)) {
-				List<Point3D> pi = new ArrayList<>();
+				List<Point> pi = new ArrayList<>();
 				for (CylindricalPoint p : nt.selectPoint(Arrays.asList(es.nodes()))) {
 					if (p.z() == 0)
-						pi.add(p.toPoint3D());
+						pi.add(p.toPoint());
 				}
 				pi.add(pi.get(0));
 
 				// Law of cosines
 				double innerAngleTotal = 0;		// in radian
-				final double tol = 1e-5;		// tolerance
 				for (int j = 0; j < pi.size() - 1; j++) {
 					double a = pi.get(j).getDistance(pi.get(j+1));
 					double b = p0.getDistance(pi.get(j));
 					double c = p0.getDistance(pi.get(j+1));
-					if (b < tol || c < tol)
+					if (b < epsilon || c < epsilon)
 						innerAngleTotal += 2 * Math.PI;
-					else if (b+c-a < tol)
+					else if (b+c-a < epsilon)
 						innerAngleTotal += Math.PI;
 					else
 						innerAngleTotal += Math.acos((b*b+c*c-a*a)/(2*b*c));
 				}
-				if (innerAngleTotal > (2-tol) * Math.PI) {
+				if (innerAngleTotal > (2-epsilon) * Math.PI) {
 					mapSet.setElementId(es);
 					break;
 				}
@@ -198,7 +200,7 @@ public class Model implements TaskTarget {
 	 * @param t 周方向座標 [0,360) (degree)
 	 * @return z 無次元軸方向座標
 	 */
-	private double calculateDepth(CylindricalPoint p) {
+	private double calculateDepth(PolarPoint p) {
 		return 1;
 	}
 }

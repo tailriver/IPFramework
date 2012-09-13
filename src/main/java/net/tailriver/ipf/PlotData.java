@@ -14,13 +14,18 @@ import java.util.Queue;
 
 import net.tailriver.ipf.dataset.DesignSet;
 import net.tailriver.ipf.dataset.ElementSet;
+import net.tailriver.ipf.dataset.XYMapSet;
 import net.tailriver.ipf.id.DesignId;
+import net.tailriver.ipf.id.ElementId;
 import net.tailriver.ipf.id.NodeId;
 import net.tailriver.ipf.sql.ConstantTable;
 import net.tailriver.ipf.sql.DesignTable;
 import net.tailriver.ipf.sql.ElementTable;
 import net.tailriver.ipf.sql.NodeTable;
 import net.tailriver.ipf.sql.SQLiteUtil;
+import net.tailriver.ipf.sql.XYMapTable;
+import net.tailriver.java.science.IsoparametricInterpolator;
+import net.tailriver.java.science.Point;
 import net.tailriver.java.science.Point3D;
 import net.tailriver.java.task.TaskIncompleteException;
 import net.tailriver.java.task.TaskTarget;
@@ -49,7 +54,8 @@ public class PlotData implements TaskTarget {
 	public void run() throws TaskIncompleteException {
 		try {
 			conn = SQLiteUtil.getConnection(dbname);
-			generatePlotData();
+			//			generatePlotData();
+			generateInterpolatedPlotData();
 		} catch (SQLException e) {
 			e.printStackTrace();
 			throw new TaskIncompleteException(e.getMessage());
@@ -61,24 +67,13 @@ public class PlotData implements TaskTarget {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private void generatePlotData() throws IOException, SQLException {
 		NodeTable     nt = new NodeTable(conn);
 		ConstantTable ct = new ConstantTable(conn);
 		ElementTable  et = new ElementTable(conn);
-		DesignTable   dt = new DesignTable(conn);
 
-		Map<NodeId, Double> deltaMap = new HashMap<>();
-		BufferedReader br = new BufferedReader(new FileReader(deltaFile));
-		String line = "";
-		int designIdNum = 1;
-		while ((line = br.readLine()) != null) {
-			DesignId did = new DesignId(designIdNum);
-			Double delta = Double.valueOf(line);
-			for (DesignSet ds : dt.select(did))
-				deltaMap.put(ds.node(), delta);
-			designIdNum++;
-		}
-		br.close();
+		Map<NodeId, Double> deltaMap = parseDeltaFile();
 
 		double R = ct.select("radius", ConstantTable.DEFAULT_RADIUS);
 
@@ -101,5 +96,83 @@ public class PlotData implements TaskTarget {
 			pw.println();
 		}
 		pw.close();
+	}
+
+	private void generateInterpolatedPlotData() throws SQLException, IOException {
+		NodeTable     nt = new NodeTable(conn);
+		ConstantTable ct = new ConstantTable(conn);
+		ElementTable  et = new ElementTable(conn);
+		XYMapTable    mt = new XYMapTable(conn);
+
+		double R = ct.select("radius", ConstantTable.DEFAULT_RADIUS);
+
+		Map<NodeId, Double> deltaMap = parseDeltaFile();
+
+		PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(plotDataFile)));
+		pw.println("# Database: " + dbname);
+		pw.println("# Delta File: " + deltaFile);
+
+		Map<ElementId, IsoparametricInterpolator> interpolatorCache = new HashMap<>();
+		double previousX = Double.NaN;
+		for (XYMapSet mapSet : mt.selectAll()) {
+			ElementId eid = mapSet.element();
+
+			double interpolated = Double.NaN;
+			if (eid != null) {
+				IsoparametricInterpolator interpolator;
+				if (!interpolatorCache.containsKey(eid)) {
+					final int INTERPOLATOR_LENGTH = 4;
+					Point[] nodePoints = new Point[INTERPOLATOR_LENGTH];
+					double[] nodeValues = new double[INTERPOLATOR_LENGTH];
+
+					NodeId[] elementNodes = et.select(eid).nodes();
+					for (int i = 0; i < INTERPOLATOR_LENGTH; i++) {
+						NodeId nid = elementNodes[i+4];
+						nodePoints[i] = nt.selectPoint(nid).toPoint();
+						nodeValues[i] = deltaMap.get(nid);
+					}
+					interpolator = new IsoparametricInterpolator(nodePoints);
+					interpolator.setNodeValue(nodeValues);
+					interpolatorCache.put(eid, interpolator);
+				}
+				else
+					interpolator = interpolatorCache.get(eid);
+
+				interpolated = interpolator.getUnknownValue(mapSet);
+			}
+
+			if (previousX != mapSet.x()) {
+				previousX = mapSet.x();
+				pw.println();
+			}
+
+			double trueX = R * mapSet.x() / Model.MAP_AMPLITUDE;
+			double trueY = R * mapSet.y() / Model.MAP_AMPLITUDE;
+			pw.printf("%.3e\t%.3f\t", trueX, trueY);
+			pw.println(Double.isNaN(interpolated) ? "?" : interpolated);
+		}
+		pw.close();
+	}
+
+	private Map<NodeId, Double> parseDeltaFile() throws SQLException, IOException {
+		BufferedReader br = null;
+		try {
+			DesignTable dt = new DesignTable(conn);
+			br = new BufferedReader(new FileReader(deltaFile));
+			Map<NodeId, Double> deltaMap = new HashMap<>();
+			String line = "";
+			int designIdNum = 1;
+			while ((line = br.readLine()) != null) {
+				DesignId did = new DesignId(designIdNum);
+				Double delta = Double.valueOf(line);
+				for (DesignSet ds : dt.select(did))
+					deltaMap.put(ds.node(), delta);
+				designIdNum++;
+			}
+			return deltaMap;
+		} finally {
+			if (br != null)
+				br.close();
+		}
 	}
 }

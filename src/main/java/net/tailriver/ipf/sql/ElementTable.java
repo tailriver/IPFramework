@@ -60,6 +60,20 @@ public class ElementTable extends Table {
 		}
 	}
 
+	public ElementSet select(ElementId eid) throws SQLException {
+		PreparedStatement ps = null;
+		try {
+			ps = conn.prepareStatement("SELECT * FROM " + tableName + " WHERE id=?");
+			ps.setInt(1, eid.id());
+
+			ResultSet rs = ps.executeQuery();
+			return processResult(rs).get(0);
+		} finally {
+			if (ps != null)
+				ps.close();
+		}
+	}
+
 	public List<ElementSet> selectAll() throws SQLException {
 		Statement st = null;
 		try {

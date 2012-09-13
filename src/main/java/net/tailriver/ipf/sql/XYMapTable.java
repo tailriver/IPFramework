@@ -61,7 +61,7 @@ public class XYMapTable extends Table {
 				int e = rs.getInt("eid");
 
 				Point p = new Point(x, y);
-				ElementId eid = new ElementId(e != 0 ? e : null);
+				ElementId eid = e != 0 ? new ElementId(e) : null;
 
 				rows.add(new XYMapSet(p, eid));
 			}
