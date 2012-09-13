@@ -13,18 +13,21 @@ import java.util.List;
 
 import net.tailriver.ipf.dataset.NodeSet;
 import net.tailriver.ipf.id.NodeId;
-import net.tailriver.ipf.science.CylindricalPoint;
-import net.tailriver.ipf.science.CylindricalTensor1;
+import net.tailriver.java.science.CylindricalPoint;
+import net.tailriver.java.science.Point3D;
 
 
 public class NodeTable extends Table {
-	public NodeTable(Connection conn) {
+	public NodeTable(Connection conn) throws SQLException {
 		super(conn, "node");
 		addColumn("num", "INTEGER PRIMARY KEY");
 		addColumn("r", "REAL");
 		addColumn("t", "REAL");
 		addColumn("z", "REAL");
 		addTableConstraint("UNIQUE(r,t,z)");
+
+		SQLiteUtil.createSinFunction(conn);
+		SQLiteUtil.createCosFunction(conn);
 	}
 
 	public int insert(CylindricalPoint p) throws SQLException {
@@ -36,9 +39,9 @@ public class NodeTable extends Table {
 		try {
 			ps = conn.prepareStatement("INSERT OR IGNORE INTO " + tableName + " (r,t,z) VALUES (?,?,?)");
 			for (CylindricalPoint p : points) {
-				ps.setDouble(1, p.get(CylindricalTensor1.R));
-				ps.setDouble(2, p.get(CylindricalTensor1.T));
-				ps.setDouble(3, p.get(CylindricalTensor1.Z));
+				ps.setDouble(1, p.r());
+				ps.setDouble(2, p.tDegree());
+				ps.setDouble(3, p.z());
 				ps.addBatch();
 			}
 			return ps.executeBatch();
@@ -62,9 +65,9 @@ public class NodeTable extends Table {
 			ps = conn.prepareStatement("SELECT num FROM node WHERE r=? AND t=? AND z=?");
 			List<NodeId> nodes = new ArrayList<NodeId>();
 			for (CylindricalPoint p : points) {
-				ps.setDouble(1, p.get(CylindricalTensor1.R));
-				ps.setDouble(2, p.get(CylindricalTensor1.T));
-				ps.setDouble(3, p.get(CylindricalTensor1.Z));
+				ps.setDouble(1, p.r());
+				ps.setDouble(2, p.tDegree());
+				ps.setDouble(3, p.z());
 
 				ResultSet rs = ps.executeQuery();
 				try {
@@ -89,22 +92,58 @@ public class NodeTable extends Table {
 	public List<CylindricalPoint> selectPoint(List<NodeId> nodes) throws SQLException {
 		PreparedStatement ps = null;
 		try {
-			ps = conn.prepareStatement("SELECT * FROM node WHERE num=?");
+			ps = conn.prepareStatement("SELECT * FROM " + tableName + " WHERE num=?");
 			List<CylindricalPoint> points = new ArrayList<>();
 			for (NodeId nid : nodes) {
 				ps.setInt(1, nid.id());
 				ResultSet rs = ps.executeQuery();
-				try {
+				while (rs.next()) {
 					double r = rs.getDouble("r");
 					double t = rs.getDouble("t");
 					double z = rs.getDouble("z");
-					points.add(new CylindricalPoint(r, t, z));
-				} catch (SQLException e) {
-					System.err.println("node not found: " + nid);
-					points.add(null);
+					points.add(new CylindricalPoint(r, t, z, false));
 				}
 			}
 			return points;
+		} finally {
+			if (ps != null)
+				ps.close();
+		}
+	}
+
+	public NodeId selectNearest(Point3D point) throws  SQLException {
+		return selectNearest(Collections.singletonList(point)).get(0);
+	}
+
+	public List<NodeId> selectNearest(Collection<Point3D> points) throws SQLException {
+		PreparedStatement ps = null;
+		try {
+			ps = conn.prepareStatement(
+					"SELECT num,(r*r+?*?-2.0*r*?*(cos360(t)*cos360(?)+sin360(t)*sin360(?))) AS distance"
+							+ " FROM " + tableName + " WHERE z=0 ORDER BY distance ASC LIMIT 1"
+					);
+			List<NodeId> nodes = new ArrayList<>();
+			for (Point3D op : points) {
+				CylindricalPoint cp = op.toCylindrical();
+				double r = cp.r();
+				double t = cp.tDegree();
+
+				if (r > 100) {
+					nodes.add(null);
+					continue;
+				}
+
+				ps.setDouble(1, r);
+				ps.setDouble(2, r);
+				ps.setDouble(3, r);
+				ps.setDouble(4, t);
+				ps.setDouble(5, t);
+
+				ResultSet rs = ps.executeQuery();
+				int n = rs.getInt("num");
+				nodes.add(new NodeId(n));
+			}
+			return nodes;
 		} finally {
 			if (ps != null)
 				ps.close();
@@ -125,7 +164,7 @@ public class NodeTable extends Table {
 				double z = rs.getDouble("z");
 
 				NodeId num = new NodeId(n);
-				CylindricalPoint p = new CylindricalPoint(r, t, z);
+				CylindricalPoint p = new CylindricalPoint(r, t, z, false);
 				rows.add(new NodeSet(num, p));
 			}
 			return rows;			

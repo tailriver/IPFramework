@@ -12,7 +12,7 @@ import net.tailriver.java.task.TaskUtil;
 
 
 public class IPFramework {
-	private static final String CLASS_TOKEN = "--";
+	public static final String CLASS_TOKEN = "--";
 	private static final String DEFAULT_TASK_FILE = "task.txt";
 	private static final int MAX_QUEUE_SIZE = 2000;
 

@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+import org.sqlite.Function;
+
 public class SQLiteUtil {
 	static {
 		try {
@@ -32,6 +34,38 @@ public class SQLiteUtil {
 				closeConnection(conn);
 			throw e;
 		}
+	}
+
+	public static void createSinFunction(Connection conn) throws SQLException {
+		Function.create(conn, "sin", new Function() {
+			@Override
+			protected void xFunc() throws SQLException {
+				result(Math.sin(value_double(0)));
+			}
+		});
+
+		Function.create(conn, "sin360", new Function() {
+			@Override
+			protected void xFunc() throws SQLException {
+				result(Math.sin(Math.toRadians(value_double(0))));
+			}
+		});
+	}
+
+	public static void createCosFunction(Connection conn) throws SQLException {
+		Function.create(conn, "cos", new Function() {
+			@Override
+			protected void xFunc() throws SQLException {
+				result(Math.cos(value_double(0)));
+			}
+		});
+
+		Function.create(conn, "cos360", new Function() {
+			@Override
+			protected void xFunc() throws SQLException {
+				result(Math.cos(Math.toRadians(value_double(0))));
+			}
+		});
 	}
 
 	public static void closeConnection(Connection conn) {

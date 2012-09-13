@@ -1,5 +1,7 @@
 package net.tailriver.ipf.dataset;
 
+import java.util.Arrays;
+
 import net.tailriver.ipf.id.ElementId;
 import net.tailriver.ipf.id.NodeId;
 
@@ -24,6 +26,6 @@ public class ElementSet extends ElementId {
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + "@{" + super.toString() + "," + nodes + "}";
+		return getClass().getSimpleName() + "@{" + super.toString() + "," + Arrays.asList(nodes) + "}";
 	}
 }

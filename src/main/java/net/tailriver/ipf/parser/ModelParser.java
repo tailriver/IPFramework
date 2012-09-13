@@ -10,19 +10,19 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.tailriver.ipf.id.NodeId;
-import net.tailriver.ipf.science.CylindricalPoint;
-import net.tailriver.ipf.science.CylindricalTensor1;
 import net.tailriver.ipf.sql.ConstantTable;
 import net.tailriver.ipf.sql.ElementTable;
 import net.tailriver.ipf.sql.NodeTable;
 import net.tailriver.java.FieldArrayList;
+import net.tailriver.java.science.CylindricalPoint;
+import net.tailriver.java.science.PolarPoint;
 
 
 public class ModelParser extends Parser {
 	protected static final Pattern planeNodePattern = Pattern.compile("([\\d.]+)\\s+([\\d.]+)");
 
 	protected Map<String, Double> constantMap;
-	protected List<FieldArrayList<CylindricalPoint, Double>> unitPlaneList;
+	protected List<FieldArrayList<PolarPoint, Double>> unitPlaneList;
 	protected double currentCycleDegree;
 	private boolean isPlaneContext;
 
@@ -64,7 +64,7 @@ public class ModelParser extends Parser {
 
 		final Matcher planeNodeMatcher = planeNodePattern.matcher(line);
 		if (planeNodeMatcher.lookingAt()) {
-			FieldArrayList<CylindricalPoint, Double> currentUnitPlane;
+			FieldArrayList<PolarPoint, Double> currentUnitPlane;
 			if (!isPlaneContext) {
 				// 頂点定義の文脈でなければ新しく要素を作り、それを対象とする
 				currentUnitPlane = new FieldArrayList<>();
@@ -78,7 +78,7 @@ public class ModelParser extends Parser {
 
 			Double r = Double.valueOf(planeNodeMatcher.group(1));
 			Double t = Double.valueOf(planeNodeMatcher.group(2));
-			CylindricalPoint p = new CylindricalPoint(r, t, null);
+			PolarPoint p = new PolarPoint(r, t, false);
 			currentUnitPlane.add(p);
 
 			setIsPlaneContext(true);
@@ -112,18 +112,18 @@ public class ModelParser extends Parser {
 		// 繰り返し角度の拡張
 		double maxCycleDegree = ct.select("max_cycle_degree", ConstantTable.DEFAULT_MAX_CYCLE_DEGREE);
 
-		for (FieldArrayList<CylindricalPoint, Double> wof : unitPlaneList) {
+		for (FieldArrayList<PolarPoint, Double> wof : unitPlaneList) {
 			for (int cycle = 0; cycle < maxCycleDegree / wof.get(); cycle++) {
 				NodeId[] elementNodes = new NodeId[ElementTable.ELEMENT_LABELS.length];
 
 				int i = 0;
-				for (CylindricalPoint p : wof) {
-					Double r = p.get(CylindricalTensor1.R);
-					Double t = p.get(CylindricalTensor1.T) + cycle * wof.get();
+				for (PolarPoint op : wof) {
+					PolarPoint temp = op.clone();
+					temp.rotate(cycle * wof.get(), false);
 
 					List<CylindricalPoint> points = new ArrayList<CylindricalPoint>();
-					points.add(new CylindricalPoint(r, t, 0d));
-					points.add(new CylindricalPoint(r, t, 1d));
+					points.add(new CylindricalPoint(temp, 0));
+					points.add(new CylindricalPoint(temp, 1));
 					nt.insert(points);
 
 					List<NodeId> nodes = nt.select(points);

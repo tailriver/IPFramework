@@ -27,11 +27,33 @@ public class ElementTable extends Table {
 	public boolean insert(NodeId[] nodes) throws SQLException {
 		PreparedStatement ps = null;
 		try {
-			ps = conn.prepareStatement("INSERT INTO " + tableName 
-					+ " ("+ Util.join(",", ELEMENT_LABELS) + ") VALUES (?,?,?,?,?,?,?,?)");
+			ps = conn.prepareStatement(
+					"INSERT INTO " + tableName +
+					" ("+ Util.join(",", ELEMENT_LABELS) + ") VALUES (?,?,?,?,?,?,?,?)");
 			for (int i = 0; i < ELEMENT_LABELS.length; i++)
 				ps.setInt(i+1, nodes[i].id());
 			return ps.execute();
+		} finally {
+			if (ps != null)
+				ps.close();
+		}
+	}
+
+	public List<ElementSet> select(NodeId nid) throws SQLException {
+		List<String> where = new ArrayList<>();
+		for (String label : ELEMENT_LABELS)
+			where.add(label.concat("=?"));
+
+		PreparedStatement ps = null;
+		try {
+			ps = conn.prepareStatement(
+					"SELECT * FROM " + tableName + " WHERE " + Util.join(" OR ", where)
+					);
+			for (int i = 1; i <= ELEMENT_LABELS.length; i++)
+				ps.setInt(i, nid.id());
+
+			ResultSet rs = ps.executeQuery();
+			return processResult(rs);
 		} finally {
 			if (ps != null)
 				ps.close();
@@ -43,18 +65,22 @@ public class ElementTable extends Table {
 		try {
 			st = conn.createStatement();
 			ResultSet rs = st.executeQuery("SELECT * FROM " + tableName);
-			List<ElementSet> rows = new ArrayList<>();
-			while (rs.next()) {
-				ElementId eid = new ElementId(rs.getInt("id"));
-				NodeId[] nodes = new NodeId[ELEMENT_LABELS.length];
-				for (int i = 0; i < ELEMENT_LABELS.length; i++)
-					nodes[i] = new NodeId(rs.getInt(ELEMENT_LABELS[i]));
-				rows.add(new ElementSet(eid, nodes));
-			}
-			return rows;
+			return processResult(rs);
 		} finally {
 			if (st != null)
 				st.close();
 		}
+	}
+
+	private List<ElementSet> processResult(ResultSet rs) throws SQLException {
+		List<ElementSet> rows = new ArrayList<>();
+		while (rs.next()) {
+			ElementId eid = new ElementId(rs.getInt("id"));
+			NodeId[] nodes = new NodeId[ELEMENT_LABELS.length];
+			for (int i = 0; i < ELEMENT_LABELS.length; i++)
+				nodes[i] = new NodeId(rs.getInt(ELEMENT_LABELS[i]));
+			rows.add(new ElementSet(eid, nodes));
+		}
+		return rows;
 	}
 }

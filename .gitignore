@@ -2,7 +2,9 @@
 .classpath
 .project
 *.db
+e172/
+w100/
 .settings/
 target/
 data/
-ga/
+garesult*/

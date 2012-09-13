@@ -6,27 +6,36 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Queue;
 
 import net.tailriver.ipf.dataset.ElementSet;
 import net.tailriver.ipf.dataset.NodeSet;
+import net.tailriver.ipf.dataset.XYMapSet;
+import net.tailriver.ipf.id.NodeId;
 import net.tailriver.ipf.parser.ModelParser;
 import net.tailriver.ipf.parser.Parser;
 import net.tailriver.ipf.parser.ParserException;
-import net.tailriver.ipf.science.CylindricalTensor1;
 import net.tailriver.ipf.sql.ConstantTable;
 import net.tailriver.ipf.sql.ElementTable;
 import net.tailriver.ipf.sql.HistoryTable;
 import net.tailriver.ipf.sql.NodeTable;
 import net.tailriver.ipf.sql.SQLiteUtil;
+import net.tailriver.ipf.sql.XYMapTable;
 import net.tailriver.java.Util;
+import net.tailriver.java.science.CylindricalPoint;
+import net.tailriver.java.science.Point3D;
 import net.tailriver.java.task.TaskIncompleteException;
 import net.tailriver.java.task.TaskTarget;
 import net.tailriver.java.task.TaskUtil;
 
 public class Model implements TaskTarget {
+	public static final int MAP_AMPLITUDE = 100;
 	private Connection conn;
 	private String dbname;
+	private boolean shouldMakeMap;
 	private String inputfile;
 	private String ansysModelFile;
 
@@ -34,6 +43,7 @@ public class Model implements TaskTarget {
 	public void pop(Queue<String> args) {
 		try {
 			dbname         = args.remove();
+			shouldMakeMap  = Boolean.parseBoolean(args.remove());
 			inputfile      = args.remove();
 			ansysModelFile = TaskUtil.outputFileCheck( args.remove() );
 		} finally {
@@ -53,6 +63,9 @@ public class Model implements TaskTarget {
 			p.parse(inputfile);
 			p.save(conn);
 
+			if (shouldMakeMap)
+				generateXYMap();
+
 			// save history
 			HistoryTable ht = new HistoryTable(conn);
 			ht.insert(inputfile);
@@ -60,8 +73,6 @@ public class Model implements TaskTarget {
 
 			// for ANSYS
 			generateAnsysInput();
-
-			// TODO output for gnuplot?
 		} catch (ParserException e) {
 			System.err.println(e.getMessage());
 			throw new TaskIncompleteException();
@@ -88,9 +99,10 @@ public class Model implements TaskTarget {
 			// node information
 			pw.println("CSYS,1");
 			for (NodeSet ns : nt.selectAll()) {
-				double r = ns.p().get(CylindricalTensor1.R) * radius * 1e-5;
-				double t = ns.p().get(CylindricalTensor1.T);
-				double z = ns.p().get(CylindricalTensor1.Z) * thickness * calculateDepth(r, t) * 1e-3;
+				CylindricalPoint p = ns.p();
+				double r = p.r() * radius * 1e-5;
+				double t = p.tDegree();
+				double z = p.z() * thickness * calculateDepth(p) * 1e-3;
 				pw.printf("N,%d,%.4e,%s,%.4e\n", ns.id(), r, t, z);
 			}
 
@@ -119,6 +131,66 @@ public class Model implements TaskTarget {
 		}
 	}
 
+	private void generateXYMap() throws SQLException {
+		NodeTable    nt = new NodeTable(conn);
+		ElementTable et = new ElementTable(conn);
+
+		List<Point3D> opoints = new ArrayList<>();
+		for (int x = -MAP_AMPLITUDE; x <= MAP_AMPLITUDE; x++)
+			for (int y = 0; y <= MAP_AMPLITUDE; y++)
+				opoints.add(new Point3D((double)x, (double)y, 0));
+
+		System.out.println("Find nearest nodes...");
+		List<NodeId> nearestNodes = nt.selectNearest(opoints);
+		List<XYMapSet> xyMap = new ArrayList<>();
+		for (int i = 0; i < nearestNodes.size(); i++) {
+			Point3D p0 = opoints.get(i);
+			XYMapSet mapSet = new XYMapSet(p0);
+			xyMap.add(mapSet);
+
+			NodeId nearestNid = nearestNodes.get(i);
+			if (nearestNid == null) {
+				mapSet.setElementId(null);
+				continue;
+			}
+
+			// surrounded Element id from NodeId
+			for (ElementSet es : et.select(nearestNid)) {
+				List<Point3D> pi = new ArrayList<>();
+				for (CylindricalPoint p : nt.selectPoint(Arrays.asList(es.nodes()))) {
+					if (p.z() == 0)
+						pi.add(p.toPoint3D());
+				}
+				pi.add(pi.get(0));
+
+				// Law of cosines
+				double innerAngleTotal = 0;		// in radian
+				final double tol = 1e-5;		// tolerance
+				for (int j = 0; j < pi.size() - 1; j++) {
+					double a = pi.get(j).getDistance(pi.get(j+1));
+					double b = p0.getDistance(pi.get(j));
+					double c = p0.getDistance(pi.get(j+1));
+					if (b < tol || c < tol)
+						innerAngleTotal += 2 * Math.PI;
+					else if (b+c-a < tol)
+						innerAngleTotal += Math.PI;
+					else
+						innerAngleTotal += Math.acos((b*b+c*c-a*a)/(2*b*c));
+				}
+				if (innerAngleTotal > (2-tol) * Math.PI) {
+					mapSet.setElementId(es);
+					break;
+				}
+			}
+		}
+
+		System.out.println("Insert map information into database...");
+		XYMapTable mt = new XYMapTable(conn);
+		mt.drop();
+		mt.create();
+		mt.insert(xyMap);
+	}
+
 	/**
 	 * 高さ計算用メソッド Overrideすることで曲面を作成可能<br>
 	 * デフォルトでは、どのような入力に対しても単位高さ (1) を返す
@@ -126,7 +198,7 @@ public class Model implements TaskTarget {
 	 * @param t 周方向座標 [0,360) (degree)
 	 * @return z 無次元軸方向座標
 	 */
-	private double calculateDepth(double r, double t) {
+	private double calculateDepth(CylindricalPoint p) {
 		return 1;
 	}
 }

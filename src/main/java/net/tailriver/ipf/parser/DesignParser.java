@@ -9,13 +9,12 @@ import java.util.regex.Pattern;
 
 import net.tailriver.ipf.id.DesignId;
 import net.tailriver.ipf.id.NodeId;
-import net.tailriver.ipf.science.CylindricalPoint;
-import net.tailriver.ipf.science.CylindricalTensor1;
 import net.tailriver.ipf.science.Stress;
 import net.tailriver.ipf.sql.ConstantTable;
 import net.tailriver.ipf.sql.DesignTable;
 import net.tailriver.ipf.sql.NodeTable;
 import net.tailriver.java.FieldArrayList;
+import net.tailriver.java.science.CylindricalPoint;
 
 
 public class DesignParser extends Parser {
@@ -74,7 +73,7 @@ public class DesignParser extends Parser {
 			if (component.length() == 1)
 				component += component;
 
-			CylindricalPoint p = new CylindricalPoint(r, t, z);
+			CylindricalPoint p = new CylindricalPoint(r, t, z, false);
 			Stress s = new Stress(component, weight);
 			factorSub.add(new DesignParserSet(p, s));
 
@@ -112,11 +111,15 @@ public class DesignParser extends Parser {
 			for (int cycle = 0; cycle <= maxCycleDegree / wof.get(); cycle++) {
 				DesignId did = new DesignId(designIdNum);
 				for (DesignParserSet dps : wof) {
-					double r = dps.p.get(CylindricalTensor1.R);
-					double t = dps.p.get(CylindricalTensor1.T) + cycle * wof.get();
-					double z = dps.p.get(CylindricalTensor1.Z);
+					CylindricalPoint p = dps.p.clone();
+					p.rotate(cycle * wof.get(), false);
 
-					CylindricalPoint p = new CylindricalPoint(r, t, z);
+					// TODO
+					if (p.tDegree() > maxCycleDegree) {
+						designIdNum--;
+						break;
+					}
+
 					NodeId node = nt.select(p);
 					dt.insert(did, node, dps.s);
 				}

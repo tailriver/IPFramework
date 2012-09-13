@@ -1,7 +1,7 @@
 package net.tailriver.ipf.dataset;
 
 import net.tailriver.ipf.id.NodeId;
-import net.tailriver.ipf.science.CylindricalPoint;
+import net.tailriver.java.science.CylindricalPoint;
 
 public class NodeSet extends NodeId {
 	private final CylindricalPoint p;

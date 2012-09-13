@@ -23,8 +23,13 @@ public class Id {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj instanceof Id)
-			return id == ((Id) obj).id;
+		if (obj.getClass().equals(this.getClass()))
+			return ((Id) obj).id.equals(this.id);
 		return super.equals(obj);
+	}
+
+	@Override
+	public int hashCode() {
+		return id.hashCode();
 	}
 }
