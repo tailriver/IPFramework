@@ -14,6 +14,7 @@ import net.tailriver.ipf.sql.ConstantTable;
 import net.tailriver.ipf.sql.DesignTable;
 import net.tailriver.ipf.sql.NodeTable;
 import net.tailriver.java.FieldArrayList;
+import net.tailriver.java.science.AngleType;
 import net.tailriver.java.science.CylindricalPoint;
 
 
@@ -73,7 +74,7 @@ public class DesignParser extends Parser {
 			if (component.length() == 1)
 				component += component;
 
-			CylindricalPoint p = new CylindricalPoint(r, t, z, false);
+			CylindricalPoint p = new CylindricalPoint(r, t, z, AngleType.DEGREE);
 			Stress s = new Stress(component, weight);
 			factorSub.add(new DesignParserSet(p, s));
 
@@ -112,7 +113,7 @@ public class DesignParser extends Parser {
 				DesignId did = new DesignId(designIdNum);
 				for (DesignParserSet dps : wof) {
 					CylindricalPoint p = dps.p.clone();
-					p.rotate(cycle * wof.get(), false);
+					p.rotate(cycle * wof.get(), AngleType.DEGREE);
 
 					// TODO
 					if (p.tDegree() > maxCycleDegree) {

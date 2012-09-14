@@ -35,18 +35,23 @@ public class PlotData implements TaskTarget {
 	private Connection conn;
 	private String dbname;
 	private String deltaFile;
-	private String plotDataFile;
+	private String plotMapFile, plotInterpolatedFile;
+
+	Map<NodeId, Double> deltaMap;
+	double trueRadius;
 
 	@Override
 	public void pop(Queue<String> args) {
 		try {
-			dbname = args.remove();
+			dbname    = args.remove();
 			deltaFile = args.remove();
-			plotDataFile = TaskUtil.outputFileCheck( args.remove() );
+			plotMapFile          = TaskUtil.outputFileCheck( args.remove() );
+			plotInterpolatedFile = TaskUtil.outputFileCheck( args.remove() );
 		} finally {
 			TaskUtil.printPopLog("DB", dbname);
 			TaskUtil.printPopLog("< delta file:", deltaFile);
-			TaskUtil.printPopLog("> plot data:", plotDataFile);
+			TaskUtil.printPopLog("> map data:", plotMapFile);
+			TaskUtil.printPopLog("> interpolated data:", plotInterpolatedFile);
 		}
 	}
 
@@ -54,8 +59,13 @@ public class PlotData implements TaskTarget {
 	public void run() throws TaskIncompleteException {
 		try {
 			conn = SQLiteUtil.getConnection(dbname);
-			//			generatePlotData();
-			generateInterpolatedPlotData();
+
+			ConstantTable ct = new ConstantTable(conn);
+			trueRadius = ct.select("radius", ConstantTable.DEFAULT_RADIUS);
+
+			deltaMap = parseDeltaFile();
+			generateDeltaMap();
+			generateDeltaInterpolated();
 		} catch (SQLException e) {
 			e.printStackTrace();
 			throw new TaskIncompleteException(e.getMessage());
@@ -67,17 +77,11 @@ public class PlotData implements TaskTarget {
 		}
 	}
 
-	@SuppressWarnings("unused")
-	private void generatePlotData() throws IOException, SQLException {
+	private void generateDeltaMap() throws IOException, SQLException {
 		NodeTable     nt = new NodeTable(conn);
-		ConstantTable ct = new ConstantTable(conn);
 		ElementTable  et = new ElementTable(conn);
 
-		Map<NodeId, Double> deltaMap = parseDeltaFile();
-
-		double R = ct.select("radius", ConstantTable.DEFAULT_RADIUS);
-
-		PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(plotDataFile)));
+		PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(plotMapFile)));
 		pw.println("# Database: " + dbname);
 		pw.println("# Delta File: " + deltaFile);
 		pw.println();
@@ -86,8 +90,8 @@ public class PlotData implements TaskTarget {
 			for (int i : new int[]{ 4, 5, 6, 7, 4 } ) {
 				NodeId nid = elementNodes[i];
 				Point3D p = nt.selectPoint(nid).toPoint3D();
-				double x = R * p.x() / Model.MAP_AMPLITUDE;
-				double y = R * p.y() / Model.MAP_AMPLITUDE;
+				double x = trueRadius * p.x() / Model.MAP_RESOLUTION;
+				double y = trueRadius * p.y() / Model.MAP_RESOLUTION;
 				Double z = deltaMap.containsKey(nid) ? deltaMap.get(nid) : p.z();
 				pw.printf("%.3e\t%.3e\t%.3e", x, y, z);
 				pw.println();
@@ -98,17 +102,12 @@ public class PlotData implements TaskTarget {
 		pw.close();
 	}
 
-	private void generateInterpolatedPlotData() throws SQLException, IOException {
+	private void generateDeltaInterpolated() throws SQLException, IOException {
 		NodeTable     nt = new NodeTable(conn);
-		ConstantTable ct = new ConstantTable(conn);
 		ElementTable  et = new ElementTable(conn);
 		XYMapTable    mt = new XYMapTable(conn);
 
-		double R = ct.select("radius", ConstantTable.DEFAULT_RADIUS);
-
-		Map<NodeId, Double> deltaMap = parseDeltaFile();
-
-		PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(plotDataFile)));
+		PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(plotInterpolatedFile)));
 		pw.println("# Database: " + dbname);
 		pw.println("# Delta File: " + deltaFile);
 
@@ -146,8 +145,8 @@ public class PlotData implements TaskTarget {
 				pw.println();
 			}
 
-			double trueX = R * mapSet.x() / Model.MAP_AMPLITUDE;
-			double trueY = R * mapSet.y() / Model.MAP_AMPLITUDE;
+			double trueX = trueRadius * mapSet.x() / Model.MAP_RESOLUTION;
+			double trueY = trueRadius * mapSet.y() / Model.MAP_RESOLUTION;
 			pw.printf("%.3e\t%.3f\t", trueX, trueY);
 			pw.println(Double.isNaN(interpolated) ? "?" : interpolated);
 		}

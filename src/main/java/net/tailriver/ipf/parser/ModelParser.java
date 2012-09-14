@@ -14,6 +14,7 @@ import net.tailriver.ipf.sql.ConstantTable;
 import net.tailriver.ipf.sql.ElementTable;
 import net.tailriver.ipf.sql.NodeTable;
 import net.tailriver.java.FieldArrayList;
+import net.tailriver.java.science.AngleType;
 import net.tailriver.java.science.CylindricalPoint;
 import net.tailriver.java.science.PolarPoint;
 
@@ -78,7 +79,7 @@ public class ModelParser extends Parser {
 
 			Double r = Double.valueOf(planeNodeMatcher.group(1));
 			Double t = Double.valueOf(planeNodeMatcher.group(2));
-			PolarPoint p = new PolarPoint(r, t, false);
+			PolarPoint p = new PolarPoint(r, t, AngleType.DEGREE);
 			currentUnitPlane.add(p);
 
 			setIsPlaneContext(true);
@@ -119,7 +120,7 @@ public class ModelParser extends Parser {
 				int i = 0;
 				for (PolarPoint op : wof) {
 					PolarPoint temp = op.clone();
-					temp.rotate(cycle * wof.get(), false);
+					temp.rotate(cycle * wof.get(), AngleType.DEGREE);
 
 					List<CylindricalPoint> points = new ArrayList<CylindricalPoint>();
 					points.add(new CylindricalPoint(temp, 0));

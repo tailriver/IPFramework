@@ -13,6 +13,7 @@ import java.util.List;
 
 import net.tailriver.ipf.dataset.NodeSet;
 import net.tailriver.ipf.id.NodeId;
+import net.tailriver.java.science.AngleType;
 import net.tailriver.java.science.CylindricalPoint;
 import net.tailriver.java.science.Point3D;
 
@@ -101,7 +102,7 @@ public class NodeTable extends Table {
 					double r = rs.getDouble("r");
 					double t = rs.getDouble("t");
 					double z = rs.getDouble("z");
-					points.add(new CylindricalPoint(r, t, z, false));
+					points.add(new CylindricalPoint(r, t, z, AngleType.DEGREE));
 				}
 			}
 			return points;
@@ -164,7 +165,7 @@ public class NodeTable extends Table {
 				double z = rs.getDouble("z");
 
 				NodeId num = new NodeId(n);
-				CylindricalPoint p = new CylindricalPoint(r, t, z, false);
+				CylindricalPoint p = new CylindricalPoint(r, t, z, AngleType.DEGREE);
 				rows.add(new NodeSet(num, p));
 			}
 			return rows;			

@@ -34,7 +34,7 @@ import net.tailriver.java.task.TaskTarget;
 import net.tailriver.java.task.TaskUtil;
 
 public class Model implements TaskTarget {
-	public static final int MAP_AMPLITUDE = 100;
+	public static final int MAP_RESOLUTION = 200;
 	private static final double epsilon = 1e-8;
 	private Connection conn;
 	private String dbname;
@@ -139,9 +139,9 @@ public class Model implements TaskTarget {
 		ElementTable et = new ElementTable(conn);
 
 		List<Point3D> opoints = new ArrayList<>();
-		for (int x = -MAP_AMPLITUDE; x <= MAP_AMPLITUDE; x++)
-			for (int y = 0; y <= MAP_AMPLITUDE; y++)
-				opoints.add(new Point3D(x, y, 0));
+		for (int x = -MAP_RESOLUTION; x <= MAP_RESOLUTION; x++)
+			for (int y = 0; y <= MAP_RESOLUTION; y++)
+				opoints.add(new Point3D((double)(x/MAP_RESOLUTION), (double)(y/MAP_RESOLUTION), 0));
 
 		System.out.println("Find nearest nodes...");
 		List<NodeId> nearestNodes = nt.selectNearest(opoints);
@@ -179,7 +179,7 @@ public class Model implements TaskTarget {
 					else
 						innerAngleTotal += Math.acos((b*b+c*c-a*a)/(2*b*c));
 				}
-				if (innerAngleTotal > (2-epsilon) * Math.PI) {
+				if (innerAngleTotal / (2 * Math.PI) > 1 - epsilon) {
 					mapSet.setElementId(es);
 					break;
 				}

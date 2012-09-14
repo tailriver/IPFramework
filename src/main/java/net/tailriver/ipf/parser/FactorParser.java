@@ -13,6 +13,7 @@ import net.tailriver.ipf.science.Force;
 import net.tailriver.ipf.sql.FactorTable;
 import net.tailriver.ipf.sql.NodeTable;
 import net.tailriver.java.FieldArrayList;
+import net.tailriver.java.science.AngleType;
 import net.tailriver.java.science.CylindricalPoint;
 
 
@@ -59,7 +60,7 @@ public class FactorParser extends Parser {
 			String direction = factorMatcher.group(4).toUpperCase();
 			Double value = Double.valueOf(factorMatcher.group(5));
 
-			CylindricalPoint p = new CylindricalPoint(r, t, z, false);
+			CylindricalPoint p = new CylindricalPoint(r, t, z, AngleType.DEGREE);
 			Force f = new Force(direction, value);
 			factorSub.add(new FactorParserSet(p, f));
 
