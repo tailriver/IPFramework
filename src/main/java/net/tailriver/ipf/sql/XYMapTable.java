@@ -31,10 +31,10 @@ public class XYMapTable extends Table {
 		PreparedStatement ps = null;
 		try {
 			ps = conn.prepareStatement("INSERT INTO " + tableName + " VALUES (?,?,?)");
-			for (XYMapSet p : data) {
-				ElementId eid = p.element();
-				ps.setDouble(1, p.x());
-				ps.setDouble(2, p.y());
+			for (XYMapSet ms : data) {
+				ElementId eid = ms.element();
+				ps.setDouble(1, ms.p().x());
+				ps.setDouble(2, ms.p().y());
 				if (eid != null)
 					ps.setInt(3, eid.id());
 				else
@@ -56,8 +56,8 @@ public class XYMapTable extends Table {
 
 			List<XYMapSet> rows = new ArrayList<>();
 			while (rs.next()) {
-				double x = rs.getInt("x");
-				double y = rs.getInt("y");
+				double x = rs.getDouble("x");
+				double y = rs.getDouble("y");
 				int e = rs.getInt("eid");
 
 				Point p = new Point(x, y);

@@ -11,6 +11,7 @@ import net.tailriver.ipf.id.DesignId;
 import net.tailriver.ipf.id.NodeId;
 import net.tailriver.ipf.science.Stress;
 import net.tailriver.ipf.sql.ConstantTable;
+import net.tailriver.ipf.sql.ConstantTableKey;
 import net.tailriver.ipf.sql.DesignTable;
 import net.tailriver.ipf.sql.NodeTable;
 import net.tailriver.java.FieldArrayList;
@@ -28,7 +29,7 @@ public class DesignParser extends Parser {
 
 	public DesignParser() {
 		designNodes = new ArrayList<>();
-		currentCycleDegree = ConstantTable.DEFAULT_MAX_CYCLE_DEGREE;
+		currentCycleDegree = ConstantTable.getDefaultValue(ConstantTableKey.MAX_CYCLE_DEGREE);
 		isPackedContext = false;
 	}
 
@@ -99,7 +100,7 @@ public class DesignParser extends Parser {
 		dt.drop();
 		dt.create();
 
-		double maxCycleDegree = ct.select("max_cycle_degree", ConstantTable.DEFAULT_MAX_CYCLE_DEGREE);
+		double maxCycleDegree = ct.select(ConstantTableKey.MAX_CYCLE_DEGREE);
 
 		int designIdNum = 1;
 		for (FieldArrayList<DesignParserSet, Double> wof : designNodes) {

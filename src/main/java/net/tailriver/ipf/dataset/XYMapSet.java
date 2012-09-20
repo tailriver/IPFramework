@@ -3,28 +3,25 @@ package net.tailriver.ipf.dataset;
 import net.tailriver.ipf.id.ElementId;
 import net.tailriver.java.science.Point;
 
-public class XYMapSet extends Point {
-	private ElementId eid;
-
-	public XYMapSet(Point p) {
-		this(p, null);
-	}
+public class XYMapSet {
+	final Point p;
+	final ElementId eid;
 
 	public XYMapSet(Point p, ElementId eid) {
-		super(p);
-		setElementId(eid);
-	}
-
-	public void setElementId(ElementId eid) {
+		this.p = p;
 		this.eid = eid;
 	}
 
-	public ElementId element() {
+	public final Point p() {
+		return p;
+	}
+
+	public final ElementId element() {
 		return eid;
 	}
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + "@{" + super.toString() + "," + eid + "}";
+		return getClass().getSimpleName() + "@{" + p + "," + eid + "}";
 	}
 }

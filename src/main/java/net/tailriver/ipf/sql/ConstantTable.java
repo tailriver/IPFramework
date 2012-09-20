@@ -4,31 +4,22 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collections;
 import java.util.Map;
 
 
 public class ConstantTable extends Table {
-	public static final double DEFAULT_RADIUS    = 1;
-	public static final double DEFAULT_THICKNESS = 1;
-	public static final double DEFAULT_MAX_CYCLE_DEGREE = 180;
-
 	public ConstantTable(Connection conn) {
 		super(conn, "constant");
 		addColumn("key", "STRING PRIMARY KEY");
 		addColumn("value", "REAL");
 	}
 
-	public int insert(String key, double value) throws SQLException {
-		return insert(Collections.singletonMap(key, value))[0];
-	}
-
-	public int[] insert(Map<String, Double> map) throws SQLException {
+	public int[] insert(Map<ConstantTableKey, Double> map) throws SQLException {
 		PreparedStatement ps = null;
 		try {
 			ps = conn.prepareStatement("INSERT INTO " + tableName + " VALUES (?,?)");
-			for (Map.Entry<String, Double> e : map.entrySet()) {
-				ps.setString(1, e.getKey());
+			for (Map.Entry<ConstantTableKey, Double> e : map.entrySet()) {
+				ps.setString(1, e.getKey().name());
 				ps.setDouble(2, e.getValue());
 				ps.addBatch();
 			}
@@ -39,18 +30,22 @@ public class ConstantTable extends Table {
 		}
 	}
 
-	public double select(String key, double defaultValue) throws SQLException {
+	public double select(ConstantTableKey key) throws SQLException {
 		PreparedStatement ps = null;
 		try {
 			ps = conn.prepareStatement("SELECT * FROM " + tableName + " WHERE key=?");
-			ps.setString(1, key);
+			ps.setString(1, key.name());
 			ResultSet rs = ps.executeQuery();
 			return rs.getDouble("value");
 		} catch (SQLException e) { 
-			return defaultValue;
+			return getDefaultValue(key);
 		} finally {
 			if (ps != null)
 				ps.close();
 		}
+	}
+
+	public static double getDefaultValue(ConstantTableKey key) {
+		return key.defaultValue;
 	}
 }

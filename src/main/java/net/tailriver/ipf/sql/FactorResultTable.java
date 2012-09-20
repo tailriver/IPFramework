@@ -31,11 +31,12 @@ public class FactorResultTable extends Table {
 		try {
 			ps = conn.prepareStatement("INSERT INTO " + tableName + " VALUES (?,?,?,?,?)");
 			for (AnsysResultSet ars : arsArray) {
-				ps.setInt(1, ars.id());
+				Stress stress = ars.stress();
+				ps.setInt(1, ars.factor().id());
 				ps.setInt(2, ars.node().id());
-				ps.setDouble(3, ars.stress(OrthogonalTensor2.XX));
-				ps.setDouble(4, ars.stress(OrthogonalTensor2.YY));
-				ps.setDouble(5, ars.stress(OrthogonalTensor2.XY));
+				ps.setDouble(3, stress.get(OrthogonalTensor2.XX));
+				ps.setDouble(4, stress.get(OrthogonalTensor2.YY));
+				ps.setDouble(5, stress.get(OrthogonalTensor2.XY));
 				ps.addBatch();
 			}
 			return ps.executeBatch();

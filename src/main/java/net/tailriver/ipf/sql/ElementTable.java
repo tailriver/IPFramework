@@ -15,7 +15,7 @@ import net.tailriver.java.Util;
 
 
 public class ElementTable extends Table {
-	public static final String[] ELEMENT_LABELS = new String[]{"p", "q", "r", "s", "t", "u", "v", "w"};
+	public static final String[] ELEMENT_LABELS = {"p", "q", "r", "s", "t", "u", "v", "w"};
 
 	public ElementTable(Connection conn) {
 		super(conn, "element");

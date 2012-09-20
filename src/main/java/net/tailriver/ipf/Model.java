@@ -21,6 +21,7 @@ import net.tailriver.ipf.parser.ParserException;
 import net.tailriver.ipf.sql.ConstantTable;
 import net.tailriver.ipf.sql.ElementTable;
 import net.tailriver.ipf.sql.HistoryTable;
+import net.tailriver.ipf.sql.ConstantTableKey;
 import net.tailriver.ipf.sql.NodeTable;
 import net.tailriver.ipf.sql.SQLiteUtil;
 import net.tailriver.ipf.sql.XYMapTable;
@@ -51,7 +52,7 @@ public class Model implements TaskTarget {
 			ansysModelFile = TaskUtil.outputFileCheck( args.remove() );
 		} finally {
 			TaskUtil.printPopLog("DB", dbname);
-			TaskUtil.printPopLog("< model:   ", inputfile);
+			TaskUtil.printPopLog("< model: ", inputfile);
 			TaskUtil.printPopLog("> Ansys model file:", ansysModelFile);
 		}
 	}
@@ -94,8 +95,8 @@ public class Model implements TaskTarget {
 			NodeTable     nt = new NodeTable(conn);
 			ElementTable  et = new ElementTable(conn);
 
-			double radius    = ct.select("radius", ConstantTable.DEFAULT_RADIUS);
-			double thickness = ct.select("thickness", ConstantTable.DEFAULT_THICKNESS);
+			double radius    = ct.select(ConstantTableKey.RADIUS);
+			double thickness = ct.select(ConstantTableKey.THICKNESS);
 
 			pw = new PrintWriter(new BufferedWriter(new FileWriter(ansysModelFile)));
 
@@ -106,13 +107,13 @@ public class Model implements TaskTarget {
 				double r = p.r() * radius * 1e-5;
 				double t = p.tDegree();
 				double z = p.z() * thickness * calculateDepth(p) * 1e-3;
-				pw.printf("N,%d,%.4e,%s,%.4e\n", ns.id(), r, t, z);
+				pw.printf("N,%d,%.4e,%s,%.4e\n", ns.node().id(), r, t, z);
 			}
 
 			// element information
 			pw.println("ET,1,SOLID185");
 			for (ElementSet r : et.selectAll())
-				pw.printf("EN,%d,%s\n", r.id(), Util.<Integer>join(",", r.nodes_id()));
+				pw.printf("EN,%d,%s\n", r.element().id(), Util.join(",", r.nodes()));
 
 			// constraint information
 			pw.println("ALLSEL");
@@ -141,19 +142,18 @@ public class Model implements TaskTarget {
 		List<Point3D> opoints = new ArrayList<>();
 		for (int x = -MAP_RESOLUTION; x <= MAP_RESOLUTION; x++)
 			for (int y = 0; y <= MAP_RESOLUTION; y++)
-				opoints.add(new Point3D((double)(x/MAP_RESOLUTION), (double)(y/MAP_RESOLUTION), 0));
+				opoints.add(new Point3D(x, y, 0).scale(1e2 / MAP_RESOLUTION));
 
 		System.out.println("Find nearest nodes...");
 		List<NodeId> nearestNodes = nt.selectNearest(opoints);
 		List<XYMapSet> xyMap = new ArrayList<>();
 		for (int i = 0; i < nearestNodes.size(); i++) {
 			Point p0 = opoints.get(i);
-			XYMapSet mapSet = new XYMapSet(p0);
-			xyMap.add(mapSet);
+			Point mapPoint = p0.clone().scale(1e-2);
 
 			NodeId nearestNid = nearestNodes.get(i);
 			if (nearestNid == null) {
-				mapSet.setElementId(null);
+				xyMap.add(new XYMapSet(mapPoint, null));
 				continue;
 			}
 
@@ -180,13 +180,12 @@ public class Model implements TaskTarget {
 						innerAngleTotal += Math.acos((b*b+c*c-a*a)/(2*b*c));
 				}
 				if (innerAngleTotal / (2 * Math.PI) > 1 - epsilon) {
-					mapSet.setElementId(es);
+					xyMap.add(new XYMapSet(mapPoint, es.element()));
 					break;
 				}
 			}
 		}
 
-		System.out.println("Insert map information into database...");
 		XYMapTable mt = new XYMapTable(conn);
 		mt.drop();
 		mt.create();

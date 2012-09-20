@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 
 import net.tailriver.ipf.id.NodeId;
 import net.tailriver.ipf.sql.ConstantTable;
+import net.tailriver.ipf.sql.ConstantTableKey;
 import net.tailriver.ipf.sql.ElementTable;
 import net.tailriver.ipf.sql.NodeTable;
 import net.tailriver.java.FieldArrayList;
@@ -22,15 +23,15 @@ import net.tailriver.java.science.PolarPoint;
 public class ModelParser extends Parser {
 	protected static final Pattern planeNodePattern = Pattern.compile("([\\d.]+)\\s+([\\d.]+)");
 
-	protected Map<String, Double> constantMap;
+	protected Map<ConstantTableKey, Double> constantMap;
 	protected List<FieldArrayList<PolarPoint, Double>> unitPlaneList;
 	protected double currentCycleDegree;
 	private boolean isPlaneContext;
 
 	public ModelParser() {
-		constantMap = new HashMap<String, Double>();
+		constantMap = new HashMap<>();
 		unitPlaneList = new ArrayList<>();
-		currentCycleDegree = ConstantTable.DEFAULT_MAX_CYCLE_DEGREE;
+		currentCycleDegree = ConstantTable.getDefaultValue(ConstantTableKey.MAX_CYCLE_DEGREE);
 		isPlaneContext = false;
 	}
 
@@ -43,8 +44,9 @@ public class ModelParser extends Parser {
 
 		final Matcher constantMatcher = Parser.CONSTANT_PATTERN.matcher(line);
 		if (constantMatcher.lookingAt()) {
-			String key = constantMatcher.group(1).toLowerCase();
-			double value = Double.valueOf(constantMatcher.group(2));
+			String keyString = constantMatcher.group(1).toUpperCase();
+			ConstantTableKey key = ConstantTableKey.valueOf(keyString);
+			Double value = Double.valueOf(constantMatcher.group(2));
 			constantMap.put(key, value);
 			setIsPlaneContext(false);
 			return true;
@@ -111,7 +113,7 @@ public class ModelParser extends Parser {
 		ct.insert(constantMap);
 
 		// 繰り返し角度の拡張
-		double maxCycleDegree = ct.select("max_cycle_degree", ConstantTable.DEFAULT_MAX_CYCLE_DEGREE);
+		double maxCycleDegree = ct.select(ConstantTableKey.MAX_CYCLE_DEGREE);
 
 		for (FieldArrayList<PolarPoint, Double> wof : unitPlaneList) {
 			for (int cycle = 0; cycle < maxCycleDegree / wof.get(); cycle++) {

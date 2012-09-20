@@ -1,10 +1,11 @@
 .DS_Store
 .classpath
 .project
-*.db
-e172/
-w100/
 .settings/
-target/
+all/
 data/
+e172/
+l-curve/
+w100/
+target/
 garesult*/

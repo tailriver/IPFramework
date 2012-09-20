@@ -19,6 +19,7 @@ import net.tailriver.ipf.id.DesignId;
 import net.tailriver.ipf.id.ElementId;
 import net.tailriver.ipf.id.NodeId;
 import net.tailriver.ipf.sql.ConstantTable;
+import net.tailriver.ipf.sql.ConstantTableKey;
 import net.tailriver.ipf.sql.DesignTable;
 import net.tailriver.ipf.sql.ElementTable;
 import net.tailriver.ipf.sql.NodeTable;
@@ -61,7 +62,7 @@ public class PlotData implements TaskTarget {
 			conn = SQLiteUtil.getConnection(dbname);
 
 			ConstantTable ct = new ConstantTable(conn);
-			trueRadius = ct.select("radius", ConstantTable.DEFAULT_RADIUS);
+			trueRadius = ct.select(ConstantTableKey.RADIUS);
 
 			deltaMap = parseDeltaFile();
 			generateDeltaMap();
@@ -114,6 +115,7 @@ public class PlotData implements TaskTarget {
 		Map<ElementId, IsoparametricInterpolator> interpolatorCache = new HashMap<>();
 		double previousX = Double.NaN;
 		for (XYMapSet mapSet : mt.selectAll()) {
+			Point p = mapSet.p();
 			ElementId eid = mapSet.element();
 
 			double interpolated = Double.NaN;
@@ -127,7 +129,7 @@ public class PlotData implements TaskTarget {
 					NodeId[] elementNodes = et.select(eid).nodes();
 					for (int i = 0; i < INTERPOLATOR_LENGTH; i++) {
 						NodeId nid = elementNodes[i+4];
-						nodePoints[i] = nt.selectPoint(nid).toPoint();
+						nodePoints[i] = nt.selectPoint(nid).toPoint().scale(1e-2);
 						nodeValues[i] = deltaMap.get(nid);
 					}
 					interpolator = new IsoparametricInterpolator(nodePoints);
@@ -137,19 +139,20 @@ public class PlotData implements TaskTarget {
 				else
 					interpolator = interpolatorCache.get(eid);
 
-				interpolated = interpolator.getUnknownValue(mapSet);
+				interpolated = interpolator.getUnknownValue(p);
 			}
 
-			if (previousX != mapSet.x()) {
-				previousX = mapSet.x();
+			if (previousX != p.x()) {
+				previousX = p.x();
 				pw.println();
 			}
 
-			double trueX = trueRadius * mapSet.x() / Model.MAP_RESOLUTION;
-			double trueY = trueRadius * mapSet.y() / Model.MAP_RESOLUTION;
-			pw.printf("%.3e\t%.3f\t", trueX, trueY);
+			double trueX = trueRadius * p.x();
+			double trueY = trueRadius * p.y();
+			pw.printf("%.3e\t%.3e\t", trueX, trueY);
 			pw.println(Double.isNaN(interpolated) ? "?" : interpolated);
 		}
+
 		pw.close();
 	}
 

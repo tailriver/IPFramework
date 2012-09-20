@@ -3,12 +3,17 @@ package net.tailriver.ipf.dataset;
 import net.tailriver.ipf.id.NodeId;
 import net.tailriver.java.science.CylindricalPoint;
 
-public class NodeSet extends NodeId {
-	private final CylindricalPoint p;
+public class NodeSet {
+	final NodeId nid;
+	final CylindricalPoint p;
 
 	public NodeSet(NodeId nid, CylindricalPoint p) {
-		super(nid);
+		this.nid = nid;
 		this.p = p;
+	}
+
+	public NodeId node() {
+		return nid;
 	}
 
 	public CylindricalPoint p() {
@@ -17,6 +22,6 @@ public class NodeSet extends NodeId {
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + "@{" + super.toString() + "," + p + "}";
+		return getClass().getSimpleName() + "@{" + nid + "," + p + "}";
 	}
 }

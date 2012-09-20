@@ -7,14 +7,16 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import net.tailriver.ipf.dataset.NodeSet;
 import net.tailriver.ipf.id.NodeId;
 import net.tailriver.java.science.AngleType;
 import net.tailriver.java.science.CylindricalPoint;
+import net.tailriver.java.science.Point;
 import net.tailriver.java.science.Point3D;
 
 
@@ -35,7 +37,7 @@ public class NodeTable extends Table {
 		return insert(Collections.singletonList(p))[0];
 	}
 
-	public int[] insert(Collection<CylindricalPoint> points) throws SQLException {
+	public int[] insert(List<CylindricalPoint> points) throws SQLException {
 		PreparedStatement ps = null;
 		try {
 			ps = conn.prepareStatement("INSERT OR IGNORE INTO " + tableName + " (r,t,z) VALUES (?,?,?)");
@@ -112,43 +114,35 @@ public class NodeTable extends Table {
 		}
 	}
 
-	public NodeId selectNearest(Point3D point) throws  SQLException {
+	public NodeId selectNearest(Point3D point) throws SQLException {
 		return selectNearest(Collections.singletonList(point)).get(0);
 	}
 
-	public List<NodeId> selectNearest(Collection<Point3D> points) throws SQLException {
-		PreparedStatement ps = null;
-		try {
-			ps = conn.prepareStatement(
-					"SELECT num,(r*r+?*?-2.0*r*?*(cos360(t)*cos360(?)+sin360(t)*sin360(?))) AS distance"
-							+ " FROM " + tableName + " WHERE z=0 ORDER BY distance ASC LIMIT 1"
-					);
-			List<NodeId> nodes = new ArrayList<>();
-			for (Point3D op : points) {
-				CylindricalPoint cp = op.toCylindrical();
-				double r = cp.r();
-				double t = cp.tDegree();
-
-				if (r > 100) {
-					nodes.add(null);
-					continue;
-				}
-
-				ps.setDouble(1, r);
-				ps.setDouble(2, r);
-				ps.setDouble(3, r);
-				ps.setDouble(4, t);
-				ps.setDouble(5, t);
-
-				ResultSet rs = ps.executeQuery();
-				int n = rs.getInt("num");
-				nodes.add(new NodeId(n));
-			}
-			return nodes;
-		} finally {
-			if (ps != null)
-				ps.close();
+	public List<NodeId> selectNearest(List<Point3D> points) throws SQLException {
+		Map<NodeId, Point> plainNode = new HashMap<>();
+		for (NodeSet ns : selectAll()) {
+			if (ns.p().z() == 0)
+				plainNode.put(ns.node(), ns.p().toPoint());
 		}
+
+		List<NodeId> nearests = new ArrayList<>(points.size());
+		for (Point3D p : points) {
+			if (p.toPolar().r() > 1e2)
+				nearests.add(null);
+			else {
+				NodeId nearestNodeId = null;
+				Double nearestDistance = Double.POSITIVE_INFINITY;
+				for (Map.Entry<NodeId, Point> e : plainNode.entrySet()) {
+					Double distance = p.getDistance(e.getValue());
+					if (nearestDistance.compareTo(distance) > 0) {
+						nearestNodeId = e.getKey();
+						nearestDistance = distance;
+					}
+				}
+				nearests.add(nearestNodeId);
+			}
+		}
+		return nearests;
 	}
 
 	public List<NodeSet> selectAll() throws SQLException {
